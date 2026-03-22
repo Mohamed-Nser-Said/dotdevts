@@ -1,0 +1,33 @@
+{
+  "global": {
+    "luaVersion": "5.3",
+    "force": false,
+    "isolate": false,
+    "ignoredModuleNames": [
+      "esi-string",
+      "esi-object",
+      "esi-variables",
+      "dkjson",
+      "esi-tool",
+      "lcurl",
+      "esi-lcurl-http-client",
+      "math",
+      "io",
+      "host"
+    ]
+  },
+  "targets": [
+    {
+      "entryPoint": "test/run.lua",
+      "outputPath": "test/run.bundle.lua",
+      "name": "run",
+      "includeGlobalIgnore": true,
+      "options": {
+        "luaVersion": "5.3",
+        "force": false,
+        "isolate": false,
+        "ignoredModuleNames": []
+      }
+    }
+  ]
+}

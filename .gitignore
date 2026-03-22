@@ -1,0 +1,5 @@
+!.meta
+!.docs
+build
+*.pdf
+node_modules/

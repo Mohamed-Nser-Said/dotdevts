@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "types": [],
+    "strict": true,
+    "outDir": "build"
+  },
+  "tstl": {
+    "sourceMapTraceback": false,
+    "buildMode": "default",
+    "luaTarget": "5.3",
+    "noResolvePaths": ["dkjson"]
+  }
+}

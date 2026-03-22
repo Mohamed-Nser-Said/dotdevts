@@ -4,7 +4,7 @@
  * Demonstrates creating folder hierarchies using GenericFolder.
  */
 
-import { GenericFolder } from "../src/base/GenericFolder";
+import { GenericFolder } from "../src/objects/GenericFolder";
 
 
 export function main(): void {

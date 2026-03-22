@@ -15,7 +15,7 @@
 // import { main as bufferExample } from "./examples/BufferExample";
 // import { main as workspaceDocumentExample } from "./examples/WorkspaceDocumentExample";
 
-import { Core } from "./src/base/Core";
+import { Core } from "./src/core/Core";
 
 
 

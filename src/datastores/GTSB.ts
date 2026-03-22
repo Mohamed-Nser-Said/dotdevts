@@ -1,8 +1,8 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
-import { ScriptLibrary } from "./ScriptLibrary";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
+import { ScriptLibrary } from "../objects/ScriptLibrary";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
-import { VariableAddFactory } from "./VariableAddFactory";
+import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type GTSBOptions = {
 	advancedLuaScript?: string;

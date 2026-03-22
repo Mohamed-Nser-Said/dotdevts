@@ -1,5 +1,5 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
 
 export type OPCUATag = {
         id: string;

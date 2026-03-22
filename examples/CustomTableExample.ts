@@ -5,8 +5,8 @@
  * which persists rows attached to any inmation object's custom options.
  */
 
-import { CustomTable } from "../src/base/CustomTable";
-import { GenericFolder } from "../src/base/GenericFolder";
+import { CustomTable } from "../src/shared/CustomTable";
+import { GenericFolder } from "../src/objects/GenericFolder";
 import { DataFrame } from "../src/std/DataFrame";
 
 

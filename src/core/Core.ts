@@ -1,7 +1,7 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
-import { ScriptLibrary } from "./ScriptLibrary";
-import { DataStoreConfiguration } from "./DataStoreConfiguration";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
+import { ScriptLibrary } from "../objects/ScriptLibrary";
+import { DataStoreConfiguration } from "../datastores/DataStoreConfiguration";
 import { CoreAddFactory } from "./CoreAddFactory";
 
 export type CoreOptions = Record<string, never>;

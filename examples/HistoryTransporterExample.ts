@@ -11,10 +11,10 @@
  * are wrapped in try/catch so the rest of the suite keeps running.
  */
 
-import { GenericFolder } from "../src/base/GenericFolder";
-import { GTSB } from "../src/base/GTSB";
-import { HistorianMapping, HistorianTag } from "../src/base/HistorianMapping";
-import { HistoryTransporter } from "../src/base/HistoryTransporter";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { GTSB } from "../src/datastores/GTSB";
+import { HistorianMapping, HistorianTag } from "../src/history/HistorianMapping";
+import { HistoryTransporter } from "../src/history/HistoryTransporter";
 
 
 export function main(): void {

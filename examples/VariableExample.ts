@@ -5,9 +5,9 @@
  * and configuring archiving via the Archive property.
  */
 
-import { GenericFolder } from "../src/base/GenericFolder";
-import { Variable } from "../src/base/Variable";
-import { VariableGroup } from "../src/base/VariableGroup";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { Variable } from "../src/objects/Variable";
+import { VariableGroup } from "../src/objects/VariableGroup";
 
 
 export function main(): void {

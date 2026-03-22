@@ -16,10 +16,10 @@
  * GTSB objects must be direct children of the Core object.
  */
 
-import { GenericFolder } from "../src/base/GenericFolder";
-import { GTSB } from "../src/base/GTSB";
-import { IObject } from "../src/base/IObject";
-import { Variable } from "../src/base/Variable";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { GTSB } from "../src/datastores/GTSB";
+import { IObject } from "../src/shared/IObject";
+import { Variable } from "../src/objects/Variable";
 
 
 export function main(): void {

@@ -1,7 +1,7 @@
-import { IObject } from "./IObject";
-import { Archive } from "./Archive";
-import { Path } from "./Path";
-import { VariableAddFactory } from "./VariableAddFactory";
+import { IObject } from "../shared/IObject";
+import { Archive } from "../history/Archive";
+import { Path } from "../shared/Path";
+import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export class ScriptEvent extends IObject {
         type = "ScriptEvent";

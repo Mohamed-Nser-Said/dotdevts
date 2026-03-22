@@ -1,6 +1,6 @@
-import { IObject } from "./IObject";
-import { Archive } from "./Archive";
-import { Path } from "./Path";
+import { IObject } from "../shared/IObject";
+import { Archive } from "../history/Archive";
+import { Path } from "../shared/Path";
 import { Variable } from "./Variable";
 
 export type VariableGroupOptions = {

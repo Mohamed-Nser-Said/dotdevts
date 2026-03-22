@@ -1,5 +1,5 @@
 import * as dkjson from "dkjson";
-import { IObject } from "./IObject";
+import { IObject } from "../shared/IObject";
 import { DataFrame } from "../std/DataFrame";
 
 export type HistorianTag = {

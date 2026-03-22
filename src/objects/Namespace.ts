@@ -1,11 +1,11 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
 import { GenericFolder, GenericFolderOptions } from "./GenericFolder";
 import { ActionItem, ActionItemOptions } from "./ActionItem";
-import { HistoryTransporter, HistoryTransporterOptions } from "./HistoryTransporter";
+import { HistoryTransporter, HistoryTransporterOptions } from "../history/HistoryTransporter";
 import { Variable, VariableOptions } from "./Variable";
 import { VariableGroup, VariableGroupOptions } from "./VariableGroup";
-import { GTSB, GTSBOptions } from "./GTSB";
+import { GTSB, GTSBOptions } from "../datastores/GTSB";
 import { ScriptEvent } from "./ScriptEvent";
 import { Scheduler } from "./Scheduler";
 import { TableHolder } from "./TableHolder";

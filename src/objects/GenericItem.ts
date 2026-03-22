@@ -1,7 +1,7 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
-import { Archive } from "./Archive";
-import { VariableAddFactory } from "./VariableAddFactory";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
+import { Archive } from "../history/Archive";
+import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type GenericItemOptions = {
     period?: number;

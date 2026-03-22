@@ -1,17 +1,17 @@
-import { GenericFolder, GenericFolderOptions } from "./GenericFolder";
-import { GenericItem, GenericItemOptions } from "./GenericItem";
-import { ActionItem, ActionItemOptions } from "./ActionItem";
-import { ScriptEvent } from "./ScriptEvent";
-import { Scheduler } from "./Scheduler";
-import { TableHolder } from "./TableHolder";
-import { GTSB, GTSBOptions } from "./GTSB";
-import { CustomTimeSeriesDataStore, CustomTimeSeriesDataStoreOptions } from "./CustomTimeSeriesDataStore";
-import { CustomEventDataStore, CustomEventDataStoreOptions } from "./CustomEventDataStore";
-import { DataStoreGroup, DataStoreGroupOptions } from "./DataStoreGroup";
-import { HistoryTransferController, HistoryTransferControllerOptions } from "./HistoryTransferController";
-import { HistoryTransporter, HistoryTransporterOptions } from "./HistoryTransporter";
-import { MessageBroker, MessageBrokerOptions } from "./MessageBroker";
-import { MessageProcessor, MessageProcessorOptions } from "./MessageProcessor";
+import { GenericFolder, GenericFolderOptions } from "../objects/GenericFolder";
+import { GenericItem, GenericItemOptions } from "../objects/GenericItem";
+import { ActionItem, ActionItemOptions } from "../objects/ActionItem";
+import { ScriptEvent } from "../objects/ScriptEvent";
+import { Scheduler } from "../objects/Scheduler";
+import { TableHolder } from "../objects/TableHolder";
+import { GTSB, GTSBOptions } from "../datastores/GTSB";
+import { CustomTimeSeriesDataStore, CustomTimeSeriesDataStoreOptions } from "../datastores/CustomTimeSeriesDataStore";
+import { CustomEventDataStore, CustomEventDataStoreOptions } from "../datastores/CustomEventDataStore";
+import { DataStoreGroup, DataStoreGroupOptions } from "../datastores/DataStoreGroup";
+import { HistoryTransferController, HistoryTransferControllerOptions } from "../history/HistoryTransferController";
+import { HistoryTransporter, HistoryTransporterOptions } from "../history/HistoryTransporter";
+import { MessageBroker, MessageBrokerOptions } from "../objects/MessageBroker";
+import { MessageProcessor, MessageProcessorOptions } from "../objects/MessageProcessor";
 import { VariableAddFactory } from "./VariableAddFactory";
 
 export class ObjectAddFactory extends VariableAddFactory {

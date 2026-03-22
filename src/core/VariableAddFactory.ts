@@ -1,5 +1,5 @@
-import { Variable, VariableOptions } from "./Variable";
-import { VariableGroup, VariableGroupOptions } from "./VariableGroup";
+import { Variable, VariableOptions } from "../objects/Variable";
+import { VariableGroup, VariableGroupOptions } from "../objects/VariableGroup";
 
 export class VariableAddFactory {
     constructor(private basePath: () => string) {}

@@ -1,6 +1,6 @@
 import * as dkjson from "dkjson";
-import { IObject } from "./IObject";
-import { Path } from "./Path";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
 import { DataFrame } from "../std/DataFrame";
 
 export type HistoryTransporterTag = {

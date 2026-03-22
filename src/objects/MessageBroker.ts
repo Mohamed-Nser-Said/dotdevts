@@ -1,6 +1,6 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
-import { VariableAddFactory } from "./VariableAddFactory";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
+import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type MessageBrokerOptions = {
     systemId?: number;

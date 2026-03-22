@@ -1,7 +1,7 @@
-import { IObject } from "./IObject";
-import { Path } from "./Path";
+import { IObject } from "../shared/IObject";
+import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
-import { VariableAddFactory } from "./VariableAddFactory";
+import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type CustomEventDataStoreOptions = {
     connectionString?: string;

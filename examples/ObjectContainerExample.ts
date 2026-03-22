@@ -1,6 +1,6 @@
-import { GenericFolder } from "../src/base/GenericFolder";
-import { ObjectContainer } from "../src/base/ObjectContainer";
-import { Variable } from "../src/base/Variable";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { ObjectContainer } from "../src/objects/ObjectContainer";
+import { Variable } from "../src/objects/Variable";
 
 
 export function main(): void {

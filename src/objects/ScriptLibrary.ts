@@ -1,4 +1,4 @@
-import { IObject } from "./IObject";
+import { IObject } from "../shared/IObject";
 
 export class ScriptLibrary {
 	constructor(private linkedObject: IObject) {}

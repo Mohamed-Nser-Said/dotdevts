@@ -1,5 +1,5 @@
-import { GenericFolder } from "../src/base/GenericFolder";
-import { TableHolder } from "../src/base/TableHolder";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { TableHolder } from "../src/objects/TableHolder";
 
 
 export function main(): void {

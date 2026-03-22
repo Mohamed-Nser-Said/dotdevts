@@ -1,7 +1,7 @@
-import { ActionItem } from "../src/base/ActionItem";
-import { GenericFolder } from "../src/base/GenericFolder";
-import { Scheduler } from "../src/base/Scheduler";
-import { ScriptEvent } from "../src/base/ScriptEvent";
+import { ActionItem } from "../src/objects/ActionItem";
+import { GenericFolder } from "../src/objects/GenericFolder";
+import { Scheduler } from "../src/objects/Scheduler";
+import { ScriptEvent } from "../src/objects/ScriptEvent";
 
 
 export function main(): void {

@@ -12,6 +12,7 @@ import { HistoryTransferController, HistoryTransferControllerOptions } from "../
 import { HistoryTransporter, HistoryTransporterOptions } from "../history/HistoryTransporter";
 import { MessageBroker, MessageBrokerOptions } from "../objects/MessageBroker";
 import { MessageProcessor, MessageProcessorOptions } from "../objects/MessageProcessor";
+import { OpcUaDataSource, OpcUaDataSourceOptions } from "../DataSources/OpcUaDataSource";
 import { VariableAddFactory } from "./VariableAddFactory";
 
 export class ObjectAddFactory extends VariableAddFactory {
@@ -69,5 +70,9 @@ export class ObjectAddFactory extends VariableAddFactory {
 
     MessageProcessor(name: string, opts?: MessageProcessorOptions): MessageProcessor {
         return new MessageProcessor(this.childPath(name), opts);
+    }
+
+    OpcUaDataSource(name: string, opts?: OpcUaDataSourceOptions): OpcUaDataSource {
+        return new OpcUaDataSource(this.childPath(name), opts);
     }
 }

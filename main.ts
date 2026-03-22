@@ -21,6 +21,9 @@ import { Core } from "./src/core/Core";
 
 const core = new Core();
 const conn = core.add.Connector("OPC");
+const opcUaLab = conn.add.OpcUaDataSource("OPCLab");
+
+opcUaLab.add.Variable("Temperature", 25);
 
 
 

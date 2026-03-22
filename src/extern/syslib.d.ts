@@ -213,6 +213,55 @@ declare namespace SysLib {
     PURGE_ON_CLEAR: number;
   }
 
+  interface SelectorEndpointType {
+    EP_OPC_UA: number;
+    EP_OPC_DA: number;
+    EP_OPC_AE: number;
+    EP_OPC_HDA: number;
+    EP_GENERIC: number;
+  }
+
+  interface UaSecurityMode {
+    SECURITY_MODE_NONE: number;
+    SECURITY_MODE_SIGN: number;
+    SECURITY_MODE_SIGN_AND_ENCRYPT: number;
+  }
+
+  interface UaSecurityPolicy {
+    SECURITY_POLICY_NONE: number;
+    SECURITY_POLICY_BASIC128RSA15: number;
+    SECURITY_POLICY_BASIC256: number;
+    SECURITY_POLICY_BASIC256SHA256: number;
+  }
+
+  interface UaUserTokenType {
+    ANONYMOUS_TOKEN: number;
+    USERNAME_TOKEN: number;
+    CERTIFICATE_TOKEN: number;
+  }
+
+  interface LanguageCodes {
+    EN: number;
+    DE: number;
+    FR: number;
+    ES: number;
+    ZH: number;
+  }
+
+  interface ArchiveMode {
+    LAST_VALUE: number;
+    AVERAGE: number;
+    MIN: number;
+    MAX: number;
+    SUM: number;
+  }
+
+  interface BrowseOptionCodes {
+    BROWSE_PERIODICALLY: number;
+    BROWSE_ON_CONNECT: number;
+    BROWSE_DISABLED: number;
+  }
+
   interface Codes {
     MassOp: MassOp;
     ReferenceType: ReferenceType;
@@ -233,6 +282,13 @@ declare namespace SysLib {
     SafDiskRepairMode: SafDiskRepairMode;
     SafRetainMode: SafRetainMode;
     SQLCatalog: SQLCatalog;
+    SelectorEndpointType: SelectorEndpointType;
+    UaSecurityMode: UaSecurityMode;
+    UaSecurityPolicy: UaSecurityPolicy;
+    UaUserTokenType: UaUserTokenType;
+    LanguageCodes: LanguageCodes;
+    ArchiveMode: ArchiveMode;
+    BrowseOptionCodes: BrowseOptionCodes;
   }
 
   interface Classes {
@@ -254,6 +310,7 @@ declare namespace SysLib {
     CustomEventDataStore: number;
     CustomTimeSeriesDataStore: number;
     Connector: number;
+    Datasource: number;
   }
 
   /**

@@ -2,6 +2,7 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { TableHolder } from "./TableHolder";
 import { DataFrame } from "../std/DataFrame";
+import { Query } from "../std/Query";
 
 /**
  * TableStore — a named collection of TableHolders under a single GenericFolder.
@@ -43,6 +44,11 @@ export class TableStore extends IObject {
     get<T>(name: string): DataFrame<T> {
         const th = new TableHolder(this.path.absolutePath() + "/" + name);
         return th.getTable<T>();
+    }
+
+    /** Read a named table back as a chainable Query. */
+    query<T>(name: string): Query<T> {
+        return Query.from<T>(this.get<T>(name).data);
     }
 
     /** List the names of all tables in this store. */

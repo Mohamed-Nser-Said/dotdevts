@@ -1,5 +1,6 @@
 import { GenericFolder } from "../src/objects/GenericFolder";
 import { TableStore } from "../src/objects/TableStore";
+import { Query } from "../src/std/Query";
 
 type Sensor = {
     id: string;
@@ -52,12 +53,12 @@ export function main(): void {
 
     const now = 1742000000000;
     store.set<SensorReading>("Readings", [
-        { sensorId: "PT-101", timestamp: now,          value: 6.3,  quality: 192 },
-        { sensorId: "TT-201", timestamp: now,          value: 87.4, quality: 192 },
-        { sensorId: "FT-301", timestamp: now,          value: 23.1, quality: 192 },
-        { sensorId: "LT-401", timestamp: now,          value: 72.0, quality: 192 },
-        { sensorId: "PT-101", timestamp: now - 60000,  value: 9.8,  quality: 192 },  // near limit
-        { sensorId: "TT-201", timestamp: now - 60000,  value: 152.1, quality: 192 }, // over limit
+        { sensorId: "PT-101", timestamp: now - 60000, value: 6.3,   quality: 192 },  // older, normal
+        { sensorId: "TT-201", timestamp: now - 60000, value: 87.4,  quality: 192 },  // older, normal
+        { sensorId: "FT-301", timestamp: now,         value: 23.1,  quality: 192 },
+        { sensorId: "LT-401", timestamp: now,         value: 72.0,  quality: 192 },
+        { sensorId: "PT-101", timestamp: now,         value: 10.5,  quality: 192 },  // latest — OVER max (10 bar)
+        { sensorId: "TT-201", timestamp: now,         value: 152.1, quality: 192 },  // latest — OVER max (150°C)
     ]);
 
     store.set<Alarm>("Alarms", [
@@ -72,58 +73,35 @@ export function main(): void {
     // ─────────────────────────────────────────────────────────────────────
     console.log("  [3] Latest readings with tag names");
 
-    const readings = store.get<SensorReading>("Readings").data;
-    const sensors  = store.get<Sensor>("Sensors").data;
-
-    // keep only the most recent reading per sensor
-    const latest: Record<string, SensorReading> = {};
-    for (const r of readings) {
-        const existing = latest[r.sensorId];
-        if (!existing || r.timestamp > existing.timestamp) {
-            latest[r.sensorId] = r;
-        }
-    }
-
-    for (const sensorId in latest) {
-        const r = latest[sensorId];
-        let tag = sensorId;
-        let unit = "";
-        for (const s of sensors) {
-            if (s.id === sensorId) { tag = s.tag; unit = s.unit; break; }
-        }
-        const qualityLabel = r.quality === 192 ? "GOOD" : "BAD";
-        console.log(`      ${tag}: ${r.value} ${unit}  [${qualityLabel}]`);
-    }
+    store.query<SensorReading>("Readings")
+        .latestBy(r => r.sensorId, r => r.timestamp)
+        .join(store.query<Sensor>("Sensors"), r => r.sensorId, s => s.id)
+        .forEach(pair => {
+            const qualityLabel = pair.left.quality === 192 ? "GOOD" : "BAD";
+            console.log(`      ${pair.right.tag}: ${pair.left.value} ${pair.right.unit}  [${qualityLabel}]`);
+        });
 
     // ─────────────────────────────────────────────────────────────────────
-    // 4. Check for limit violations inline
+    // 4. Check for limit violations
     // ─────────────────────────────────────────────────────────────────────
     console.log("  [4] Limit violation check");
 
-    for (const sensorId in latest) {
-        const r = latest[sensorId];
-        let sensor: Sensor | undefined;
-        for (const s of sensors) { if (s.id === sensorId) { sensor = s; break; } }
-        if (!sensor) continue;
-
-        if (r.value > sensor.maxLimit) {
-            console.log(`      [VIOLATION] ${sensorId}: ${r.value} ${sensor.unit} > max ${sensor.maxLimit}`);
-        } else if (r.value < sensor.minLimit) {
-            console.log(`      [VIOLATION] ${sensorId}: ${r.value} ${sensor.unit} < min ${sensor.minLimit}`);
-        }
-    }
+    store.query<SensorReading>("Readings")
+        .latestBy(r => r.sensorId, r => r.timestamp)
+        .join(store.query<Sensor>("Sensors"), r => r.sensorId, s => s.id)
+        .where(pair => pair.left.value > pair.right.maxLimit || pair.left.value < pair.right.minLimit)
+        .forEach(pair => {
+            console.log(`      [VIOLATION] ${pair.left.sensorId}: ${pair.left.value} ${pair.right.unit}  (limit: ${pair.right.minLimit}–${pair.right.maxLimit})`);
+        });
 
     // ─────────────────────────────────────────────────────────────────────
     // 5. List unacknowledged alarms
     // ─────────────────────────────────────────────────────────────────────
     console.log("  [5] Unacknowledged alarms");
 
-    const alarms = store.get<Alarm>("Alarms").data;
-    for (const a of alarms) {
-        if (!a.acknowledged) {
-            console.log(`      [${a.severity}] ${a.sensorId} — ${a.message}`);
-        }
-    }
+    store.query<Alarm>("Alarms")
+        .where(a => !a.acknowledged)
+        .forEach(a => console.log(`      [${a.severity}] ${a.sensorId} — ${a.message}`));
 
     // ─────────────────────────────────────────────────────────────────────
     // 6. Store via add factory — separate config store per line

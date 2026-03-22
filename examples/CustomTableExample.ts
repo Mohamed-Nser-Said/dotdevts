@@ -4,9 +4,11 @@
  * Demonstrates storing and retrieving structured data using CustomTable,
  * which persists rows attached to any inmation object's custom options.
  */
-import { GenericFolder } from "../base/GenericFolder";
-import { CustomTable } from "../base/CustomTable";
-import { DataFrame } from "../std/DataFrame";
+
+import { CustomTable } from "../src/base/CustomTable";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { DataFrame } from "../src/std/DataFrame";
+
 
 type Product = {
 	id: string;

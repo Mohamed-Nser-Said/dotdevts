@@ -4,8 +4,10 @@
  * Demonstrates creating ActionItem objects, setting scripts, and using
  * the onTrigger builder for scheduled Lua execution.
  */
-import { GenericFolder } from "../base/GenericFolder";
-import { ActionItem } from "../base/ActionItem";
+
+import { ActionItem } from "../src/base/ActionItem";
+import { GenericFolder } from "../src/base/GenericFolder";
+
 
 export function main(): void {
 	const corePath = syslib.getcorepath();

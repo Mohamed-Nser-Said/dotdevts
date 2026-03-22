@@ -1,6 +1,7 @@
-import { ObjectContainer } from "../base/ObjectContainer";
-import { Variable } from "../base/Variable";
-import { GenericFolder } from "../base/GenericFolder";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { ObjectContainer } from "../src/base/ObjectContainer";
+import { Variable } from "../src/base/Variable";
+
 
 export function main(): void {
         const basePath = "/System/Core/ObjectContainerExample";

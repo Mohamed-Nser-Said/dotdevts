@@ -1,5 +1,6 @@
-import { TableHolder } from "../base/TableHolder";
-import { GenericFolder } from "../base/GenericFolder";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { TableHolder } from "../src/base/TableHolder";
+
 
 export function main(): void {
         const basePath = "/System/Core/TableHolderExample";

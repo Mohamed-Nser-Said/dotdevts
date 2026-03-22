@@ -1,7 +1,8 @@
-import { ScriptEvent } from "../base/ScriptEvent";
-import { Scheduler } from "../base/Scheduler";
-import { ActionItem } from "../base/ActionItem";
-import { GenericFolder } from "../base/GenericFolder";
+import { ActionItem } from "../src/base/ActionItem";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { Scheduler } from "../src/base/Scheduler";
+import { ScriptEvent } from "../src/base/ScriptEvent";
+
 
 export function main(): void {
         const basePath = "/System/Core/ScriptEventExample";

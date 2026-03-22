@@ -4,7 +4,9 @@
  * Demonstrates building and transforming tabular data with DataFrame —
  * filtering, mapping, merging, joining, and CSV export.
  */
-import { DataFrame } from "../std/DataFrame";
+
+import { DataFrame } from "../src/std/DataFrame";
+
 
 type Reading = {
 	id: string;

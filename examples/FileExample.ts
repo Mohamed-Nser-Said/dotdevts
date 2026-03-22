@@ -4,7 +4,8 @@
  * Demonstrates reading, writing, and navigating the file system via the File
  * utility — plain text, JSON, CSV, directory listing, and existence checks.
  */
-import { File } from "../std/File";
+
+import { File } from "../src/std/File";
 
 export function main(): void {
     const baseDir = "/home/mohamed/vmshare/dev/projects/inmation-froge/"

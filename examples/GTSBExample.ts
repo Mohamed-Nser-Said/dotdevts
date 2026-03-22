@@ -15,10 +15,12 @@
  *
  * GTSB objects must be direct children of the Core object.
  */
-import { IObject } from "../base/IObject";
-import { GTSB } from "../base/GTSB";
-import { Variable } from "../base/Variable";
-import { GenericFolder } from "../base/GenericFolder";
+
+import { GenericFolder } from "../src/base/GenericFolder";
+import { GTSB } from "../src/base/GTSB";
+import { IObject } from "../src/base/IObject";
+import { Variable } from "../src/base/Variable";
+
 
 export function main(): void {
 	const corePath = syslib.getcorepath();

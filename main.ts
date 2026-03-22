@@ -15,9 +15,9 @@
 // import { main as bufferExample } from "./examples/BufferExample";
 // import { main as workspaceDocumentExample } from "./examples/WorkspaceDocumentExample";
 
-import { Core } from "./base/Core";
-import { CustomTimeSeriesDataStore } from "./base/CustomTimeSeriesDataStore";
-import { Namespace } from "./base/Namespace";
+import { Core } from "./src/base/Core";
+
+
 
 const core = new Core();
 const conn = core.add.Connector("OPC");

@@ -47,13 +47,14 @@
  * NOTE: CustomTimeSeriesDataStore, CustomEventDataStore, MessageProcessor and
  *       HistoryTransferController must be direct children of Core.
  */
-import { Core } from "../base/Core";
-import { GenericFolder } from "../base/GenericFolder";
 
-import { CustomTimeSeriesDataStore } from "../base/CustomTimeSeriesDataStore";
-import { CustomEventDataStore } from "../base/CustomEventDataStore";
-import { MessageProcessor } from "../base/MessageProcessor";
-import { HistoryTransferController } from "../base/HistoryTransferController";
+import { Core } from "../src/base/Core";
+import { CustomEventDataStore } from "../src/base/CustomEventDataStore";
+import { CustomTimeSeriesDataStore } from "../src/base/CustomTimeSeriesDataStore";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { HistoryTransferController } from "../src/base/HistoryTransferController";
+import { MessageProcessor } from "../src/base/MessageProcessor";
+
 
 // ─────────────────────────────────────────────────────────────
 // MongoDB connection shared by both stores

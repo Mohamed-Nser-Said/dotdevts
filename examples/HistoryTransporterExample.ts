@@ -10,10 +10,12 @@
  * does not support these child types the mass call will fail. The examples below
  * are wrapped in try/catch so the rest of the suite keeps running.
  */
-import { GenericFolder } from "../base/GenericFolder";
-import { HistoryTransporter } from "../base/HistoryTransporter";
-import { GTSB } from "../base/GTSB";
-import { HistorianMapping, HistorianTag } from "../base/HistorianMapping";
+
+import { GenericFolder } from "../src/base/GenericFolder";
+import { GTSB } from "../src/base/GTSB";
+import { HistorianMapping, HistorianTag } from "../src/base/HistorianMapping";
+import { HistoryTransporter } from "../src/base/HistoryTransporter";
+
 
 export function main(): void {
 	const corePath = syslib.getcorepath();

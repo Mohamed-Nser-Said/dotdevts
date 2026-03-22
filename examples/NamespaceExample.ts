@@ -1,5 +1,5 @@
-import { Namespace } from "../base/Namespace";
-import { GenericFolder } from "../base/GenericFolder";
+import { GenericFolder } from "../src/base/GenericFolder";
+import { Namespace } from "../src/base/Namespace";
 
 export function main(): void {
         const corePath = "/System/Core";

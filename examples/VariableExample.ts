@@ -4,9 +4,11 @@
  * Demonstrates creating Variables and VariableGroups, reading/writing values,
  * and configuring archiving via the Archive property.
  */
-import { GenericFolder } from "../base/GenericFolder";
-import { Variable } from "../base/Variable";
-import { VariableGroup } from "../base/VariableGroup";
+
+import { GenericFolder } from "../src/base/GenericFolder";
+import { Variable } from "../src/base/Variable";
+import { VariableGroup } from "../src/base/VariableGroup";
+
 
 export function main(): void {
 	const corePath = syslib.getcorepath();

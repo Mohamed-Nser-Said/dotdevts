@@ -3,7 +3,9 @@
  *
  * Demonstrates creating folder hierarchies using GenericFolder.
  */
-import { GenericFolder } from "../base/GenericFolder";
+
+import { GenericFolder } from "../src/base/GenericFolder";
+
 
 export function main(): void {
 	const corePath = syslib.getcorepath();

@@ -23,9 +23,11 @@
  * Demonstrates: Workspace.path/name/parentPath, Document (append/insert/
  * replace/findLine/remove/toString), and the interplay between the two.
  */
-import { Workspace } from "../std/Workspace";
-import { Document } from "../std/Document";
-import { File } from "../std/File";
+
+import { Workspace } from "../src/std/Workspace";
+import { Document } from "../src/std/Document";
+import { File } from "../src/std/File";
+
 
 export function main(): void {
     // ─────────────────────────────────────────────────────────────────────

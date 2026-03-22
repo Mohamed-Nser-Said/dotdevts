@@ -6,6 +6,7 @@ import { ActionItem, ActionItemOptions } from "./ActionItem";
 import { ScriptEvent } from "./ScriptEvent";
 import { Scheduler } from "./Scheduler";
 import { TableHolder } from "./TableHolder";
+import { TableStore } from "./TableStore";
 
 export type GenericFolderOptions = {
         cleanupExisting?: boolean;
@@ -40,6 +41,7 @@ export class GenericFolder extends IObject {
                 ScriptEvent(name: string): ScriptEvent;
                 Scheduler(name: string): Scheduler;
                 TableHolder(name: string): TableHolder;
+                TableStore(name: string): TableStore;
         };
 
         constructor(path: string | number | Path, opts?: GenericFolderOptions) {
@@ -69,6 +71,9 @@ export class GenericFolder extends IObject {
                         },
                         TableHolder(name: string): TableHolder {
                                 return new TableHolder(self.path.absolutePath() + "/" + name);
+                        },
+                        TableStore(name: string): TableStore {
+                                return new TableStore(self.path.absolutePath() + "/" + name);
                         },
                 };
 

@@ -16,7 +16,10 @@
 // import { main as workspaceDocumentExample } from "./examples/WorkspaceDocumentExample";
 
 import { Core } from "./src/core/Core";
+import {main as StoreExample} from "./examples/TableStoreExample";
 
+
+StoreExample();
 
 
 const core = new Core();

@@ -4,6 +4,7 @@ import { ActionItem, ActionItemOptions } from "../objects/ActionItem";
 import { ScriptEvent } from "../objects/ScriptEvent";
 import { Scheduler } from "../objects/Scheduler";
 import { TableHolder } from "../objects/TableHolder";
+import { TableStore } from "../objects/TableStore";
 import { GTSB, GTSBOptions } from "../datastores/GTSB";
 import { CustomTimeSeriesDataStore, CustomTimeSeriesDataStoreOptions } from "../datastores/CustomTimeSeriesDataStore";
 import { CustomEventDataStore, CustomEventDataStoreOptions } from "../datastores/CustomEventDataStore";
@@ -38,6 +39,10 @@ export class ObjectAddFactory extends VariableAddFactory {
 
     TableHolder(name: string): TableHolder {
         return new TableHolder(this.childPath(name));
+    }
+
+    TableStore(name: string): TableStore {
+        return new TableStore(this.childPath(name));
     }
 
     GTSB(name: string, opts?: GTSBOptions): GTSB {

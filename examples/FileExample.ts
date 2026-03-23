@@ -8,7 +8,7 @@
 import { File } from "../src/std/File";
 
 export function main(): void {
-    const baseDir = "/home/mohamed/vmshare/dev/projects/inmation-froge/"
+    const baseDir = "./"
 
     // -------------------------------------------------------------------------
     // [0] Write a plain text file

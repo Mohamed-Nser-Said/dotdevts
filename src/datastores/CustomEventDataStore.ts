@@ -4,7 +4,7 @@ import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type CustomEventDataStoreOptions = {
-    connectionString?: string;
+    connectionString?: string| {port: number, host: string}
     database?: string;
     collection?: string;
     registerAsDataStore?: boolean;
@@ -14,13 +14,14 @@ export type CustomEventDataStoreOptions = {
 };
 
 export class CustomEventDataStore extends IObject {
-    type = "CustomEventDataStore";
-    dataStoreConfiguration: DataStoreConfiguration;
-    add: VariableAddFactory;
+    public readonly type = "CustomEventDataStore";
+    public readonly dataStoreConfiguration: DataStoreConfiguration;
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: CustomEventDataStoreOptions) {
         super(path, syslib.model.classes.CustomEventDataStore);
         this.add = new VariableAddFactory(() => this.path.absolutePath());
+        const connectionString = typeof(opts?.connectionString) == "string"? opts?.connectionString : `${opts?.connectionString?.host}:${opts?.connectionString?.port}`
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{

@@ -15,26 +15,29 @@ import { GenericFolder } from "../src/objects/GenericFolder";
 import { GTSB } from "../src/datastores/GTSB";
 import { HistorianMapping, HistorianTag } from "../src/history/HistorianMapping";
 import { HistoryTransporter } from "../src/history/HistoryTransporter";
+import { Core } from "../src/core/Core";
+import { Connector } from "../src/core/Connector";
 
 
 export function main(): void {
-	const corePath = syslib.getcorepath();
-	const rootPath = `${corePath}/examples/history`;
+	const core = new Core();
+	const conn = new Connector("/System/Core/CORE-LOCAL-SITE/AMS_Windfarm-connector");
 
-	const root = new GenericFolder(rootPath);
+	const root =  core.add.GenericFolder("HistoryTransporter", {cleanupExisting: true});
+	const corePath = core.path.absolutePath();
 
 	// --- HistoryTransporter (requires valid parent type) ---
 	try {
-		const ht = new HistoryTransporter(`${rootPath}/Transporter1`);
+		const ht = new HistoryTransporter(`/System/Core/CORE-LOCAL-SITE/AMS_Windfarm-connector/HT1`);
 		console.log(`Created HistoryTransporter: ${ht.path.absolutePath()}`);
 
-		const htWithTags = new HistoryTransporter(`${rootPath}/Transporter2`, {
-			TagConfiguration: [
-				{ Path: `${corePath}/examples/variables/Speed`, Name: "Speed", Historian: 1 },
-				{ Path: `${corePath}/examples/variables/Motor/RPM`, Name: "RPM", Historian: 1 },
-			],
-		});
-		console.log(`Created HistoryTransporter with tags: ${htWithTags.path.absolutePath()}`);
+		// const htWithTags =  conn.add.HistoryTransporter(`Transporter2`, {
+		// 	TagConfiguration: [
+		// 		{ Path: `${corePath}/examples/variables/Speed`, Name: "Speed", Historian: 1 },
+		// 		{ Path: `${corePath}/examples/variables/Motor/RPM`, Name: "RPM", Historian: 1 },
+		// 	],
+		// });
+		// console.log(`Created HistoryTransporter with tags: ${htWithTags.path.absolutePath()}`);
 
 		ht.setTagConfiguration([
 			{ Path: `${corePath}/examples/variables/Flow`, Name: "Flow", Historian: 1 },
@@ -55,52 +58,5 @@ export function main(): void {
 	} catch (e) {
 		console.log(`HistoryTransporter creation skipped: parent type does not support HistoryTransporter children.`);
 	}
-
-	// --- HistorianMapping on a GTSB (GTSB also requires valid parent type) ---
-	try {
-		const gtsb = new GTSB(`${rootPath}/HistBuffer`);
-		const mapping = new HistorianMapping(gtsb);
-		console.log(`Created HistorianMapping on: ${gtsb.path.absolutePath()}`);
-
-		mapping.clear();
-		mapping.appendMany([
-			{ EquipmentId: "EQ-001", Tag: "TI-101", Path: `${corePath}/examples/variables/Speed`, Historian: 1 },
-			{ EquipmentId: "EQ-001", Tag: "TI-102", Path: `${corePath}/examples/variables/Motor/RPM`, Historian: 1 },
-			{ EquipmentId: "EQ-002", Tag: "PI-201", Path: `${corePath}/examples/variables/Flow`, Historian: 1 },
-		]);
-		console.log(`Mapping count: ${mapping.count()}`);
-
-		const eq1Tags = mapping.list((t) => t.EquipmentId === "EQ-001");
-		console.log(`EQ-001 tags: ${eq1Tags.length}`);
-
-		mapping.update({
-			EquipmentId: "EQ-001",
-			Tag: "TI-101",
-			Path: `${corePath}/examples/variables/Motor/Temperature`,
-			Historian: 1,
-		});
-		console.log("Updated TI-101 path");
-
-		const tagNames = mapping.map((t) => t.Tag);
-		console.log(`All tags: ${tagNames.join(", ")}`);
-
-		mapping.forEach((t: HistorianTag) => {
-			console.log(`  ${t.EquipmentId} / ${t.Tag} -> ${t.Path}`);
-		});
-
-		const df = mapping.get();
-		console.log(`Mapping DataFrame rows: ${df.data.length}`);
-
-		mapping.updateMany((t) => ({ ...t, Historian: 2 }));
-		console.log(`After updateMany, count: ${mapping.count()}`);
-	} catch (e) {
-		console.log(`GTSB/HistorianMapping creation skipped: parent type does not support GTSB children.`);
-	}
-
-	// --- API surface demo (skipMass — path-only, no mass call) ---
-	const readonlyGtsb = new GTSB(`${rootPath}/HistBuffer`, { skipMass: true });
-	const mapping = new HistorianMapping(readonlyGtsb);
-	console.log(`HistorianMapping path: ${readonlyGtsb.path.absolutePath()}`);
-	console.log(`Configured prop path ends with: MSIMsgDHistorianConfigList`);
 }
 

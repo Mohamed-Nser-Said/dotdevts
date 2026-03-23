@@ -22,8 +22,8 @@ export type OpcUaDataSourceOptions = {
 };
 
 export class OpcUaDataSource extends IObject {
-    type = "OpcUaDataSource";
-    add: VariableAddFactory;
+    public readonly type = "OpcUaDataSource";
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: OpcUaDataSourceOptions) {
         super(path, syslib.model.classes.Datasource);

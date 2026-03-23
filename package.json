@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tstl",
     "dev": "tstl --watch",
-    "run": "tstl && froge run --no-bundle ./build/main.lua --context '/System/Core'"
+    "lua": "tstl && cts run ./build/main.lua"
   },
   "devDependencies": {
     "typescript-to-lua": "^1.34.0"

@@ -4,7 +4,7 @@ import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export type CustomTimeSeriesDataStoreOptions = {
-    connectionString?: string;
+    connection: string | { port: number, host: string }
     database?: string;
     collection?: string;
     registerAsDataStore?: boolean;
@@ -14,14 +14,14 @@ export type CustomTimeSeriesDataStoreOptions = {
 };
 
 export class CustomTimeSeriesDataStore extends IObject {
-    type = "CustomTimeSeriesDataStore";
-    dataStoreConfiguration: DataStoreConfiguration;
-    add: VariableAddFactory;
+    public readonly type = "CustomTimeSeriesDataStore";
+    public readonly dataStoreConfiguration: DataStoreConfiguration;
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: CustomTimeSeriesDataStoreOptions) {
         super(path, syslib.model.classes.CustomTimeSeriesDataStore);
         this.add = new VariableAddFactory(() => this.path.absolutePath());
-
+        const connectionString = typeof (opts?.connection) == "string" ? opts?.connection : `${opts?.connection?.host}:${opts?.connection?.port}`
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{
                 class: syslib.model.classes.CustomTimeSeriesDataStore,
@@ -32,7 +32,7 @@ export class CustomTimeSeriesDataStore extends IObject {
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbAllowInvalidHostnames": false,
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbUseTLS": false,
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbUseCompression": false,
-                "CustomTimeSeriesStore.MongoDBConnection.ConnectionString": opts?.connectionString ?? "mongodbGP1:27017",
+                "CustomTimeSeriesStore.MongoDBConnection.ConnectionString": connectionString ?? "mongodbGP1:27017",
                 "CustomTimeSeriesStore.TimeSeriesCollection": opts?.collection ?? "custom_time_series",
                 "CustomTimeSeriesStore.TimeSeriesDatabase": opts?.database ?? "inmation_timeseries_db",
             }]);

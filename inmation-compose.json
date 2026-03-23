@@ -2,6 +2,13 @@
     "version": "0.1",
     "connections": [
         {
+            "name": "win10-00-vm-cts",
+            "hostname": "DESKTOP-RCPOESU",
+            "port": 8002,
+            "usr": "so",
+            "pwd": "12345678Aa"
+        },
+        {
             "name": "win1000",
             "hostname": "win1000",
             "port": 8002,
@@ -11,13 +18,6 @@
         {
             "name": "win1001",
             "hostname": "win1001",
-            "port": 8002,
-            "usr": "so",
-            "pwd": "12345678Aa"
-        },
-        {
-            "name": "win10-00-vm-cts",
-            "hostname": "DESKTOP-RCPOESU",
             "port": 8002,
             "usr": "so",
             "pwd": "12345678Aa"

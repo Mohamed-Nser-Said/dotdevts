@@ -78,7 +78,7 @@ export function main(): void {
     const sensorTimeSeries = new CustomTimeSeriesDataStore(
         `${core.path.absolutePath()}/WaterTreatment_SensorTimeSeries`,
         {
-            connectionString: MONGO_URI,
+            connection: MONGO_URI,
             database: "water_plant",
             collection: "sensor_readings",
             registerAsDataStore: true,

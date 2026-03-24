@@ -13,6 +13,14 @@ export type CustomTimeSeriesDataStoreOptions = {
     skipMass?: boolean;
 };
 
+/** Options for reading documents from the underlying MongoDB collection. */
+export type CustomTimeSeriesCollectionReadOptions = {
+    /** MongoDB query/filter. */
+    query?: Mongo.Query;
+    /** Query options such as sort/skip/limit. */
+    options?: Mongo.FindOptions;
+};
+
 export class CustomTimeSeriesDataStore extends IObject {
     public readonly type = "CustomTimeSeriesDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
@@ -67,9 +75,70 @@ export class CustomTimeSeriesDataStore extends IObject {
         return { client, database, collection };
     }
 
-    getCollection() {
+    /**
+     * Returns the underlying lua-mongo Collection handle for this data store.
+     *
+     * Note: the runtime object comes from `syslib.getmongoconnection()`. We cast
+     * it to the richer `Mongo.Collection` interface so consumers can use typed
+     * query/options (e.g. `find(query, { sort, limit })`).
+     */
+    getCollection(): Mongo.Collection {
         const [client, database, collection] = syslib.getmongoconnection(this.path.absolutePath());
-        return client.getCollection(database, collection);
+        return client.getCollection(database, collection) as unknown as Mongo.Collection;
+    }
+
+    /**
+     * Returns an iterator over matching documents.
+     *
+     * This is the most allocation-friendly option when you want to stream docs.
+     */
+    findIterator<T = Mongo.Document, U = T>(
+        query?: Mongo.Query,
+        options?: Mongo.FindOptions,
+        map?: (doc: unknown) => U,
+    ): Mongo.LuaIterator<U> {
+        const cursor = this.getCollection().find<T>(query, options);
+        return map ? cursor.iterator(map) : (cursor.iterator() as unknown as Mongo.LuaIterator<U>);
+    }
+
+    /**
+     * Returns all matching documents as an array.
+     *
+     * If you want to transform documents as you read them, pass `map`.
+     */
+    findAll<T = Mongo.Document, U = T>(
+        query?: Mongo.Query,
+        options?: Mongo.FindOptions,
+        map?: (doc: unknown) => U,
+    ): U[] {
+        const iter = this.findIterator<T, U>(query, options, map);
+        const out: U[] = [];
+        while (true) {
+            const doc = iter();
+            if (doc === undefined) break;
+            out.push(doc);
+        }
+        return out;
+    }
+
+    /** Convenience alias for `findAll({ query, options })`. */
+    read<T = Mongo.Document>(opts?: CustomTimeSeriesCollectionReadOptions): T[] {
+        return this.findAll<T>(opts?.query, opts?.options);
+    }
+
+    /**
+     * Finds a single document and unwraps the BSON wrapper to a plain JS/Lua table.
+     *
+     * Returns `undefined` when no document matches.
+     */
+    findOneValue<T = Mongo.Document, U = T>(
+        query?: Mongo.Query,
+        options?: Mongo.FindOptions,
+        map?: (doc: unknown) => U,
+    ): U | undefined {
+        const bson = this.getCollection().findOne<T>(query, options);
+        if (!bson) return undefined;
+        return map ? bson.value(map) : (bson.value() as unknown as U);
     }
 
     getId(core?: IObject): number {

@@ -2,7 +2,7 @@ import { GenericFolder, GenericFolderOptions } from "../objects/GenericFolder";
 import { GenericItem, GenericItemOptions } from "../objects/GenericItem";
 import { ActionItem, ActionItemOptions } from "../objects/ActionItem";
 import { ScriptEvent } from "../objects/ScriptEvent";
-import { Scheduler } from "../objects/Scheduler";
+
 import { TableHolder } from "../objects/TableHolder";
 import { TableStore } from "../objects/TableStore";
 import { GTSB, GTSBOptions } from "../datastores/GTSB";
@@ -15,6 +15,7 @@ import { MessageBroker, MessageBrokerOptions } from "../objects/MessageBroker";
 import { MessageProcessor, MessageProcessorOptions } from "../objects/MessageProcessor";
 import { OpcUaDataSource, OpcUaDataSourceOptions } from "../DataSources/OpcUaDataSource";
 import { VariableAddFactory } from "./VariableAddFactory";
+import { SchedulerItem, SchedulerItemOptions } from "../objects/Scheduler";
 
 export class ObjectAddFactory extends VariableAddFactory {
     GenericFolder(name: string, opts?: GenericFolderOptions): GenericFolder {
@@ -33,8 +34,8 @@ export class ObjectAddFactory extends VariableAddFactory {
         return new ScriptEvent(this.childPath(name));
     }
 
-    Scheduler(name: string): Scheduler {
-        return new Scheduler(this.childPath(name));
+    SchedulerItem(name: string, options?: SchedulerItemOptions): SchedulerItem {
+        return new SchedulerItem(this.childPath(name), options);
     }
 
     TableHolder(name: string): TableHolder {

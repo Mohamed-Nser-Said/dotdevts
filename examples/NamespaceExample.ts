@@ -40,7 +40,7 @@ export function main(): void {
         console.log("      TableHolder created:", th.path.absolutePath());
 
         console.log("  [8] Add Scheduler via namespace");
-        const sched = ns.add.Scheduler("MyScheduler");
+        const sched = ns.add.SchedulerItem("MyScheduler");
         console.log("      Scheduler created:", sched.path.absolutePath());
 
         console.log("  [9] childPath helper");

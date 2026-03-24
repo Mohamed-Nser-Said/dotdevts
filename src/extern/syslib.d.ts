@@ -25,7 +25,11 @@ declare namespace SysLib {
       type: number | ReferenceType;
     }
 
-    type ReferenceType = "SECURITY" | "OBJECT_LINK" | "PROPERTY_LINK" | "OBJECT_LINK_PASSIVE";
+    type ReferenceType =
+      | "SECURITY"
+      | "OBJECT_LINK"
+      | "PROPERTY_LINK"
+      | "OBJECT_LINK_PASSIVE";
 
     type ReferenceList = Reference[];
 
@@ -48,15 +52,15 @@ declare namespace SysLib {
 
     namespace Codes {
       type MassStatus =
-        | 1  // CREATED
-        | 2  // UPDATED
-        | 3  // REMOVED
-        | 4  // SUPERSEDED
-        | 5  // ENABLED
-        | 6  // DISABLED
-        | 7  // SUCCESS_SAME
-        | 8  // ACCEPTED
-        | 99 // SUCCESS
+        | 1   // CREATED
+        | 2   // UPDATED
+        | 3   // REMOVED
+        | 4   // SUPERSEDED
+        | 5   // ENABLED
+        | 6   // DISABLED
+        | 7   // SUCCESS_SAME
+        | 8   // ACCEPTED
+        | 99  // SUCCESS
         | 100 // WARNING_ABSENT
         | 101 // WARNING_SAME
         | 102 // WARNING_PROPERTY_CHANGES_IGNORED
@@ -80,12 +84,51 @@ declare namespace SysLib {
   }
 
   interface MassOp {
-    UPSERT: number;
+    INSERT: number;
     UPDATE: number;
+    DELETE: number;
+    UPSERT: number;
   }
 
   interface ReferenceType {
     SECURITY: number;
+    OBJECT_LINK: number;
+    PROPERTY_LINK: number;
+    OBJECT_LINK_PASSIVE: number;
+  }
+
+  interface SysObjectType {
+    OT_OBJECT: number;
+    OT_PROPERTY: number;
+    OT_REFERENCE: number;
+  }
+
+  interface RecurrenceType {
+    SECOND: number;
+    MINUTE: number;
+    HOUR: number;
+    DAY: number;
+    WEEK: number;
+    MONTH: number;
+    YEAR: number;
+  }
+
+  interface DaysInMonth {
+    WDIM_FIRST: number;
+    WDIM_SECOND: number;
+    WDIM_THIRD: number;
+    WDIM_FOURTH: number;
+    WDIM_LAST: number;
+  }
+
+  interface DaysOfWeek {
+    SUNDAY: number;
+    MONDAY: number;
+    TUESDAY: number;
+    WEDNESDAY: number;
+    THURSDAY: number;
+    FRIDAY: number;
+    SATURDAY: number;
   }
 
   interface SecurityAttributes {
@@ -265,6 +308,10 @@ declare namespace SysLib {
   interface Codes {
     MassOp: MassOp;
     ReferenceType: ReferenceType;
+    SysObjectType: SysObjectType;
+    RecurrenceType: RecurrenceType;
+    DaysInMonth: DaysInMonth;
+    DaysOfWeek: DaysOfWeek;
     HistoryTransporterMode: HistoryTransporterMode;
     SimpleRecurrence: SimpleRecurrence;
     AuxStateChangeStrategy: AuxStateChangeStrategy;
@@ -392,17 +439,6 @@ declare namespace SysLib {
    *  - value     VARIANT  — Current property value
    *  - position  INTEGER  — Array index; 0 for scalar properties
    *  - modelcode INTEGER  — Class model code of the owning object
-   *
-   * Example:
-   * ```ts
-   * const db = syslib.getsystemdb();
-   * const [cur, err] = db.query(`SELECT objid FROM properties WHERE code IS ${syslib.model.properties.ObjectName} AND value IS 'MyItem'`);
-   * let row = cur.fetch({}, "a");
-   * while (row) {
-   *   const obj = syslib.getobject(row.objid as number);
-   *   row = cur.fetch(row, "a");
-   * }
-   * ```
    */
   interface SystemDb {
     /**
@@ -416,35 +452,22 @@ declare namespace SysLib {
   /**
    * Describes the result of syslib.listbuffer([objspec]).
    * Each field is a parallel array — all fields at index `i` describe the same buffer.
-   *
-   * @see https://docs.inmation.com/api/1.100/lua/functions.html#listbuffer
    */
   interface ListBufferResult {
-    /** Numeric IDs of the objects where the buffers are defined. */
     object: number[];
-    /** Buffer names. */
     name: string[];
-    /** Input source: a relative property path (e.g. ".ItemValue") or another buffer name. */
     lower: string[];
-    /** Maximum buffer size in elements. */
     length: number[];
-    /** Maximum time span in milliseconds. */
     duration: number[];
-    /** Monotonically increasing write counter (aids overflow detection). */
     counter: number[];
-    /** Current number of elements in the buffer. */
     size: number[];
-    /** Currently reserved capacity in elements. */
     capacity: number[];
-    /** Total number of peek operations performed on the buffer. */
     peeks: number[];
-    /** Total number of elements returned by peek operations. */
     peeked: number[];
   }
 
   /**
    * Minimal representation of a lua-mongo client returned by syslib.getmongoconnection().
-   * @see https://docs.inmation.com/api/1.100/lua/functions.html#getmongoconnection
    */
   interface MongoCollection {
     drop(): void;
@@ -456,203 +479,161 @@ declare namespace SysLib {
   }
 
   interface MongoClient {
-    /** Returns a collection handle for the given database and collection names. */
     getCollection(database: string, collection: string): MongoCollection;
   }
 
   interface SysLib {
     model: ModelInfo;
+
     /** @noSelf */
     getvalue(path: string): unknown;
+
     /** @noSelf */
     getobject(objspec?: string | number | SysLibObject): SysLibObject | undefined;
+
     /** @noSelf */
     mass(ops: unknown[]): void;
+
     /** @noSelf */
     enableobject(path: string): void;
+
     /** @noSelf */
     disableobject(path: string): void;
+
     /** @noSelf */
     sleep(ms: number): void;
+
     /** @noSelf */
     deleteobject(path: string): void;
+
     /** @noSelf */
     getreferences(path: string): unknown;
+
+    /** @noSelf */
+    getbackreferences(objspec: string | number | SysLibObject): Model.ReferenceList;
+
     /** @noSelf */
     splitpath(path: string): [string, string];
+
     /** @noSelf */
     execute(service: unknown, code: string): unknown;
+
     /** @noSelf */
     getconnectorpath(path: string): unknown;
+
     /** @noSelf */
     getcorepath(path?: string): string;
+
     /** @noSelf */
     listproperties(path: string, format: string, ...rest: unknown[]): [unknown, number];
+
     /** @noSelf */
     setvalue(path: string, value: unknown): void;
+
     /** @noSelf */
     uuid(): string;
+
     /** @noSelf */
     now(): number;
+
+    /**
+     * Common inmation usage is:
+     * - syslib.gettime() -> current time string
+     * - syslib.gettime("2026-03-24T07:00:00.000Z") -> converted runtime value
+     */
     /** @noSelf */
-    gettime(timestamp?: number): string;
+    gettime(timestamp?: number | string): string | number;
+
     /** @noSelf */
     log(level: number, message: string): void;
+
     /** @noSelf */
     getselfpath(): string;
-    /**
-     * Returns a read-only handle to the inmation system database.
-     * Use it to query static property values across all objects using SQL (SQLite3 + JSON1).
-     *
-     * Component Execution: All Components
-     *
-     * @see SystemDb for query usage and the `properties` table schema.
-     */
+
     /** @noSelf */
     getsystemdb(): SystemDb;
 
-    // -------------------------------------------------------------------------
-    // In-memory aggregation / buffering API
-    // -------------------------------------------------------------------------
-
-    /**
-     * Removes the named buffer from the specified object.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#buffer
-     */
     /** @noSelf */
     buffer(objspec: string | number, name: string): void;
-    /**
-     * Creates a buffer on `objspec` with the given `name`, reading from `input`
-     * (a relative property path starting with "." or another buffer name),
-     * bounded by `duration` (ms) and `size` (element count).
-     */
+
     /** @noSelf */
     buffer(objspec: string | number, name: string, input: string, duration: number, size: number): void;
-    /**
-     * Creates a buffer with a Lua transformation function.  The `input` must be
-     * another buffer name.  `transformFn` is a well-formed Lua chunk that returns
-     * a function `(input, peek, tear)`.
-     */
-    /** @noSelf */
-    buffer(objspec: string | number, name: string, input: string, duration: number, size: number, transformFn: string): void;
-    /**
-     * Creates a buffer with built-in aggregation.  `input` must be another buffer.
-     * `aggPeriod` is the aggregation interval in ms (0 = run on every new value).
-     * `aggType` is an Aggregates code group value string, e.g. `"AGG_TYPE_AVERAGE"`.
-     */
-    /** @noSelf */
-    buffer(objspec: string | number, name: string, input: string, duration: number, size: number, aggPeriod: number, aggType: string): void;
 
-    /**
-     * Removes the repeater from the named buffer at `objspec`.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#attach
-     */
+    /** @noSelf */
+    buffer(
+      objspec: string | number,
+      name: string,
+      input: string,
+      duration: number,
+      size: number,
+      transformFn: string
+    ): void;
+
+    /** @noSelf */
+    buffer(
+      objspec: string | number,
+      name: string,
+      input: string,
+      duration: number,
+      size: number,
+      aggPeriod: number,
+      aggType: string
+    ): void;
+
     /** @noSelf */
     attach(objspec: string | number, name: string): void;
-    /**
-     * Attaches `repeater` (an object/path with a dynamic property) to the named
-     * buffer at `objspec`.  The repeater's dynamic property receives each new
-     * value stored into the buffer.
-     */
+
     /** @noSelf */
     attach(objspec: string | number, name: string, repeater: string | number): void;
 
-    /**
-     * Returns the contents of the named buffer without clearing it.
-     * Returns four parallel arrays: values, timestamps (ms), qualities, counter.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#peek
-     */
     /** @noSelf */
     peek(objspec: string | number, name: string): LuaMultiReturn<[unknown[], number[], number[], number]>;
 
-    /**
-     * Atomically retrieves and clears the named buffer.
-     * Returns four parallel arrays: values, timestamps (ms), qualities, counter.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#tear
-     */
     /** @noSelf */
     tear(objspec: string | number, name: string): LuaMultiReturn<[unknown[], number[], number[], number]>;
 
-    /**
-     * Returns the last value stored in the named buffer at `objspec`.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#last
-     */
     /** @noSelf */
     last(objspec: string | number, name: string): unknown;
 
-    /**
-     * Lists buffers at `objspec` (or all buffers in the component if omitted).
-     * Each field of the result is a parallel array indexed by buffer number.
-     *
-     * Component Execution: All Components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#listbuffer
-     */
     /** @noSelf */
     listbuffer(objspec?: string | number): ListBufferResult;
 
-    /**
-     * Returns a lua-mongo client, database name, and collection name for the
-     * given MongoDB data store object.
-     *
-     * - Pass an objspec (path/id) for a custom data store.
-     * - Pass a `syslib.model.codes.RepoStoreName` numeric code for a system store.
-     * - Omit the argument to default to the System Custom Data Store (Master Core only).
-     *
-     * Component Execution: All 64-bit components
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#getmongoconnection
-     */
     /** @noSelf */
     getmongoconnection(store?: string | number, testarchive?: boolean): LuaMultiReturn<[MongoClient, string, string]>;
 
-    /**
-     * Returns logs created between `startTime` and `endTime` for the given objects.
-     * If `objects` is omitted, logs for all objects in the system are returned.
-     * `maxlogs` defaults to 100; pass 0 to return all matching logs.
-     *
-     * Component Execution: Master Core only
-     * @see https://docs.inmation.com/api/1.100/lua/functions.html#getlogs
-     */
     /** @noSelf */
     getlogs(startTime: number, endTime: number, objects?: (string | number)[], maxlogs?: number): unknown[];
   }
 }
 
 declare const syslib: SysLib.SysLib;
-
 declare const inmation: SysLib.SysLib;
 
 // Minimal LuaMultiReturn declaration (mirrors @typescript-to-lua/language-extensions)
-// Used to declare functions that return multiple Lua values without table.unpack wrapping.
 declare type LuaMultiReturn<T extends unknown[]> = T & {
-    readonly __tstlMultiReturn: unknown;
+  readonly __tstlMultiReturn: unknown;
 };
 
 declare namespace Host {
   namespace io {
     /** @noSelf */
     function read(filePath: string): string;
+
     /** @noSelf */
     function write(filePath: string, content: string): void;
   }
+
   namespace os {
     /** @noSelf */
     function exec(cmd: string, cwd?: string): string | undefined;
   }
+
   namespace workspace {
     interface WorkspaceInfo {
       path: string;
       name: string;
     }
+
     /** @noSelf */
     function info(): WorkspaceInfo;
   }

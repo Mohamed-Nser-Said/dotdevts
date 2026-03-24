@@ -7,8 +7,8 @@ import { Variable, VariableOptions } from "./Variable";
 import { VariableGroup, VariableGroupOptions } from "./VariableGroup";
 import { GTSB, GTSBOptions } from "../datastores/GTSB";
 import { ScriptEvent } from "./ScriptEvent";
-import { Scheduler } from "./Scheduler";
 import { TableHolder } from "./TableHolder";
+import { SchedulerItem } from "./Scheduler";
 
 export class Namespace {
         type = "Namespace";
@@ -22,7 +22,7 @@ export class Namespace {
                 VariableGroup(name: string, opts?: VariableGroupOptions): VariableGroup;
                 GTSB(name: string, opts?: GTSBOptions): GTSB;
                 ScriptEvent(name: string): ScriptEvent;
-                Scheduler(name: string): Scheduler;
+                SchedulerItem(name: string): SchedulerItem;
                 TableHolder(name: string): TableHolder;
         };
 
@@ -56,8 +56,8 @@ export class Namespace {
                         ScriptEvent(name: string): ScriptEvent {
                                 return new ScriptEvent(self.childPath(name));
                         },
-                        Scheduler(name: string): Scheduler {
-                                return new Scheduler(self.childPath(name));
+                        SchedulerItem(name: string): SchedulerItem {
+                                return new SchedulerItem(self.childPath(name));
                         },
                         TableHolder(name: string): TableHolder {
                                 return new TableHolder(self.childPath(name));

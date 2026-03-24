@@ -16,11 +16,17 @@ import { main as bufferExample } from "./examples/BufferExample";
 import { main as workspaceDocumentExample } from "./examples/WorkspaceDocumentExample";
 import { main as TableStoreExample } from "./examples/TableStoreExample";
 import {main as CustomTimeSeriesDataStore} from "./examples/CustomTimeSeriesDataStoreExample";
+import {main as ScheduledActions} from "./examples/ScheduledActionsExample";
+import * as mongo from "mongo";
+import { SetExample } from "./examples/SetExample";
+
 
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
 
+SetExample()
 
+ScheduledActions();
 CustomTimeSeriesDataStore();
 // customTableExample();
 // genericFolderExample();

@@ -1,6 +1,6 @@
 import { ActionItem } from "../src/objects/ActionItem";
 import { GenericFolder } from "../src/objects/GenericFolder";
-import { Scheduler } from "../src/objects/Scheduler";
+import { SchedulerItem } from "../src/objects/Scheduler";
 import { ScriptEvent } from "../src/objects/ScriptEvent";
 
 
@@ -25,7 +25,7 @@ export function main(): void {
         console.log("      VariableGroup created:", vg.path.absolutePath());
 
         console.log("  [4] Create Scheduler");
-        const scheduler = new Scheduler(basePath + "/MyScheduler");
+        const scheduler = new SchedulerItem(basePath + "/MyScheduler");
         console.log("      Scheduler created:", scheduler.path.absolutePath());
         console.log("      Scheduler type:", scheduler.type);
 
@@ -41,7 +41,7 @@ export function main(): void {
         console.log("      Inline ScriptEvent:", se2.path.absolutePath());
 
         console.log("  [7] GenericFolder add.Scheduler shorthand");
-        const sched2 = gf.add.Scheduler("InlineScheduler");
+        const sched2 = gf.add.SchedulerItem("InlineScheduler");
         console.log("      Inline Scheduler:", sched2.path.absolutePath());
 
         console.log("  ScriptEventExample done.");

@@ -67,6 +67,11 @@ export class CustomTimeSeriesDataStore extends IObject {
         return { client, database, collection };
     }
 
+    getCollection() {
+        const [client, database, collection] = syslib.getmongoconnection(this.path.absolutePath());
+        return client.getCollection(database, collection);
+    }
+
     getId(core?: IObject): number {
         const dsc = core ? new DataStoreConfiguration(core) : this.dataStoreConfiguration;
         const sets = dsc.getDataStoreSets().data;

@@ -4,9 +4,9 @@ import { VariableOptions, Variable } from "./Variable";
 import { VariableGroupOptions, VariableGroup } from "./VariableGroup";
 import { ActionItem, ActionItemOptions } from "./ActionItem";
 import { ScriptEvent } from "./ScriptEvent";
-import { Scheduler } from "./Scheduler";
 import { TableHolder } from "./TableHolder";
 import { TableStore } from "./TableStore";
+import { SchedulerItem, SchedulerItemOptions } from "./Scheduler";
 
 export type GenericFolderOptions = {
         cleanupExisting?: boolean;
@@ -39,7 +39,7 @@ export class GenericFolder extends IObject {
                 VariableGroup(name: string, opts?: VariableGroupOptions): VariableGroup;
                 ActionItem(name: string, opts?: ActionItemOptions): ActionItem;
                 ScriptEvent(name: string): ScriptEvent;
-                Scheduler(name: string): Scheduler;
+                SchedulerItem(name: string, options?: SchedulerItemOptions): SchedulerItem;
                 TableHolder(name: string): TableHolder;
                 TableStore(name: string): TableStore;
         };
@@ -66,8 +66,8 @@ export class GenericFolder extends IObject {
                         ScriptEvent(name: string): ScriptEvent {
                                 return new ScriptEvent(self.path.absolutePath() + "/" + name);
                         },
-                        Scheduler(name: string): Scheduler {
-                                return new Scheduler(self.path.absolutePath() + "/" + name);
+                        SchedulerItem(name: string): SchedulerItem {
+                                return new SchedulerItem(self.path.absolutePath() + "/" + name);
                         },
                         TableHolder(name: string): TableHolder {
                                 return new TableHolder(self.path.absolutePath() + "/" + name);

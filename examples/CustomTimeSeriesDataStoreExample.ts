@@ -11,10 +11,7 @@ export function main() {
 
     const myDataStore = core.add.CustomTimeSeriesDataStore("myDataStore", { registerAsDataStore: true, connection: { port: 27017, host: "localhost" } });
 
-    const db = myDataStore.getMongoConnection()
-    console.log(db);
-    console.log("Created!");
-
+    myDataStore.getCollection().insert({ name: 'Jane Smith2', height: 185, test: { one: "@#$#", two: { test: "TESTVAL" } } })
 
 
 

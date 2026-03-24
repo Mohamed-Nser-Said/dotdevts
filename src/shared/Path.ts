@@ -31,4 +31,10 @@ export class Path {
 	parentPathAsString(): string {
 		return this.parentPath().absolutePath();
 	}
+
+	join(path: string) {
+		if (!path.startsWith("/"))
+			return `${this.absolutePath()}/${path}`;
+		else return `${this.absolutePath()}${path}`;
+	}
 }

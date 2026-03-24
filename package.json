@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tstl",
     "dev": "tstl --watch",
-    "lua": "tstl && cts run ./build/main.lua"
+    "main": "tstl && cts run ./build/main.lua"
   },
   "devDependencies": {
     "typescript-to-lua": "^1.34.0"

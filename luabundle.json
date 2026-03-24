@@ -13,7 +13,8 @@
       "esi-lcurl-http-client",
       "math",
       "io",
-      "host"
+      "host",
+      "mongo"
     ]
   },
   "targets": [

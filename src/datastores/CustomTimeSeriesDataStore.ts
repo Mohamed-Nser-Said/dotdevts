@@ -2,6 +2,7 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
+import { mq, MongoQueryBuilder } from "../std/MongoQuery";
 
 export type CustomTimeSeriesDataStoreOptions = {
     connection: string | { port: number, host: string }
@@ -14,9 +15,9 @@ export type CustomTimeSeriesDataStoreOptions = {
 };
 
 /** Options for reading documents from the underlying MongoDB collection. */
-export type CustomTimeSeriesCollectionReadOptions = {
+export type CustomTimeSeriesCollectionReadOptions<T extends Mongo.Document = Mongo.Document> = {
     /** MongoDB query/filter. */
-    query?: Mongo.Query;
+    query?: Mongo.Query<T>;
     /** Query options such as sort/skip/limit. */
     options?: Mongo.FindOptions;
 };
@@ -93,13 +94,49 @@ export class CustomTimeSeriesDataStore extends IObject {
      *
      * This is the most allocation-friendly option when you want to stream docs.
      */
-    findIterator<T = Mongo.Document, U = T>(
-        query?: Mongo.Query,
+    findIterator<T extends Mongo.Document = Mongo.Document, U = T>(
+        query?: Mongo.Query<T>,
         options?: Mongo.FindOptions,
         map?: (doc: unknown) => U,
     ): Mongo.LuaIterator<U> {
-        const cursor = this.getCollection().find<T>(query, options);
-        return map ? cursor.iterator(map) : (cursor.iterator() as unknown as Mongo.LuaIterator<U>);
+        // lua-mongo does not accept `nil` for the query argument; use an empty
+        // filter when the caller does not provide one.
+        const q = (query ?? ({} as unknown as Mongo.Query<T>));
+        const cursor = this.getCollection().find<T>(q, options);
+
+        // Important: the lua-mongo `cursor:iterator()` API is designed for Lua's
+        // generic-for protocol and returns an iterator function that expects the
+        // cursor userdata as argument #1.
+        //
+        // Our typings model that returned iterator as `Mongo.CursorIter<T>` with
+        // `@noSelf`, so we can call it without TypeScriptToLua injecting a leading
+        // `nil`.
+        //
+        // NOTE: In this environment, `cursor.iterator(handler)` appears to have
+        // different/quirky semantics. To keep `.map(...)` reliable, we always use
+        // `cursor.iterator()` and apply `map` in *this* wrapper.
+        const it = cursor.iterator();
+
+        // Generic-for iterators also receive the previous control variable.
+        // Cursor iterators typically ignore it, but passing it makes this wrapper
+        // compatible with the protocol.
+        let control: unknown = undefined;
+
+        // Return a TS function that ignores the implicit `self` arg from TSTL.
+        return ((_: unknown) => {
+            const raw = it(cursor, control);
+            control = raw;
+            if (raw === undefined || raw === null) return undefined;
+
+            // If the iterator yields a BSONDocument wrapper, unwrap it.
+            let doc: unknown = raw;
+            const maybeValue = (raw as any).value;
+            if (typeof maybeValue === "function") {
+                doc = (raw as any).value();
+            }
+
+            return map ? (map(doc) as unknown as U) : (doc as unknown as U);
+        }) as unknown as Mongo.LuaIterator<U>;
     }
 
     /**
@@ -107,8 +144,8 @@ export class CustomTimeSeriesDataStore extends IObject {
      *
      * If you want to transform documents as you read them, pass `map`.
      */
-    findAll<T = Mongo.Document, U = T>(
-        query?: Mongo.Query,
+    findAll<T extends Mongo.Document = Mongo.Document, U = T>(
+        query?: Mongo.Query<T>,
         options?: Mongo.FindOptions,
         map?: (doc: unknown) => U,
     ): U[] {
@@ -123,8 +160,34 @@ export class CustomTimeSeriesDataStore extends IObject {
     }
 
     /** Convenience alias for `findAll({ query, options })`. */
-    read<T = Mongo.Document>(opts?: CustomTimeSeriesCollectionReadOptions): T[] {
+    read<T extends Mongo.Document = Mongo.Document>(opts?: CustomTimeSeriesCollectionReadOptions<T>): T[] {
         return this.findAll<T>(opts?.query, opts?.options);
+    }
+
+    /**
+     * LINQ-ish query API that *executes* on `.build()`.
+     *
+     * Example:
+     *   const values = ds
+     *     .query<MyDoc>()
+     *     .where(doc => doc.runId === runId)
+     *     .map(doc => doc.value)
+     *     .limit(10)
+     *     .build();
+     */
+    query<TDoc extends Mongo.Document = Mongo.Document>(): MongoQueryable<TDoc, TDoc> {
+        return new MongoQueryable<TDoc, TDoc>(this);
+    }
+
+    /**
+     * Returns documents from the underlying MongoDB collection.
+     *
+     * This is a convenience helper for the common case where you want to read
+     * everything (or use only `FindOptions` such as `limit`/`sort`) without
+     * providing a query filter.
+     */
+    readAll<T extends Mongo.Document = Mongo.Document>(options?: Mongo.FindOptions): T[] {
+        return this.findAll<T>({} as unknown as Mongo.Query<T>, options);
     }
 
     /**
@@ -132,12 +195,14 @@ export class CustomTimeSeriesDataStore extends IObject {
      *
      * Returns `undefined` when no document matches.
      */
-    findOneValue<T = Mongo.Document, U = T>(
-        query?: Mongo.Query,
+    findOneValue<T extends Mongo.Document = Mongo.Document, U = T>(
+        query?: Mongo.Query<T>,
         options?: Mongo.FindOptions,
         map?: (doc: unknown) => U,
     ): U | undefined {
-        const bson = this.getCollection().findOne<T>(query, options);
+        // lua-mongo does not accept `nil` for the query argument.
+        const q = (query ?? ({} as unknown as Mongo.Query<T>));
+        const bson = this.getCollection().findOne<T>(q, options);
         if (!bson) return undefined;
         return map ? bson.value(map) : (bson.value() as unknown as U);
     }
@@ -158,5 +223,150 @@ export class CustomTimeSeriesDataStore extends IObject {
 
     static appendable(parent: IObject, name: string, opts?: CustomTimeSeriesDataStoreOptions): CustomTimeSeriesDataStore {
         return new CustomTimeSeriesDataStore(parent.path.absolutePath() + "/" + name, opts);
+    }
+}
+
+export class MongoQueryable<TDoc extends Mongo.Document, TOut> {
+    private readonly store: CustomTimeSeriesDataStore;
+    private readonly queryBuilder: MongoQueryBuilder<TDoc>;
+
+    private options: Mongo.FindOptions | undefined;
+    private mapper: ((doc: unknown) => unknown) | undefined;
+
+    constructor(store: CustomTimeSeriesDataStore) {
+        this.store = store;
+        // Use the existing query builder implementation for consistent operator merging.
+        this.queryBuilder = mq<TDoc>();
+    }
+
+    /** Start / continue adding conditions on a field (string form). */
+    where<K extends Extract<keyof TDoc, string>>(field: K): MongoQueryableFieldBuilder<TDoc, TOut, K>;
+
+    /**
+     * Predicate form (compile-time macro):
+     *   where(doc => doc.field OP value)
+     *
+     * The TSTL plugin rewrites this into the string+operator form.
+     */
+    where(predicate: (doc: TDoc) => boolean): MongoQueryable<TDoc, TOut>;
+
+    where(arg: unknown): any {
+        if (typeof arg === "function") {
+            throw new Error(
+                "MongoQueryable.where(predicate) is a compile-time macro. " +
+                "Use a simple comparison like doc => doc.field === value, and ensure the TSTL plugin is enabled."
+            );
+        }
+        return new MongoQueryableFieldBuilder<TDoc, TOut, any>(this, arg as any);
+    }
+
+    /** Limit number of results. */
+    limit(n: number): this {
+        this.options = { ...(this.options ?? {}), limit: n };
+        return this;
+    }
+
+    /** Skip N results. */
+    skip(n: number): this {
+        this.options = { ...(this.options ?? {}), skip: n };
+        return this;
+    }
+
+    /** Sort by a field. Direction: 1 (asc) or -1 (desc). */
+    sort<K extends Extract<keyof TDoc, string>>(field: K, direction: 1 | -1 = 1): this {
+        // Mongo sort object: { field: 1 | -1 }
+        this.options = { ...(this.options ?? {}), sort: { [field]: direction } };
+        return this;
+    }
+
+    /** Client-side mapping of each document (executed in Lua after reading). */
+    map<U>(fn: (doc: TOut) => U): MongoQueryable<TDoc, U> {
+        const prev = this.mapper;
+        if (!prev) {
+            this.mapper = (doc: unknown) => fn(doc as unknown as TOut);
+        } else {
+            this.mapper = (doc: unknown) => fn(prev(doc) as unknown as TOut);
+        }
+        return this as unknown as MongoQueryable<TDoc, U>;
+    }
+
+    /** Alias for map(). */
+    select<U>(fn: (doc: TOut) => U): MongoQueryable<TDoc, U> {
+        return this.map(fn);
+    }
+
+    /** Execute the query and return the resulting array. */
+    build(): TOut[] {
+        const q = this.queryBuilder.build();
+        const map = this.mapper ? ((doc: unknown) => this.mapper!(doc) as unknown as TOut) : undefined;
+        return this.store.findAll<TDoc, TOut>(q, this.options, map);
+    }
+
+    /**
+     * Convenience property to execute the query without calling `.build()`.
+     *
+     * Example:
+     *   const rows = ds.query<T>().where(...).map(...).value
+     */
+    get value(): TOut[] {
+        return this.build();
+    }
+
+    /** Alias for `.value` (sometimes reads nicer). */
+    get result(): TOut[] {
+        return this.build();
+    }
+
+    // Internal: apply conditions to the underlying query.
+    _setField(field: string, value: unknown): void {
+        this.queryBuilder._setField(field, value);
+    }
+
+    _mergeFieldOps(field: string, ops: Record<string, unknown>): void {
+        this.queryBuilder._mergeFieldOps(field, ops);
+    }
+}
+
+export class MongoQueryableFieldBuilder<
+    TDoc extends Mongo.Document,
+    TOut,
+    K extends Extract<keyof TDoc, string>,
+> {
+    constructor(private parent: MongoQueryable<TDoc, TOut>, private field: K) { }
+
+    /** Direct match `{ field: value }` (no operator object). */
+    is(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._setField(this.field, value as unknown);
+        return this.parent;
+    }
+
+    eq(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $eq: value as unknown });
+        return this.parent;
+    }
+
+    ne(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $ne: value as unknown });
+        return this.parent;
+    }
+
+    gt(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $gt: value as unknown });
+        return this.parent;
+    }
+
+    gte(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $gte: value as unknown });
+        return this.parent;
+    }
+
+    lt(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $lt: value as unknown });
+        return this.parent;
+    }
+
+    lte(value: TDoc[K]): MongoQueryable<TDoc, TOut> {
+        this.parent._mergeFieldOps(this.field, { $lte: value as unknown });
+        return this.parent;
     }
 }

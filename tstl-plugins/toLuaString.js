@@ -34,6 +34,104 @@ function isMethodCallNamed(callExpr, name) {
     );
 }
 
+function stripParens(expr) {
+    while (ts.isParenthesizedExpression(expr)) {
+        expr = expr.expression;
+    }
+    return expr;
+}
+
+function getSingleReturnExpression(fn) {
+    if (ts.isArrowFunction(fn) && !ts.isBlock(fn.body)) {
+        return fn.body;
+    }
+
+    if (ts.isArrowFunction(fn) && ts.isBlock(fn.body)) {
+        const st = fn.body.statements;
+        if (st.length === 1 && ts.isReturnStatement(st[0]) && st[0].expression) {
+            return st[0].expression;
+        }
+        return undefined;
+    }
+
+    if (ts.isFunctionExpression(fn)) {
+        const st = fn.body.statements;
+        if (st.length === 1 && ts.isReturnStatement(st[0]) && st[0].expression) {
+            return st[0].expression;
+        }
+        return undefined;
+    }
+
+    return undefined;
+}
+
+function tryGetPropertyPath(expr, paramName) {
+    expr = stripParens(expr);
+
+    const parts = [];
+    while (ts.isPropertyAccessExpression(expr)) {
+        parts.unshift(expr.name.text);
+        expr = stripParens(expr.expression);
+    }
+
+    if (ts.isIdentifier(expr) && expr.text === paramName) {
+        return parts.length > 0 ? parts.join(".") : undefined;
+    }
+
+    return undefined;
+}
+
+function operatorToMethodName(opTokenKind) {
+    switch (opTokenKind) {
+        case ts.SyntaxKind.EqualsEqualsToken:
+        case ts.SyntaxKind.EqualsEqualsEqualsToken:
+            return "eq";
+        case ts.SyntaxKind.ExclamationEqualsToken:
+        case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+            return "ne";
+        case ts.SyntaxKind.GreaterThanToken:
+            return "gt";
+        case ts.SyntaxKind.GreaterThanEqualsToken:
+            return "gte";
+        case ts.SyntaxKind.LessThanToken:
+            return "lt";
+        case ts.SyntaxKind.LessThanEqualsToken:
+            return "lte";
+        default:
+            return undefined;
+    }
+}
+
+function tryParseWherePredicate(fn) {
+    if (!ts.isArrowFunction(fn) && !ts.isFunctionExpression(fn)) return undefined;
+    if (fn.parameters.length !== 1) return undefined;
+    const p = fn.parameters[0];
+    if (!ts.isIdentifier(p.name)) return undefined;
+    const paramName = p.name.text;
+
+    const returned = getSingleReturnExpression(fn);
+    if (!returned) return undefined;
+
+    const expr = stripParens(returned);
+    if (!ts.isBinaryExpression(expr)) return undefined;
+
+    const opMethod = operatorToMethodName(expr.operatorToken.kind);
+    if (!opMethod) return undefined;
+
+    const leftPath = tryGetPropertyPath(expr.left, paramName);
+    const rightPath = tryGetPropertyPath(expr.right, paramName);
+
+    if (leftPath && !rightPath) {
+        return { fieldPath: leftPath, opMethod, valueExpr: expr.right };
+    }
+    if (rightPath && !leftPath) {
+        return { fieldPath: rightPath, opMethod, valueExpr: expr.left };
+    }
+
+    // Ambiguous or unsupported (both sides reference doc, or neither side does).
+    return undefined;
+}
+
 function createMinimalEmitHost() {
     return {
         directoryExists: () => true,
@@ -50,6 +148,28 @@ module.exports = function toLuaStringPlugin() {
             [ts.SyntaxKind.CallExpression]: (node, context) => {
                 if (!ts.isCallExpression(node)) {
                     return context.superTransformExpression(node);
+                }
+
+                // LINQ-ish macro: obj.where(doc => doc.field OP value)
+                // is compiled into obj.where("field").<op>(value)
+                // Supported OP: ===, ==, !==, !=, >, >=, <, <=
+                if (isMethodCallNamed(node, "where") && node.arguments.length === 1) {
+                    const arg0 = node.arguments[0];
+                    const parsed = tryParseWherePredicate(arg0);
+                    if (parsed) {
+                        const propAccess = node.expression; // PropertyAccessExpression
+                        const prefix = context.transformExpression(propAccess.expression);
+                        const whereId = tstl.createIdentifier("where", node);
+                        const opId = tstl.createIdentifier(parsed.opMethod, node);
+                        const whereCall = tstl.createMethodCallExpression(
+                            prefix,
+                            whereId,
+                            [tstl.createStringLiteral(parsed.fieldPath, node)],
+                            node
+                        );
+                        const valueLua = context.transformExpression(parsed.valueExpr);
+                        return tstl.createMethodCallExpression(whereCall, opId, [valueLua], node);
+                    }
                 }
 
                 const isToLuaCall = isToLuaIdentifier(node.expression);

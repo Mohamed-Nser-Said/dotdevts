@@ -2,6 +2,13 @@ import { ActionItem } from "../objects/ActionItem";
 import { GenericFolder } from "../objects/GenericFolder";
 import { SchedulerItem, SchedulerItemOptions } from "../objects/Scheduler";
 
+export type ScheduledActionOptions = {
+    name?: string;
+    absolutePath?: string;
+    cleanupExisting?: boolean; // If true, deletes existing scheduled actions folder with the same name before creating new one
+
+} & SchedulerItemOptions;
+
 export class ScheduledActions {
 
     private readonly folder: GenericFolder | undefined;
@@ -9,8 +16,8 @@ export class ScheduledActions {
     private readonly _actions = new Map<string, ActionItem>();
 
 
-    constructor(path: string, options?: SchedulerItemOptions) {
-        this.folder = new GenericFolder(path);
+    constructor(path: string, options?: ScheduledActionOptions) {
+        this.folder = new GenericFolder(path, { cleanupExisting: options?.cleanupExisting });
         const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } }
         this.scheduler = this.folder.add.SchedulerItem("__ScheduledActions", defaultOptions);
 

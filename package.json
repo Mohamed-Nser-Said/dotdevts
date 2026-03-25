@@ -3,7 +3,8 @@
   "scripts": {
     "build": "tstl",
     "dev": "tstl --watch",
-    "main": "tstl && cts run ./build/main.lua"
+    "mainc": "tstl && cts run ./build/main.lua",
+    "main": "tstl && froge run ./build/main.lua -c win1000"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.57.2",

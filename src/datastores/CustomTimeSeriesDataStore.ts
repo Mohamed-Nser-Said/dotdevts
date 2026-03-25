@@ -30,6 +30,7 @@ export class CustomTimeSeriesDataStore extends IObject {
         super(path, syslib.model.classes.CustomTimeSeriesDataStore);
         this.add = new VariableAddFactory(() => this.path.absolutePath());
         const connectionString = typeof (opts?.connection) == "string" ? opts?.connection : `${opts?.connection?.host}:${opts?.connection?.port}`
+
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{
                 class: syslib.model.classes.CustomTimeSeriesDataStore,

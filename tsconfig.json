@@ -11,6 +11,11 @@
   "tstl": {
     "sourceMapTraceback": false,
     "luaTarget": "5.3",
-    "noResolvePaths": ["dkjson", "mongo"]
+    "noResolvePaths": ["dkjson", "mongo"],
+    "luaPlugins": [
+      {
+        "name": "./tstl-plugins/toLuaString"
+      }
+    ]
   }
 }

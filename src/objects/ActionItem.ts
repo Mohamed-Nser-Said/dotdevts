@@ -2,6 +2,7 @@ import { IObject } from "../shared/IObject";
 import { Archive } from "../history/Archive";
 import { Path } from "../shared/Path";
 import { VariableAddFactory } from "../core/VariableAddFactory";
+import { ScriptChunk } from "../shared/toLua";
 
 export type ActionItemOptions = {
 	script?: string;
@@ -56,9 +57,15 @@ export class ActionItem extends IObject {
 		}]);
 	}
 
-	onTrigger(script: string): ActionItem {
-		this.setScript(script);
-		return this;
+
+	/** Fluent version of setFunc(). */
+	onTrigger(fn: ScriptChunk): ActionItem;
+	onTrigger(script: string): ActionItem;
+	onTrigger(scriptOrFn: string | ScriptChunk): ActionItem {
+		if (typeof scriptOrFn === "string") return this.onTrigger(scriptOrFn);
+		throw new Error(
+			"ActionItem.onTrigger(fn) is a compile-time feature. Ensure the TypeScriptToLua luaPlugin `./tstl-plugins/toLuaString` is configured in tsconfig.json (tstl.luaPlugins)."
+		);
 	}
 
 	setValue(value: unknown): void {

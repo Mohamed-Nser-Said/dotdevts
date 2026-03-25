@@ -1,6 +1,7 @@
 import { ActionItem } from "../objects/ActionItem";
 import { GenericFolder } from "../objects/GenericFolder";
 import { SchedulerItem, SchedulerItemOptions } from "../objects/Scheduler";
+import { ScriptChunk } from "../shared/toLua";
 
 export type ScheduledActionOptions = {
     name?: string;
@@ -15,7 +16,6 @@ export class ScheduledActions {
     private readonly scheduler: SchedulerItem;
     private readonly _actions = new Map<string, ActionItem>();
 
-
     constructor(path: string, options?: ScheduledActionOptions) {
         this.folder = new GenericFolder(path, { cleanupExisting: options?.cleanupExisting });
         const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } }
@@ -23,17 +23,45 @@ export class ScheduledActions {
 
     }
 
-    addAction(script: string, options?: { name?: string, absolutePath?: string }) {
-
+    /**
+     * Add a scheduled ActionItem.
+     *
+     * You can pass:
+     * - no arguments (creates an ActionItem with no initial script),
+     * - a raw Lua script chunk string,
+     * - or a TypeScript function (ScriptChunk) that is compiled to a Lua chunk at build time.
+     *
+     * Function form relies on the TypeScriptToLua plugin `tstl-plugins/toLuaString.js`.
+     */
+    addAction(): ActionItem | undefined;
+    addAction(script: string, options?: { name?: string; absolutePath?: string }): ActionItem | undefined;
+    addAction(fn: ScriptChunk, options?: { name?: string; absolutePath?: string }): ActionItem | undefined;
+    addAction(scriptOrFn?: string | ScriptChunk, options?: { name?: string; absolutePath?: string }): ActionItem | undefined {
         if (!this.folder) return;
         const unqName = `${options?.name ?? ""}__action${syslib.uuid()}`;
-        const action = this.folder?.add.ActionItem(unqName, { script: script, scheduler: this.scheduler?.path.absolutePath() });
-        this._actions?.set(unqName, action);
-        return action
+
+        // Strings (and undefined) are handled directly.
+        if (scriptOrFn === undefined || typeof scriptOrFn === "string") {
+            const action = this.folder.add.ActionItem(unqName, {
+                script: scriptOrFn,
+                scheduler: this.scheduler.path.absolutePath(),
+            });
+            this._actions.set(unqName, action);
+            return action;
+        }
+
+        // Functions should be compiled away by the plugin into a string argument.
+        throw new Error(
+            "ScheduledActions.addAction(fn) is a compile-time feature. Ensure the TypeScriptToLua luaPlugin `./tstl-plugins/toLuaString` is configured in tsconfig.json (tstl.luaPlugins)."
+        );
     }
 
     get schedulerPath() {
         return this.scheduler.path.absolutePath();
+    }
+
+    get rootPath() {
+        return this.folder?.path.absolutePath();
     }
 
     get actions(): ActionItem[] {
@@ -47,11 +75,15 @@ export class ScheduledActions {
 
     }
 
+    delete() {
+        this.removeActions();
+        this.scheduler.delete(true);
+        this.folder?.delete(true);
+    }
 
-
-
-
-
+    updateScheduler(options: SchedulerItemOptions) {
+        this.scheduler.update(options);
+    }
 
 
 }

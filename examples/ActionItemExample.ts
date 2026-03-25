@@ -26,6 +26,7 @@ export function main(): void {
 	`);
 	console.log("Set script on LogTime");
 
+
 	// --- ActionItem with script inline via options ---
 	const inline = new ActionItem(`${rootPath}/InlineScript`, {
 		script: `syslib.log(2, "InlineScript fired")`,
@@ -36,6 +37,12 @@ export function main(): void {
 	const chained = new ActionItem(`${rootPath}/Chained`)
 		.onTrigger(`syslib.log(2, "Chained trigger fired")`);
 	console.log(`Created chained: ${chained.path.absolutePath()}`);
+
+	// --- onTriggerFunc: fluent TS function setter ---
+	const chainedFunc = new ActionItem(`${rootPath}/ChainedFunc`).onTrigger(() => {
+		syslib.log(2, "ChainedFunc trigger fired");
+	});
+	console.log(`Created chainedFunc: ${chainedFunc.path.absolutePath()}`);
 
 	// --- ActionItem.add builder: child variables ---
 	const withChildren = new ActionItem(`${rootPath}/WithChildren`);

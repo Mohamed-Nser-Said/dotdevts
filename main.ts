@@ -1,3 +1,6 @@
+// Ensure TypeScriptToLua runtime helpers are installed into _G before any other imports run.
+import "./prelude";
+
 import { main as genericFolderExample } from "./examples/GenericFolderExample";
 import { main as variableExample } from "./examples/VariableExample";
 import { main as customTableExample } from "./examples/CustomTableExample";
@@ -15,8 +18,8 @@ import { main as systemDbExample } from "./examples/SystemDbExample";
 import { main as bufferExample } from "./examples/BufferExample";
 import { main as workspaceDocumentExample } from "./examples/WorkspaceDocumentExample";
 import { main as TableStoreExample } from "./examples/TableStoreExample";
-import {main as CustomTimeSeriesDataStore} from "./examples/CustomTimeSeriesDataStoreExample";
-import {main as ScheduledActions} from "./examples/ScheduledActionsExample";
+import { main as CustomTimeSeriesDataStore } from "./examples/CustomTimeSeriesDataStoreExample";
+import { main as ScheduledActions } from "./examples/ScheduledActionsExample";
 import * as mongo from "mongo";
 import { SetExample } from "./examples/SetExample";
 
@@ -24,7 +27,7 @@ import { SetExample } from "./examples/SetExample";
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
 
-SetExample()
+SetExample();
 
 ScheduledActions();
 CustomTimeSeriesDataStore();

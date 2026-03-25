@@ -392,7 +392,7 @@ declare namespace SysLib {
     properties: Properties;
   }
 
-  interface SysLibObject extends Model.Object {}
+  interface SysLibObject extends Model.Object { }
 
   /**
    * A row from a SystemDb cursor query, keyed by field name (when fetched with mode "a").
@@ -529,6 +529,13 @@ declare namespace SysLib {
 
     /** @noSelf */
     setvalue(path: string, value: unknown): void;
+
+    /**
+     * Extended form frequently used in inmation runtime:
+     * syslib.setvalue(path, value, quality, timestamp)
+     */
+    /** @noSelf */
+    setvalue(path: string, value: unknown, quality: number, timestamp: number): void;
 
     /** @noSelf */
     uuid(): string;

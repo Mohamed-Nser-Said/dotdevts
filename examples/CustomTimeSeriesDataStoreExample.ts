@@ -11,31 +11,38 @@ export function main() {
 
     const myDataStore = core.add.CustomTimeSeriesDataStore("myDataStore2", { registerAsDataStore: true, connection: { port: 27017, host: "localhost" } });
 
-    // myDataStore.getCollection().insert({ name: 'Jane Smith2', height: 185, test: { one: "@#$#", two: { test: "TESTVAL" } } })
-
-    const scheduledActions = new ScheduledActions(core.path.join("Runner"), { cleanupExisting: true });
-
-    const script = (txt: string) => `
-    local v = syslib.now()
-    syslib.setvalue(syslib.getselfpath(), "${txt}", 0, v)
-    `;
-    scheduledActions.addAction(script("Action 1"));
-    scheduledActions.addAction(script("Action 2"));
-    scheduledActions.addAction(script("Action 3"));
-    scheduledActions.actions.forEach(a => { a.archive.setDataStore(myDataStore); a.archive.persistencyMode("persist dynamic values immediately"); a.archive.setRawHistory("enabled"); });
+    const scheduledActions = new ScheduledActions(core.path.join("Runner-v2"), { cleanupExisting: true });
 
 
-    // check barnching 
-    // wen app is redy have a vresio of 1
-    // then you have chagnes you darft you deploy
-    // how some verioing, which tools, 
-    //  like mif the background works, if not
-    // version control.
-    // keep git like
-    //  automaion develppe what is possibel wha
-    // deployemen
-    // how we do i
+    // 1) TS function → compiled to Lua chunk string at build time
+    scheduledActions.addAction(() => {
+        const txt = "Action 1";
+        const v = syslib.now();
+        syslib.setvalue(syslib.getselfpath(), txt, 0, v);
+        return "TEST"
+    });
 
+    scheduledActions.addAction(() => {
+        const txt = "Action 2";
+        const v = syslib.now();
+        syslib.setvalue(syslib.getselfpath(), txt, 0, v);
+
+        return "TEST2.2"
+    });
+
+
+    scheduledActions.addAction(() => {
+        let count = 0;
+        for (let i = 0; i < 5; i++) {
+            const txt = `Action 3 - ${i}`;
+            const v = syslib.now();
+            syslib.setvalue(syslib.getselfpath(), txt, 0, v);
+        }
+        return count;
+    });
+
+
+    console.log(`Scheduled actions created under scheduler: ${scheduledActions.schedulerPath}`);
 
 
 }

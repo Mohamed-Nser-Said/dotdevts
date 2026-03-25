@@ -2,29 +2,29 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 
 export type HistoryTransferControllerOptions = {
-    skipMass?: boolean;
+	skipMass?: boolean;
 };
 
 export class HistoryTransferController extends IObject {
-    type = "HistoryTransferController";
+	public readonly type: string = "HistoryTransferController";
 
-    constructor(path: string | number | Path, opts?: HistoryTransferControllerOptions) {
-        super(path, syslib.model.classes.HistoryController);
+	constructor(path: string | number | Path, opts?: HistoryTransferControllerOptions) {
+		super(path, syslib.model.classes.HistoryController);
 
-        if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
-            syslib.mass([{
-                class: syslib.model.classes.HistoryController,
-                operation: syslib.model.codes.MassOp.UPSERT,
-                path: this.path.absolutePath(),
-                ObjectName: this.path.name(),
-                "AuxStateManagement.AuxStateChangeStrategy": syslib.model.codes.AuxStateChangeStrategy.INHIBIT,
-                DedicatedThreadExecution: true,
-                ActivationMode: 1,
-            }]);
-        }
-    }
+		if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
+			syslib.mass([{
+				class: syslib.model.classes.HistoryController,
+				operation: syslib.model.codes.MassOp.UPSERT,
+				path: this.path.absolutePath(),
+				ObjectName: this.path.name(),
+				"AuxStateManagement.AuxStateChangeStrategy": syslib.model.codes.AuxStateChangeStrategy.INHIBIT,
+				DedicatedThreadExecution: true,
+				ActivationMode: 1,
+			}]);
+		}
+	}
 
-    static appendable(parent: IObject, name: string, opts?: HistoryTransferControllerOptions): HistoryTransferController {
-        return new HistoryTransferController(parent.path.absolutePath() + "/" + name, opts);
-    }
+	static appendable(parent: IObject, name: string, opts?: HistoryTransferControllerOptions): HistoryTransferController {
+		return new HistoryTransferController(parent.path.absolutePath() + "/" + name, opts);
+	}
 }

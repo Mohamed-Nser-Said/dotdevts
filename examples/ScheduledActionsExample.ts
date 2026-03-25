@@ -7,7 +7,7 @@ import { SchedulerItem } from "../src/objects/Scheduler";
 
     const core = new Core();
     
-    const scheduledTasks = new ScheduledActions(core.path.join("myTest2"))
+    const scheduledTasks = new ScheduledActions(core.path.join("myTest2"));
     scheduledTasks.addAction("return syslib.uuid()");
     scheduledTasks.addAction("return syslib.uuid()");
 

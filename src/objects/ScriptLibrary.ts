@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 
 export class ScriptLibrary {
-	constructor(private linkedObject: IObject) {}
+	constructor(private readonly linkedObject: IObject) {}
 
 	setScript(script: string): void {
 		syslib.setvalue(this.linkedObject.path.absolutePath() + ".AdvancedLuaScript", script);

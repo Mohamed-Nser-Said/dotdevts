@@ -16,7 +16,7 @@ export type HistoryTransporterOptions = {
 };
 
 export class HistoryTransporter extends IObject {
-	type = "HistoryTransporter";
+	public readonly type: string = "HistoryTransporter";
 
 	constructor(path: string | number | Path, opts?: HistoryTransporterOptions) {
 		super(path, syslib.model.classes.HistoryTransporter);

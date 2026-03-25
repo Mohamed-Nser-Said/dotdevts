@@ -17,7 +17,7 @@ export type SchedulerItemOptions = {
 };
 
 export class SchedulerItem extends IObject {
-        type = "SchedulerItem";
+        public readonly type: string = "SchedulerItem";
 
         constructor(path: string | number | Path, opts?: SchedulerItemOptions) {
                 super(path, syslib.model.classes.SchedulerItem);

@@ -5,8 +5,8 @@ import { VariableAddFactory } from "../core/VariableAddFactory";
 export type DataStoreGroupOptions = Record<string, never>;
 
 export class DataStoreGroup extends IObject {
-    type = "DataStoreGroup";
-    add: VariableAddFactory;
+    public readonly type: string = "DataStoreGroup";
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, _opts?: DataStoreGroupOptions) {
         super(path, syslib.model.classes.DataStoreGroup);

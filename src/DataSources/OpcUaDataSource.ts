@@ -22,7 +22,7 @@ export type OpcUaDataSourceOptions = {
 };
 
 export class OpcUaDataSource extends IObject {
-    public readonly type = "OpcUaDataSource";
+    public readonly type: string = "OpcUaDataSource";
     public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: OpcUaDataSourceOptions) {

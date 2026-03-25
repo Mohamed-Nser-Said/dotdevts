@@ -8,15 +8,15 @@ export type MessageProcessorOptions = {
 };
 
 export class MessageProcessor extends IObject {
-    type = "MessageProcessor";
-    historianMapping: HistorianMapping;
-    add: VariableAddFactory;
+    public readonly type: string = "MessageProcessor";
+    public readonly historianMapping: HistorianMapping;
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: MessageProcessorOptions) {
         super(path, syslib.model.classes.MessageProcessor);
 
         this.historianMapping = new HistorianMapping(this);
-    this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.add = new VariableAddFactory(() => this.path.absolutePath());
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{

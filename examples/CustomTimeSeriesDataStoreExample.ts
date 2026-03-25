@@ -22,7 +22,7 @@ export function main() {
         const v = syslib.now();
         syslib.setvalue(syslib.getselfpath(), txt, 0, v);
 
-        return "TEST2.1"
+        return "TEST2.1";
     });
 
 
@@ -38,7 +38,7 @@ export function main() {
         const v = syslib.now();
         syslib.setvalue(syslib.getselfpath(), txt, 0, v);
 
-        return "TEST2.2"
+        return "TEST2.2";
     });
 
 

@@ -4,9 +4,9 @@ import { Path } from "../shared/Path";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 
 export class ScriptEvent extends IObject {
-        type = "ScriptEvent";
-        archive: Archive;
-        add: VariableAddFactory;
+        public readonly type: string = "ScriptEvent";
+        public readonly archive: Archive;
+        public readonly add: VariableAddFactory;
 
         constructor(path: string | number | Path) {
                 super(path, syslib.model.classes.ScriptEvents);

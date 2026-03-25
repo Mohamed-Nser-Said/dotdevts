@@ -16,7 +16,7 @@ export type CustomEventDataStoreOptions = {
 };
 
 export class CustomEventDataStore extends IObject implements IDataStore {
-    public readonly type = "CustomEventDataStore";
+    public readonly type: string = "CustomEventDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
     public readonly add: VariableAddFactory;
 

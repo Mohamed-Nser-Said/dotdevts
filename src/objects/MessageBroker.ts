@@ -8,8 +8,8 @@ export type MessageBrokerOptions = {
 };
 
 export class MessageBroker extends IObject {
-    type = "MessageBroker";
-    add: VariableAddFactory;
+    public readonly type: string = "MessageBroker";
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: MessageBrokerOptions) {
         super(path, syslib.model.classes.MessageBroker);

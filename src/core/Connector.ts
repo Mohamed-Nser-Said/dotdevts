@@ -18,8 +18,8 @@ export type ConnectorOptions = {
 };
 
 export class Connector extends IObject {
-    type = "Connector";
-    add: ObjectAddFactory;
+    public readonly type: string = "Connector";
+    public readonly add: ObjectAddFactory;
 
     constructor(path: string | number | Path, opts?: ConnectorOptions) {
         super(path, syslib.model.classes.Connector);

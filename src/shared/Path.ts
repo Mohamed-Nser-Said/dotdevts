@@ -32,7 +32,7 @@ export class Path {
 		return this.parentPath().absolutePath();
 	}
 
-	join(path: string) {
+	join(path: string): string {
 		if (!path.startsWith("/"))
 			return `${this.absolutePath()}/${path}`;
 		else return `${this.absolutePath()}${path}`;

@@ -2,7 +2,7 @@ import { Variable, VariableOptions } from "../objects/Variable";
 import { VariableGroup, VariableGroupOptions } from "../objects/VariableGroup";
 
 export class VariableAddFactory {
-    constructor(private basePath: () => string) {}
+    constructor(private readonly basePath: () => string) {}
 
     protected childPath(name: string): string {
         return this.basePath() + "/" + name;

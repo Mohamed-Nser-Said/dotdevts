@@ -17,10 +17,10 @@ export type GTSBOptions = {
 };
 
 export class GTSB extends IObject implements IDataStore {
-	type = "GTSB";
-	scriptLibrary: ScriptLibrary;
-	dataStoreConfiguration: DataStoreConfiguration;
-	add: VariableAddFactory;
+	public readonly type: string = "GTSB";
+	public readonly scriptLibrary: ScriptLibrary;
+	public readonly dataStoreConfiguration: DataStoreConfiguration;
+	public readonly add: VariableAddFactory;
 
 	constructor(path: string | number | Path, opts?: GTSBOptions) {
 		super(path, syslib.model.classes.GenericTimeSeriesBuffer);

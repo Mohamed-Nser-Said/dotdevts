@@ -10,9 +10,9 @@ export type ActionItemOptions = {
 };
 
 export class ActionItem extends IObject {
-	type = "ActionItem";
-	archive: Archive;
-	add: VariableAddFactory;
+	public readonly type: string = "ActionItem";
+	public readonly archive: Archive;
+	public readonly add: VariableAddFactory;
 
 	constructor(path: string | number | Path, opts?: ActionItemOptions) {
 		super(path, syslib.model.classes.ActionItem);

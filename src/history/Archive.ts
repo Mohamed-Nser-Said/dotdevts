@@ -41,7 +41,7 @@ export type ArchiveHistoryInterval = {
  *   for use with {@link setDataStore} / `gethistory(..., datastore)`.
  */
 export class Archive {
-	constructor(private linkedObject: IObject) { }
+	constructor(private readonly linkedObject: IObject) { }
 
 	private itemPath(): string {
 		return this.linkedObject.path.absolutePath();

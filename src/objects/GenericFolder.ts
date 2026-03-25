@@ -32,8 +32,8 @@ function massRecursive(path: Path): void {
 }
 
 export class GenericFolder extends IObject {
-        type = "GenericFolder";
-        add: {
+        public readonly type: string = "GenericFolder";
+        public readonly add: {
                 GenericFolder(name: string, opts?: GenericFolderOptions): GenericFolder;
                 Variable(name: string, value?: unknown, opts?: VariableOptions): Variable;
                 VariableGroup(name: string, opts?: VariableGroupOptions): VariableGroup;
@@ -48,7 +48,6 @@ export class GenericFolder extends IObject {
                 super(path, syslib.model.classes.GenFolder);
                 if (opts?.cleanupExisting) this.delete(true);
 
-                // eslint-disable-next-line @typescript-eslint/no-this-alias
                 const self = this;
                 this.add = {
                         GenericFolder(name: string, childOpts?: GenericFolderOptions): GenericFolder {

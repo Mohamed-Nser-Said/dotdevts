@@ -7,8 +7,8 @@ export type VariableOptions = {
 };
 
 export class Variable extends IObject {
-	type = "Variable";
-	archive: Archive;
+	public readonly type: string = "Variable";
+	public readonly archive: Archive;
 
 	constructor(path: string | number | Path, value?: unknown, _opts?: VariableOptions) {
 		super(path, syslib.model.classes.Variable);

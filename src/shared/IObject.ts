@@ -11,11 +11,11 @@ export type PermissionOptions = {
 };
 
 export class IObject {
-	path: Path;
-	object: SysLib.Model.Object | undefined;
-	class?: number;
-	customTable: CustomTable<unknown>;
-	type = "IObject";
+	public readonly path: Path;
+	public object: SysLib.Model.Object | undefined;
+	public readonly class?: number;
+	public readonly customTable: CustomTable<unknown>;
+	public readonly type: string = "IObject";
 
 	constructor(path: string | number | Path, classCode?: number) {
 		this.path = new Path(path);
@@ -55,14 +55,14 @@ export class IObject {
 	private profileMask(permissionOptions: PermissionOptions = {}): number {
 		const { codes, flags } = syslib.model;
 		return (
-codes.ReferenceType.SECURITY +
-(permissionOptions.AllowList ? flags.SecurityAttributes.LIST : 0) +
-(permissionOptions.AllowRead ? flags.SecurityAttributes.READ : 0) +
-(permissionOptions.AllowWrite ? flags.SecurityAttributes.WRITE : 0) +
-(permissionOptions.AllowModify ? flags.SecurityAttributes.MODIFY : 0) +
-(permissionOptions.AllowExecute ? flags.SecurityAttributes.EXECUTE : 0) +
-(permissionOptions.AllowInheritable ? flags.SecurityAttributes.INHERITABLE : 0)
-);
+			codes.ReferenceType.SECURITY +
+			(permissionOptions.AllowList ? flags.SecurityAttributes.LIST : 0) +
+			(permissionOptions.AllowRead ? flags.SecurityAttributes.READ : 0) +
+			(permissionOptions.AllowWrite ? flags.SecurityAttributes.WRITE : 0) +
+			(permissionOptions.AllowModify ? flags.SecurityAttributes.MODIFY : 0) +
+			(permissionOptions.AllowExecute ? flags.SecurityAttributes.EXECUTE : 0) +
+			(permissionOptions.AllowInheritable ? flags.SecurityAttributes.INHERITABLE : 0)
+		);
 	}
 
 	setProfile(profilePath: unknown, permissionOptions: PermissionOptions = {}): void {
@@ -140,7 +140,7 @@ codes.ReferenceType.SECURITY +
 	rename(newName: string): IObject {
 		try {
 			syslib.execute(
-this.parentService(),
+				this.parentService(),
 				`syslib.renameobject("${this.path.absolutePath()}", "${this.path.parentPath().absolutePath()}", "${newName}")`
 			);
 		} catch (err) {
@@ -152,7 +152,7 @@ this.parentService(),
 	moveTo(newParentPath: string): IObject {
 		try {
 			syslib.execute(
-this.parentService(),
+				this.parentService(),
 				`syslib.moveobject("${this.path.absolutePath()}", "${newParentPath}", "${this.path.name()}")`
 			);
 		} catch (err) {

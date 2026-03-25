@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 
 export class ObjectContainer {
-        objects: IObject[];
+        public readonly objects: IObject[];
 
         constructor(objects?: (IObject | string)[]) {
                 this.objects = [];

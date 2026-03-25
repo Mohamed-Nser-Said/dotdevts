@@ -9,7 +9,7 @@ type LinkedObject = {
 };
 
 export class CustomTable<T> {
-	private linkedObject: LinkedObject;
+	private readonly linkedObject: LinkedObject;
 
 	constructor(linkedObject: LinkedObject) {
 		this.linkedObject = linkedObject;

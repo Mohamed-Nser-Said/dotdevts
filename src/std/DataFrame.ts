@@ -3,9 +3,9 @@ import * as dkjson from "dkjson";
 export type Row = Record<string, unknown>;
 
 export class DataFrame<T> {
-	type = "DataFrame";
-	data: T[];
-	columns: string[];
+	public readonly type: string = "DataFrame";
+	public data: T[];
+	public columns: string[];
 
 	constructor(data: T[] = [], columns?: string[]) {
 		this.data = data;

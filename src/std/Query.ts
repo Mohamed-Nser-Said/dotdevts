@@ -13,7 +13,7 @@
  *     .forEach(pair => console.log(pair.left.name, pair.right.value));
  */
 export class Query<T> {
-    _data: T[];
+    private readonly _data: T[];
 
     constructor(data: T[]) {
         this._data = [];

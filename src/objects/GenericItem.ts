@@ -11,15 +11,15 @@ export type GenericItemOptions = {
 };
 
 export class GenericItem extends IObject {
-    type = "GenericItem";
-    archive: Archive;
-    add: VariableAddFactory;
+    public readonly type: string = "GenericItem";
+    public readonly archive: Archive;
+    public readonly add: VariableAddFactory;
 
     constructor(path: string | number | Path, opts?: GenericItemOptions) {
         super(path, syslib.model.classes.GenItem);
 
         this.archive = new Archive(this);
-    this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.add = new VariableAddFactory(() => this.path.absolutePath());
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{

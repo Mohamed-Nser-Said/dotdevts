@@ -24,7 +24,7 @@ const EMPTY_JSON = `{
 }`;
 
 export class HistorianMapping {
-	constructor(private linkedObject: IObject) {}
+	constructor(private readonly linkedObject: IObject) {}
 
 	private get propPath(): string {
 		return this.linkedObject.path.absolutePath() + ".MSIMsgDHistorianConfigList";

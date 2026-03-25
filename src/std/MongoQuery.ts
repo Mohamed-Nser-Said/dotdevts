@@ -148,7 +148,10 @@ export class MongoQueryBuilder<T extends Mongo.Document = Mongo.Document> {
 }
 
 export class MongoFieldBuilder<T extends Mongo.Document, K extends KeyOf<T>> {
-    constructor(private parent: MongoQueryBuilder<T>, private field: K) { }
+    constructor(
+        private readonly parent: MongoQueryBuilder<T>,
+        private readonly field: K,
+    ) { }
 
     /** Direct match `{ field: value }` (no operator object). */
     is(value: T[K]): MongoQueryBuilder<T> {

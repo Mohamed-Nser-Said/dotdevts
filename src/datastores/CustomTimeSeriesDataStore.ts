@@ -33,7 +33,7 @@ export type CustomTimeSeriesCollectionReadOptions<T extends Mongo.Document = Mon
  *   {@link getId} yields the **row id** for `ArchiveSelector`, not the lua-mongo connection id.
  */
 export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
-    public readonly type = "CustomTimeSeriesDataStore";
+    public readonly type: string = "CustomTimeSeriesDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
     public readonly add: VariableAddFactory;
 
@@ -343,7 +343,10 @@ export class MongoQueryableFieldBuilder<
     TOut,
     K extends Extract<keyof TDoc, string>,
 > {
-    constructor(private parent: MongoQueryable<TDoc, TOut>, private field: K) { }
+    constructor(
+        private readonly parent: MongoQueryable<TDoc, TOut>,
+        private readonly field: K,
+    ) { }
 
     /** Direct match `{ field: value }` (no operator object). */
     is(value: TDoc[K]): MongoQueryable<TDoc, TOut> {

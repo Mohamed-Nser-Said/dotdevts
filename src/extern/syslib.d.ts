@@ -25,6 +25,36 @@ declare namespace SysLib {
   type QualityCode = number;
 
   namespace Model {
+    interface AttributeMap {
+      [code: number]: boolean;
+      [code: string]: boolean;
+    }
+
+    interface ModelNameMap {
+      [code: number]: string;
+      [code: string]: string;
+    }
+
+    interface ClassCollection {
+      [code: number]: Class;
+      [tag: string]: Class;
+    }
+
+    interface PropertyCollection {
+      [code: number]: Property;
+      [tag: string]: Property;
+    }
+
+    interface PerformanceCounterCollection {
+      [code: number]: PerformanceCounter;
+      [tag: string]: PerformanceCounter;
+    }
+
+    interface CapabilityCollection {
+      [code: number]: Capability;
+      [tag: string]: Capability;
+    }
+
     interface Reference {
       name: string;
       path: string;
@@ -38,6 +68,72 @@ declare namespace SysLib {
       | "OBJECT_LINK_PASSIVE";
 
     type ReferenceList = Reference[];
+
+    /**
+     * Static-model class metadata userdata exposed through numeric indexing of `syslib.model.classes`.
+     * See https://docs.inmation.com/api/1.110/lua/static_model.html
+     */
+    interface Class {
+      code: number;
+      tag: string;
+      toplevel: boolean;
+      version_major: number;
+      version_minor: number;
+      sortorder: number;
+      subclasses: ClassCollection;
+      properties: PropertyCollection;
+      models: ModelNameMap;
+      attributes: AttributeMap;
+      performance: PerformanceCounterCollection;
+      parents: ClassCollection;
+      children: ClassCollection;
+    }
+
+    /**
+     * Static-model property metadata userdata exposed through numeric indexing of `syslib.model.properties`.
+     */
+    interface Property {
+      code: number;
+      tag: string;
+      type: number;
+      iscompound: boolean;
+      flaggroup?: number;
+      codegroup?: number;
+      table?: boolean;
+      tableschema?: string;
+      default?: unknown;
+      datatype?: number;
+      max?: unknown;
+      min?: unknown;
+      properties: PropertyCollection;
+      attributes: AttributeMap;
+      capabilities: CapabilityCollection;
+    }
+
+    /**
+     * Static-model performance counter userdata exposed through numeric indexing of `syslib.model.counters`.
+     */
+    interface PerformanceCounter {
+      code: number;
+      tag: string;
+      meaning: string;
+      engunit_name: string;
+      engunit_meaning: string;
+      performancegroup_name: string;
+      timebase_name: string;
+      show_timebase: boolean;
+    }
+
+    /**
+     * Static-model capability userdata exposed through `property.capabilities`.
+     */
+    interface Capability {
+      code: number;
+      tag: string;
+      meaning: string;
+      coding_code: number;
+      property: Property;
+    }
 
     interface Object extends ModelObject {
       brefs: ReferenceList;
@@ -346,6 +442,8 @@ declare namespace SysLib {
   }
 
   interface Classes {
+    [className: string]: number | Model.Class;
+    [classCode: number]: Model.Class;
     Core: number;
     GenFolder: number;
     HistoryTransporter: number;
@@ -368,12 +466,24 @@ declare namespace SysLib {
   }
 
   /**
+   * Numeric and symbolic performance counter lookup table.
+   *
+   * - `syslib.model.counters.CounterName` -> numeric code
+   * - `syslib.model.counters[code]` -> static-model counter userdata
+   */
+  interface Counters {
+    [counterName: string]: number | Model.PerformanceCounter;
+    [counterCode: number]: Model.PerformanceCounter;
+  }
+
+  /**
    * Provides numeric property codes for use in queries (e.g. syslib.getsystemdb SQL)
    * and listproperties calls. Access via syslib.model.properties.PropertyName.
    * Values are loaded on demand (do not iterate the table).
    * Full list: https://docs.inmation.com/system-model/1.110/property/index.html
    */
   interface Properties {
+    [propertyCode: number]: Model.Property;
     /** 1 — The display name of the object */
     ObjectName: number;
     /** The class code of the object (matches syslib.model.classes.*) */
@@ -390,13 +500,14 @@ declare namespace SysLib {
     ScriptBody: number;
     /** Generic item selector (e.g. LuaScript, Python…) */
     SelectorGenItem: number;
-    [propertyName: string]: number;
+    [propertyName: string]: number | Model.Property;
   }
 
   interface ModelInfo {
     codes: Codes;
     flags: Flags;
     classes: Classes;
+    counters: Counters;
     /** Numeric property codes. Access via syslib.model.properties.PropertyName. */
     properties: Properties;
   }
@@ -588,7 +699,7 @@ declare namespace SysLib {
    * Global `syslib` / `inmation` Lua API (Core, Connector, etc.). See https://docs.inmation.com/api/1.110/lua/functions.html
    */
   interface SysLib {
-    /** Model metadata: `classes`, `codes`, `flags`, `properties` (numeric codes). */
+    /** Model metadata: `classes`, `counters`, `codes`, `flags`, `properties` (numeric codes + static-model userdata). */
     model: ModelInfo;
 
     /**
@@ -835,7 +946,7 @@ declare namespace SysLib {
      * Current scope parameters for this instance.
      * @noSelf
      */
-    getscopeparameters(): { comment?: string; [key: string]: unknown };
+    getscopeparameters(): { comment?: string;[key: string]: unknown };
 
     /**
      * Merge into script-local SCI defaults; empty table returns current. Short: `syslib.def`

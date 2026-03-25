@@ -18,7 +18,7 @@ import { Query } from "../std/Query";
  *   const products = store.get<Product>("Products");
  */
 export class TableStore extends IObject {
-    type = "TableStore";
+    public readonly type: string = "TableStore";
 
     constructor(path: string | number | Path) {
         super(path, syslib.model.classes.GenFolder);

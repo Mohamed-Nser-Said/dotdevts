@@ -11,9 +11,9 @@ import { TableHolder } from "./TableHolder";
 import { SchedulerItem } from "./Scheduler";
 
 export class Namespace {
-        type = "Namespace";
-        path: Path;
-        add: {
+        public readonly type: string = "Namespace";
+        public readonly path: Path;
+        public readonly add: {
                 Namespace(name: string): Namespace;
                 GenericFolder(name: string, opts?: GenericFolderOptions): GenericFolder;
                 ActionItem(name: string, opts?: ActionItemOptions): ActionItem;
@@ -29,7 +29,6 @@ export class Namespace {
         constructor(path: string | Path) {
                 this.path = path instanceof Path ? path : new Path(path);
 
-                // eslint-disable-next-line @typescript-eslint/no-this-alias
                 const self = this;
                 this.add = {
                         Namespace(name: string): Namespace {

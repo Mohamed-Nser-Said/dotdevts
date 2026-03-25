@@ -17,7 +17,7 @@ export type DataStoreRow = {
  * `datastores` holds internal composite ids assigned when registering.
  */
 export class DataStoreConfiguration {
-	constructor(private linkedObject: IObject) {}
+	constructor(private readonly linkedObject: IObject) { }
 
 	private get propPath(): string {
 		return this.linkedObject.path.absolutePath() + ".DataStoreConfiguration.DataStoreSets";

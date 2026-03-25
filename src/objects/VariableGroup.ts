@@ -8,9 +8,9 @@ export type VariableGroupOptions = {
 };
 
 export class VariableGroup extends IObject {
-	type = "VariableGroup";
-	archive: Archive;
-	add: {
+	public readonly type: string = "VariableGroup";
+	public readonly archive: Archive;
+	public readonly add: {
 		Variable(name: string, value?: unknown, opts?: { recursive?: boolean }): Variable;
 		VariableGroup(name: string, opts?: VariableGroupOptions): VariableGroup;
 	};
@@ -27,7 +27,6 @@ export class VariableGroup extends IObject {
 			},
 		]);
 
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
 		this.add = {
 			Variable(name: string, value?: unknown, childOpts?: { recursive?: boolean }): Variable {

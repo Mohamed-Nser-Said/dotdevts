@@ -3,7 +3,7 @@ import { Path } from "../shared/Path";
 import { DataFrame } from "../std/DataFrame";
 
 export class TableHolder extends IObject {
-        type = "TableHolder";
+        public readonly type: string = "TableHolder";
 
         constructor(path: string | number | Path) {
                 super(path, syslib.model.classes.TableHolder);

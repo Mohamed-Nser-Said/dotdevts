@@ -7,10 +7,10 @@ import { CoreAddFactory } from "./CoreAddFactory";
 export type CoreOptions = Record<string, never>;
 
 export class Core extends IObject {
-    type = "Core";
-    scriptLibrary: ScriptLibrary;
-    dataStoreConfiguration: DataStoreConfiguration;
-    add: CoreAddFactory;
+    public readonly type: string = "Core";
+    public readonly scriptLibrary: ScriptLibrary;
+    public readonly dataStoreConfiguration: DataStoreConfiguration;
+    public readonly add: CoreAddFactory;
 
     constructor(path?: string | number | Path, _opts?: CoreOptions) {
         const resolvedPath = path ?? (syslib.getcorepath() as string);

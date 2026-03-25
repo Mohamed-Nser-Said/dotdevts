@@ -14,7 +14,7 @@ export type ScheduledActionOptions = {
 
 export class ScheduledActions {
 
-    private readonly folder: GenericFolder | undefined;
+    private readonly folder: GenericFolder;
     private readonly scheduler: SchedulerItem;
     private readonly _actions = new Map<string, ActionItem>();
     private readonly dataStore: IDataStore | undefined;
@@ -22,7 +22,7 @@ export class ScheduledActions {
     constructor(path: string, options?: ScheduledActionOptions) {
         this.dataStore = options?.dataStore;
         this.folder = new GenericFolder(path, { cleanupExisting: options?.cleanupExisting });
-        const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } }
+        const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } };
         this.scheduler = this.folder.add.SchedulerItem("__ScheduledActions", defaultOptions);
 
     }
@@ -41,7 +41,6 @@ export class ScheduledActions {
     addAction(script: string, options?: { name?: string; absolutePath?: string }): ActionItem | undefined;
     addAction(fn: ScriptChunk, options?: { name?: string; absolutePath?: string }): ActionItem | undefined;
     addAction(scriptOrFn?: string | ScriptChunk, options?: { name?: string; absolutePath?: string }): ActionItem | undefined {
-        if (!this.folder) return;
         const unqName = `${options?.name ?? ""}__action${syslib.uuid()}`;
 
         // Strings (and undefined) are handled directly.
@@ -68,12 +67,12 @@ export class ScheduledActions {
     }
 
     get rootPath() {
-        return this.folder?.path.absolutePath();
+        return this.folder.path.absolutePath();
     }
 
     get actions(): ActionItem[] {
         const actions = new Set<ActionItem>(Array.from(this._actions.values()).map(a => a));
-        syslib.getbackreferences(this.scheduler?.path.absolutePath()).forEach(ref => actions.add(new ActionItem(ref.path)));
+        syslib.getbackreferences(this.scheduler.path.absolutePath()).forEach(ref => actions.add(new ActionItem(ref.path)));
         return Array.from(actions);
     }
 
@@ -85,7 +84,7 @@ export class ScheduledActions {
     delete() {
         this.removeActions();
         this.scheduler.delete(true);
-        this.folder?.delete(true);
+        this.folder.delete(true);
     }
 
     updateScheduler(options: SchedulerItemOptions) {

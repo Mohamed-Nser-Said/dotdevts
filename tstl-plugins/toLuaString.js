@@ -56,8 +56,9 @@ module.exports = function toLuaStringPlugin() {
                 const isSetFuncCall = isMethodCallNamed(node, "setFunc");
                 const isOnTriggerFuncCall = isMethodCallNamed(node, "onTriggerFunc");
                 const isAddActionCall = isMethodCallNamed(node, "addAction");
+                const isOnTriggerCall = isMethodCallNamed(node, "onTrigger");
 
-                if (!isToLuaCall && !isSetFuncCall && !isOnTriggerFuncCall && !isAddActionCall) {
+                if (!isToLuaCall && !isSetFuncCall && !isOnTriggerFuncCall && !isAddActionCall && !isOnTriggerCall) {
                     return context.superTransformExpression(node);
                 }
 
@@ -81,8 +82,8 @@ module.exports = function toLuaStringPlugin() {
                 }
 
                 const arg = node.arguments[0];
-                // If not an inline function, fall back to default transformation for setFunc/onTriggerFunc.
-                // This allows passing a raw string: setFunc("...") / onTriggerFunc("...")
+                // If not an inline function, fall back to default transformation.
+                // This allows passing raw strings: setFunc("..."), onTrigger("..."), addAction("...")
                 if (!ts.isArrowFunction(arg) && !ts.isFunctionExpression(arg)) {
                     if (isToLuaCall) {
                         diagForNode(context, arg, "toLua(fn) requires an inline function: () => { ... }");
@@ -173,6 +174,19 @@ module.exports = function toLuaStringPlugin() {
                         prefix,
                         methodId,
                         [tstl.createStringLiteral(chunk, node), ...extraArgs],
+                        node
+                    );
+                }
+
+                // obj.onTrigger(fn) -> obj.onTrigger("<chunk>")
+                if (isOnTriggerCall) {
+                    const propAccess = node.expression; // PropertyAccessExpression
+                    const prefix = context.transformExpression(propAccess.expression);
+                    const methodId = tstl.createIdentifier("onTrigger", node);
+                    return tstl.createMethodCallExpression(
+                        prefix,
+                        methodId,
+                        [tstl.createStringLiteral(chunk, node)],
                         node
                     );
                 }

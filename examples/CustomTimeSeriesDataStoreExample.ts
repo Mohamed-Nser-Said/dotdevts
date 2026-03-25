@@ -19,7 +19,8 @@ export function main() {
         const txt = "Action 1";
         const v = syslib.now();
         syslib.setvalue(syslib.getselfpath(), txt, 0, v);
-        return "TEST"
+
+        return "TEST2.1"
     });
 
     scheduledActions.addAction(() => {

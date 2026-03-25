@@ -27,9 +27,9 @@ import { SetExample } from "./examples/SetExample";
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
 
-SetExample();
+// SetExample();
 
-ScheduledActions();
+// ScheduledActions();
 CustomTimeSeriesDataStore();
 // customTableExample();
 // genericFolderExample();

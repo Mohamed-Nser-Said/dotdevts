@@ -3,6 +3,7 @@ import { Path } from "../shared/Path";
 import { ScriptLibrary } from "../objects/ScriptLibrary";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
+import { ScriptChunk } from "../shared/toLua";
 
 export type GTSBOptions = {
 	advancedLuaScript?: string;
@@ -85,8 +86,25 @@ export class GTSB extends IObject {
 		return id;
 	}
 
-	onTrigger(script: string): void {
-		syslib.setvalue(this.path.absolutePath() + ".AdvancedLuaScript", script);
+	/**
+	 * Set the processing script.
+	 *
+	 * Accepts either:
+	 * - a raw Lua script chunk string, or
+	 * - a TypeScript function (ScriptChunk) compiled to a Lua chunk string at build time.
+	 *
+	 * The function form relies on the TypeScriptToLua plugin `tstl-plugins/toLuaString.js`.
+	 */
+	onTrigger(script: string): void;
+	onTrigger(fn: ScriptChunk): void;
+	onTrigger(scriptOrFn: string | ScriptChunk): void {
+		if (typeof scriptOrFn === "string") {
+			syslib.setvalue(this.path.absolutePath() + ".AdvancedLuaScript", scriptOrFn);
+			return;
+		}
+		throw new Error(
+			"GTSB.onTrigger(fn) is a compile-time feature. Ensure the TypeScriptToLua luaPlugin `./tstl-plugins/toLuaString` is configured in tsconfig.json (tstl.luaPlugins)."
+		);
 	}
 
 	delete(silent?: boolean): boolean {

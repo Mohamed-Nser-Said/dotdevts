@@ -4,6 +4,7 @@ import { ScriptLibrary } from "../objects/ScriptLibrary";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 import { ScriptChunk } from "../shared/toLua";
+import { IDataStore } from "../Interfaces/IDataStore";
 
 export type GTSBOptions = {
 	advancedLuaScript?: string;
@@ -15,7 +16,7 @@ export type GTSBOptions = {
 	core?: string | IObject;
 };
 
-export class GTSB extends IObject {
+export class GTSB extends IObject implements IDataStore {
 	type = "GTSB";
 	scriptLibrary: ScriptLibrary;
 	dataStoreConfiguration: DataStoreConfiguration;
@@ -79,8 +80,18 @@ export class GTSB extends IObject {
 		return 1;
 	}
 
-	getId(core?: DataStoreConfiguration): number {
-		const config = core ?? this.dataStoreConfiguration;
+	/**
+	 * Archive row id for this buffer’s registration (see {@link IDataStore}).
+	 * @param core Optional Core (or any {@link IObject} sharing the target `dataStoreConfiguration`).
+	 */
+	getId(core?: IObject): number {
+		let config: DataStoreConfiguration;
+		if (!core) {
+			config = this.dataStoreConfiguration;
+		} else {
+			const withDsc = core as IObject & { dataStoreConfiguration?: DataStoreConfiguration };
+			config = withDsc.dataStoreConfiguration ?? new DataStoreConfiguration(core);
+		}
 		const id = config.getIdByName(this.path.name());
 		if (id === undefined) throw new Error(`DataStore '${this.path.name()}' not found`);
 		return id;

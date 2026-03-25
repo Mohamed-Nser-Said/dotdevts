@@ -2,9 +2,11 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
+import { IDataStore } from "../Interfaces/IDataStore";
+import { inmationMongoConnectionString } from "./mongoConnectionString";
 
 export type CustomEventDataStoreOptions = {
-    connectionString?: string| {port: number, host: string}
+	connectionString?: string | { port: number; host: string };
     database?: string;
     collection?: string;
     registerAsDataStore?: boolean;
@@ -13,7 +15,7 @@ export type CustomEventDataStoreOptions = {
     skipMass?: boolean;
 };
 
-export class CustomEventDataStore extends IObject {
+export class CustomEventDataStore extends IObject implements IDataStore {
     public readonly type = "CustomEventDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
     public readonly add: VariableAddFactory;
@@ -21,7 +23,7 @@ export class CustomEventDataStore extends IObject {
     constructor(path: string | number | Path, opts?: CustomEventDataStoreOptions) {
         super(path, syslib.model.classes.CustomEventDataStore);
         this.add = new VariableAddFactory(() => this.path.absolutePath());
-        const connectionString = typeof(opts?.connectionString) == "string"? opts?.connectionString : `${opts?.connectionString?.host}:${opts?.connectionString?.port}`
+        const connectionString = inmationMongoConnectionString(opts?.connectionString, "mongodbGP1:27017");
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{
@@ -35,7 +37,7 @@ export class CustomEventDataStore extends IObject {
                 "CustomEventStore.MongoDBConnection.MongoDbUseTLS": false,
                 "CustomEventStore.MongoDBConnection.MongoDbUseCompression": false,
                 "CustomEventStore.EventPurgeOptions": syslib.model.codes.EventPurgeOptions.DO_NOT_PURGE,
-                "CustomEventStore.MongoDBConnection.ConnectionString": opts?.connectionString ?? "mongodbGP1:27017",
+                "CustomEventStore.MongoDBConnection.ConnectionString": connectionString,
                 "CustomEventStore.CustomEventCollection": opts?.collection ?? "custom_event_store",
                 "CustomEventStore.CustomEventDatabase": opts?.database ?? "inmation_event_db",
             }]);
@@ -57,6 +59,7 @@ export class CustomEventDataStore extends IObject {
         return 3;
     }
 
+    /** {@inheritDoc IDataStore.getId} */
     getId(core?: IObject): number {
         const dsc = core ? new DataStoreConfiguration(core) : this.dataStoreConfiguration;
         const sets = dsc.getDataStoreSets().data;

@@ -10,6 +10,12 @@ export type DataStoreRow = {
 	rowid: number;
 };
 
+/**
+ * Read/write the Core property `DataStoreConfiguration.DataStoreSets` (JSON table + DataFrame).
+ *
+ * Each **row** is one logical store registration: `rowid` is what items use as archive selector;
+ * `datastores` holds internal composite ids assigned when registering.
+ */
 export class DataStoreConfiguration {
 	constructor(private linkedObject: IObject) {}
 
@@ -31,6 +37,10 @@ export class DataStoreConfiguration {
 		return DataFrame.fromRawInmation<DataStoreRow>(raw as Record<string, unknown>[]);
 	}
 
+	/**
+	 * Append a registration row for `dataStore` and return its internal composite id
+	 * (stored in `row.datastores[0]` — not the same as {@link rowIdForStoreName}).
+	 */
 	addDataStore(dataStore: IObject & { _uniqueID(): number }): number {
 		// Use the cached object on the IObject (set by IObject constructor + refreshed after mass)
 		// to get the numid — avoids a redundant getobject call and mirrors the Teal implementation.
@@ -76,20 +86,44 @@ export class DataStoreConfiguration {
 		return newId;
 	}
 
+	/** Same as {@link addDataStore} — registers the store on this Core’s DataStoreSets. */
+	register(dataStore: IObject & { _uniqueID(): number }): number {
+		return this.addDataStore(dataStore);
+	}
+
 	removeDataStore(dataStore: IObject): void {
 		const name = dataStore.path.name();
 		const sets = this.getDataStoreSets().data.filter((r) => r.name !== name);
 		this.encode(sets);
 	}
 
+	/** Same as {@link removeDataStore}. */
+	unregister(dataStore: IObject): void {
+		this.removeDataStore(dataStore);
+	}
+
 	removeAllDataStores(): void {
 		this.encode([]);
 	}
 
+	/** Clear every registration row (empty DataStoreSets). */
+	clear(): void {
+		this.removeAllDataStores();
+	}
+
+	/**
+	 * **Row id** (`rowid`) for a store whose `ObjectName` matches `name` — this is what
+	 * {@link IDataStore.getId} / {@link Archive.setDataStore} use for archive targeting.
+	 */
 	getIdByName(name: string): number | undefined {
 		for (const row of this.getDataStoreSets().data) {
 			if (row.name === name) return row.rowid;
 		}
 		return undefined;
+	}
+
+	/** Same as {@link getIdByName}. */
+	rowIdForStoreName(name: string): number | undefined {
+		return this.getIdByName(name);
 	}
 }

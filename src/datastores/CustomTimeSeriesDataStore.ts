@@ -4,9 +4,11 @@ import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 import { mq, MongoQueryBuilder } from "../std/MongoQuery";
 import { IDataStore } from "../Interfaces/IDataStore";
+import { inmationMongoConnectionString } from "./mongoConnectionString";
 
 export type CustomTimeSeriesDataStoreOptions = {
-    connection: string | { port: number, host: string }
+	/** `host:port` string or `{ host, port }`; omit for default lab host (see {@link inmationMongoConnectionString}). */
+	connection?: string | { port: number; host: string };
     database?: string;
     collection?: string;
     registerAsDataStore?: boolean;
@@ -23,6 +25,13 @@ export type CustomTimeSeriesCollectionReadOptions<T extends Mongo.Document = Mon
     options?: Mongo.FindOptions;
 };
 
+/**
+ * Mongo-backed **custom time-series** store object plus typed read helpers (`query`, `findAll`, …).
+ *
+ * - **Registration**: `registerAsDataStore: true` adds a row on the Core’s {@link DataStoreConfiguration}.
+ * - **Archive wiring**: pass this instance to `Variable.archive.setDataStore(store)` (see `Archive` in `history/Archive.ts`).
+ *   {@link getId} yields the **row id** for `ArchiveSelector`, not the lua-mongo connection id.
+ */
 export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
     public readonly type = "CustomTimeSeriesDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
@@ -31,7 +40,7 @@ export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
     constructor(path: string | number | Path, opts?: CustomTimeSeriesDataStoreOptions) {
         super(path, syslib.model.classes.CustomTimeSeriesDataStore);
         this.add = new VariableAddFactory(() => this.path.absolutePath());
-        const connectionString = typeof (opts?.connection) == "string" ? opts?.connection : `${opts?.connection?.host}:${opts?.connection?.port}`
+        const connectionString = inmationMongoConnectionString(opts?.connection, "mongodbGP1:27017");
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{
@@ -43,7 +52,7 @@ export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbAllowInvalidHostnames": false,
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbUseTLS": false,
                 "CustomTimeSeriesStore.MongoDBConnection.MongoDbUseCompression": false,
-                "CustomTimeSeriesStore.MongoDBConnection.ConnectionString": connectionString ?? "mongodbGP1:27017",
+                "CustomTimeSeriesStore.MongoDBConnection.ConnectionString": connectionString,
                 "CustomTimeSeriesStore.TimeSeriesCollection": opts?.collection ?? "custom_time_series",
                 "CustomTimeSeriesStore.TimeSeriesDatabase": opts?.database ?? "inmation_timeseries_db",
             }]);
@@ -208,6 +217,7 @@ export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
         return map ? bson.value(map) : (bson.value() as unknown as U);
     }
 
+    /** {@inheritDoc IDataStore.getId} */
     getId(core?: IObject): number {
         const dsc = core ? new DataStoreConfiguration(core) : this.dataStoreConfiguration;
         const sets = dsc.getDataStoreSets().data;

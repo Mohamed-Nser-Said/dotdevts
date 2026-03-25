@@ -15,7 +15,7 @@ export function main(): void {
         console.log("      toString:", ns.toString());
 
         console.log("  [2] Add a Variable via namespace");
-        const v = ns.add.Variable("Setpoint", 100);
+        const v = ns.children.Variable("Setpoint", 100);
         console.log("      Variable created:", v.path.absolutePath());
 
         console.log("  [3] Push into sub-namespace");
@@ -23,24 +23,24 @@ export function main(): void {
         console.log("      Sub namespace:", sub.path.absolutePath());
 
         console.log("  [4] Add GenericFolder via sub namespace");
-        const gf = sub.add.GenericFolder("Assets");
+        const gf = sub.children.GenericFolder("Assets");
         console.log("      GenericFolder created:", gf.path.absolutePath());
 
-        console.log("  [5] Add nested Namespace via add builder");
-        const child = ns.add.Namespace("ChildNS");
+        console.log("  [5] Add nested Namespace via children factory");
+        const child = ns.children.Namespace("ChildNS");
         console.log("      Child namespace:", child.path.absolutePath());
 
         console.log("  [6] Add ScriptEvent via namespace");
-        const se = ns.add.ScriptEvent("MyEvent");
+        const se = ns.children.ScriptEvent("MyEvent");
         console.log("      ScriptEvent created:", se.path.absolutePath());
 
         console.log("  [7] Add TableHolder via namespace");
-        const th = ns.add.TableHolder("Config");
+        const th = ns.children.TableHolder("Config");
         th.setTable([{ key: "value", count: 42 }]);
         console.log("      TableHolder created:", th.path.absolutePath());
 
         console.log("  [8] Add Scheduler via namespace");
-        const sched = ns.add.SchedulerItem("MyScheduler");
+        const sched = ns.children.SchedulerItem("MyScheduler");
         console.log("      Scheduler created:", sched.path.absolutePath());
 
         console.log("  [9] childPath helper");

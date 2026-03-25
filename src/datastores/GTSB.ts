@@ -2,7 +2,7 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { ScriptLibrary } from "../objects/ScriptLibrary";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 import { ScriptChunk } from "../shared/toLua";
 import { IDataStore } from "../Interfaces/IDataStore";
 
@@ -20,7 +20,7 @@ export class GTSB extends IObject implements IDataStore {
 	public readonly type: string = "GTSB";
 	public readonly scriptLibrary: ScriptLibrary;
 	public readonly dataStoreConfiguration: DataStoreConfiguration;
-	public readonly add: VariableAddFactory;
+	public readonly children: VariableChildren;
 
 	constructor(path: string | number | Path, opts?: GTSBOptions) {
 		super(path, syslib.model.classes.GenericTimeSeriesBuffer);
@@ -50,7 +50,7 @@ export class GTSB extends IObject implements IDataStore {
 			);
 		}
 
-		this.add = new VariableAddFactory(() => this.path.absolutePath());
+		this.children = new VariableChildren(() => this.path.absolutePath());
 
 		if (!opts?.skipMass && (!syslib.getobject(this.path.absolutePath()) || opts?.advancedLuaScript)) {
 			const retryLatency = opts?.retryLatency ?? 1;

@@ -32,7 +32,8 @@ inmation-compose.json   froge/cts connection profiles
 luabundle.json          Lua bundler config (ignored native modules)
 
 src/
-├── core/               Core, CoreAddFactory, ObjectAddFactory, VariableAddFactory, Connector
+├── core/               Core, Connector
+├── children/           ObjectChildren, CoreChildren; `VariableChildren` / `GenericFolderChildren` re-exported from `objects/VariableGroup.ts` / `objects/GenericFolder.ts` (Lua require order)
 ├── objects/            inmation object wrappers (Variable, GenericFolder, ActionItem, TableHolder, …)
 ├── datastores/         CustomTimeSeriesDataStore, GTSB, CustomEventDataStore, DataStoreGroup, DataStoreConfiguration
 ├── DataSources/        OpcUaDataSource
@@ -52,8 +53,8 @@ build/                  Generated Lua output (do not edit)
 
 ### Object model
 - `IObject` (base) → holds a `Path`, a `syslib` model object ref, and a `CustomTable<T>`.
-- `VariableAddFactory` → `ObjectAddFactory` → `CoreAddFactory`: each level adds typed `.add.Xxx()` factory methods.
-- `Core` extends `IObject`: the root entry point. `core.add.CustomTimeSeriesDataStore(...)`, `core.add.GenericFolder(...)`, etc.
+- `VariableChildren` → `ObjectChildren` → `CoreChildren`: each level adds typed `.children.Xxx()` factory methods; `GenericFolderChildren` narrows what you can create under a folder; `NamespaceChildren` (in `Namespace.ts`) covers logical namespace paths.
+- `Core` extends `IObject`: the root entry point. `core.children.CustomTimeSeriesDataStore(...)`, `core.children.GenericFolder(...)`, etc.
 - Objects are created via `syslib.mass([{ class, operation: MassOp.UPSERT, path, ... }])`.
 
 ### MongoDB / data stores

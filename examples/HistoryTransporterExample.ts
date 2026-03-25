@@ -23,7 +23,7 @@ export function main(): void {
 	const core = new Core();
 	const conn = new Connector("/System/Core/CORE-LOCAL-SITE/AMS_Windfarm-connector");
 
-	const root =  core.add.GenericFolder("HistoryTransporter", {cleanupExisting: true});
+	const root =  core.children.GenericFolder("HistoryTransporter", {cleanupExisting: true});
 	const corePath = core.path.absolutePath();
 
 	// --- HistoryTransporter (requires valid parent type) ---
@@ -31,7 +31,7 @@ export function main(): void {
 		const ht = new HistoryTransporter(`/System/Core/CORE-LOCAL-SITE/AMS_Windfarm-connector/HT1`);
 		console.log(`Created HistoryTransporter: ${ht.path.absolutePath()}`);
 
-		// const htWithTags =  conn.add.HistoryTransporter(`Transporter2`, {
+		// const htWithTags =  conn.children.HistoryTransporter(`Transporter2`, {
 		// 	TagConfiguration: [
 		// 		{ Path: `${corePath}/examples/variables/Speed`, Name: "Speed", Historian: 1 },
 		// 		{ Path: `${corePath}/examples/variables/Motor/RPM`, Name: "RPM", Historian: 1 },

@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 import { Archive } from "../history/Archive";
 import { Path } from "../shared/Path";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 import { ScriptChunk } from "../shared/toLua";
 
 export type ActionItemOptions = {
@@ -12,12 +12,12 @@ export type ActionItemOptions = {
 export class ActionItem extends IObject {
 	public readonly type: string = "ActionItem";
 	public readonly archive: Archive;
-	public readonly add: VariableAddFactory;
+	public readonly children: VariableChildren;
 
 	constructor(path: string | number | Path, opts?: ActionItemOptions) {
 		super(path, syslib.model.classes.ActionItem);
 		this.archive = new Archive(this);
-		this.add = new VariableAddFactory(() => this.path.absolutePath());
+		this.children = new VariableChildren(() => this.path.absolutePath());
 
 		if (!syslib.getobject(this.path.absolutePath())) {
 			syslib.mass([{

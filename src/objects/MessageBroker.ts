@@ -1,6 +1,6 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 
 export type MessageBrokerOptions = {
     systemId?: number;
@@ -9,11 +9,11 @@ export type MessageBrokerOptions = {
 
 export class MessageBroker extends IObject {
     public readonly type: string = "MessageBroker";
-    public readonly add: VariableAddFactory;
+    public readonly children: VariableChildren;
 
     constructor(path: string | number | Path, opts?: MessageBrokerOptions) {
         super(path, syslib.model.classes.MessageBroker);
-        this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.children = new VariableChildren(() => this.path.absolutePath());
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             const systemId = opts?.systemId ?? 8002;

@@ -39,10 +39,10 @@ export function main(): void {
 	console.log(`Created variable group: ${motorGroup.path.absolutePath()}`);
 
 	// Add children via the builder
-	const rpm = motorGroup.add.Variable("RPM", 1500);
-	const torque = motorGroup.add.Variable("Torque", 50.0);
-	const nested = motorGroup.add.VariableGroup("Diagnostics");
-	const temp = nested.add.Variable("Temperature", 65.0);
+	const rpm = motorGroup.children.Variable("RPM", 1500);
+	const torque = motorGroup.children.Variable("Torque", 50.0);
+	const nested = motorGroup.children.VariableGroup("Diagnostics");
+	const temp = nested.children.Variable("Temperature", 65.0);
 
 	console.log(`RPM: ${rpm.path.absolutePath()}`);
 	console.log(`Torque: ${torque.path.absolutePath()}`);

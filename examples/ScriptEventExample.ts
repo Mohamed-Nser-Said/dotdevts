@@ -17,11 +17,11 @@ export function main(): void {
         console.log("      Type:", se.type);
 
         console.log("  [2] Add a Variable child to ScriptEvent");
-        const v = se.add.Variable("Status", "idle");
+        const v = se.children.Variable("Status", "idle");
         console.log("      Variable created:", v.path.absolutePath());
 
         console.log("  [3] Add a VariableGroup child to ScriptEvent");
-        const vg = se.add.VariableGroup("Config");
+        const vg = se.children.VariableGroup("Config");
         console.log("      VariableGroup created:", vg.path.absolutePath());
 
         console.log("  [4] Create Scheduler");
@@ -35,13 +35,13 @@ export function main(): void {
         });
         console.log("      ActionItem created:", ai.path.absolutePath());
 
-        console.log("  [6] GenericFolder add.ScriptEvent shorthand");
+        console.log("  [6] GenericFolder.children.ScriptEvent shorthand");
         const gf = new GenericFolder(basePath + "/SubFolder");
-        const se2 = gf.add.ScriptEvent("InlineEvent");
+        const se2 = gf.children.ScriptEvent("InlineEvent");
         console.log("      Inline ScriptEvent:", se2.path.absolutePath());
 
-        console.log("  [7] GenericFolder add.Scheduler shorthand");
-        const sched2 = gf.add.SchedulerItem("InlineScheduler");
+        console.log("  [7] GenericFolder.children.Scheduler shorthand");
+        const sched2 = gf.children.SchedulerItem("InlineScheduler");
         console.log("      Inline Scheduler:", sched2.path.absolutePath());
 
         console.log("  ScriptEventExample done.");

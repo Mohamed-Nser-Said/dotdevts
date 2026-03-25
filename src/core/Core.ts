@@ -2,7 +2,7 @@ import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { ScriptLibrary } from "../objects/ScriptLibrary";
 import { DataStoreConfiguration } from "../datastores/DataStoreConfiguration";
-import { CoreAddFactory } from "./CoreAddFactory";
+import { CoreChildren } from "../children/CoreChildren";
 
 export type CoreOptions = Record<string, never>;
 
@@ -10,14 +10,14 @@ export class Core extends IObject {
     public readonly type: string = "Core";
     public readonly scriptLibrary: ScriptLibrary;
     public readonly dataStoreConfiguration: DataStoreConfiguration;
-    public readonly add: CoreAddFactory;
+    public readonly children: CoreChildren;
 
     constructor(path?: string | number | Path, _opts?: CoreOptions) {
         const resolvedPath = path ?? (syslib.getcorepath() as string);
         super(resolvedPath, syslib.model.classes.Core);
         this.scriptLibrary = new ScriptLibrary(this);
         this.dataStoreConfiguration = new DataStoreConfiguration(this);
-        this.add = new CoreAddFactory(() => this.path.absolutePath());
+        this.children = new CoreChildren(() => this.path.absolutePath());
     }
 
     isMaster(): boolean {

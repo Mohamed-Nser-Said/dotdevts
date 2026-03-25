@@ -1,17 +1,17 @@
 import { IObject } from "../shared/IObject";
 import { Archive } from "../history/Archive";
 import { Path } from "../shared/Path";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 
 export class ScriptEvent extends IObject {
         public readonly type: string = "ScriptEvent";
         public readonly archive: Archive;
-        public readonly add: VariableAddFactory;
+        public readonly children: VariableChildren;
 
         constructor(path: string | number | Path) {
                 super(path, syslib.model.classes.ScriptEvents);
                 this.archive = new Archive(this);
-                this.add = new VariableAddFactory(() => this.path.absolutePath());
+                this.children = new VariableChildren(() => this.path.absolutePath());
 
                 if (!syslib.getobject(this.path.absolutePath())) {
                         syslib.mass([{

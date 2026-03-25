@@ -1,6 +1,6 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 
 export type OpcUaIdentityOptions = {
     type?: number;
@@ -23,11 +23,11 @@ export type OpcUaDataSourceOptions = {
 
 export class OpcUaDataSource extends IObject {
     public readonly type: string = "OpcUaDataSource";
-    public readonly add: VariableAddFactory;
+    public readonly children: VariableChildren;
 
     constructor(path: string | number | Path, opts?: OpcUaDataSourceOptions) {
         super(path, syslib.model.classes.Datasource);
-        this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.children = new VariableChildren(() => this.path.absolutePath());
 
         if (!opts?.skipMass && (!syslib.getobject(this.path.absolutePath()) || opts?.overwrite)) {
             const codes = syslib.model.codes;

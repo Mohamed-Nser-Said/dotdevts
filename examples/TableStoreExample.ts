@@ -104,11 +104,11 @@ export function main(): void {
         .forEach(a => console.log(`      [${a.severity}] ${a.sensorId} — ${a.message}`));
 
     // ─────────────────────────────────────────────────────────────────────
-    // 6. Store via add factory — separate config store per line
+    // 6. Store via children factory — separate config store per line
     // ─────────────────────────────────────────────────────────────────────
-    console.log("  [6] Per-line config store via add factory");
+    console.log("  [6] Per-line config store via children factory");
     const lineFolder = new GenericFolder(basePath + "/LineA");
-    const lineConfig = lineFolder.add.TableStore("Config");
+    const lineConfig = lineFolder.children.TableStore("Config");
     lineConfig.set("Thresholds", [
         { tag: "PT-101", warnAt: 8.0,  tripAt: 9.5  },
         { tag: "TT-201", warnAt: 130.0, tripAt: 148.0 },

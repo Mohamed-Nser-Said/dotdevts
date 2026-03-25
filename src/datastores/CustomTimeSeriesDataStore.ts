@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 import { mq, MongoQueryBuilder } from "../std/MongoQuery";
 import { IDataStore } from "../Interfaces/IDataStore";
 import { inmationMongoConnectionString } from "./mongoConnectionString";
@@ -35,11 +35,11 @@ export type CustomTimeSeriesCollectionReadOptions<T extends Mongo.Document = Mon
 export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
     public readonly type: string = "CustomTimeSeriesDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
-    public readonly add: VariableAddFactory;
+    public readonly children: VariableChildren;
 
     constructor(path: string | number | Path, opts?: CustomTimeSeriesDataStoreOptions) {
         super(path, syslib.model.classes.CustomTimeSeriesDataStore);
-        this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.children = new VariableChildren(() => this.path.absolutePath());
         const connectionString = inmationMongoConnectionString(opts?.connection, "mongodbGP1:27017");
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {

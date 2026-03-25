@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { HistorianMapping } from "../history/HistorianMapping";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 
 export type MessageProcessorOptions = {
     skipMass?: boolean;
@@ -10,13 +10,13 @@ export type MessageProcessorOptions = {
 export class MessageProcessor extends IObject {
     public readonly type: string = "MessageProcessor";
     public readonly historianMapping: HistorianMapping;
-    public readonly add: VariableAddFactory;
+    public readonly children: VariableChildren;
 
     constructor(path: string | number | Path, opts?: MessageProcessorOptions) {
         super(path, syslib.model.classes.MessageProcessor);
 
         this.historianMapping = new HistorianMapping(this);
-        this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.children = new VariableChildren(() => this.path.absolutePath());
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {
             syslib.mass([{

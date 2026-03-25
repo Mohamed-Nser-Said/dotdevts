@@ -11,7 +11,7 @@ export function main() {
 
     const core = new Core();
 
-    const myDataStore = core.add.CustomTimeSeriesDataStore("myDataStore2", { registerAsDataStore: true, connection: { port: 27017, host: "localhost" } });
+    const myDataStore = core.children.CustomTimeSeriesDataStore("myDataStore2", { registerAsDataStore: true, connection: { port: 27017, host: "localhost" } });
 
     const scheduledActions = new ScheduledActions(core.path.join("Runner-v2"), { cleanupExisting: false, dataStore: myDataStore, });
 

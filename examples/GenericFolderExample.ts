@@ -16,18 +16,18 @@ export function main(): void {
 	const root = new GenericFolder(rootPath);
 	console.log(`Created root folder: ${root.path.absolutePath()}`);
 
-	// --- Nested folders using .add builder ---
-	const sensors = root.add.GenericFolder("Sensors");
+	// --- Nested folders using .children factory ---
+	const sensors = root.children.GenericFolder("Sensors");
 	console.log(`Created child folder: ${sensors.path.absolutePath()}`);
 
-	const temperature = sensors.add.GenericFolder("Temperature");
+	const temperature = sensors.children.GenericFolder("Temperature");
 	console.log(`Created nested folder: ${temperature.path.absolutePath()}`);
 
 	// --- Add variables directly via the builder ---
-	const tempVar = temperature.add.Variable("TempSensor1", 21.5);
+	const tempVar = temperature.children.Variable("TempSensor1", 21.5);
 	console.log(`Created variable: ${tempVar.path.absolutePath()}`);
 
-	const pressure = sensors.add.VariableGroup("Pressure");
+	const pressure = sensors.children.VariableGroup("Pressure");
 	console.log(`Created variable group: ${pressure.path.absolutePath()}`);
 
 	// --- static appendable factory ---

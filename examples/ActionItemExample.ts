@@ -44,10 +44,10 @@ export function main(): void {
 	});
 	console.log(`Created chainedFunc: ${chainedFunc.path.absolutePath()}`);
 
-	// --- ActionItem.add builder: child variables ---
+	// --- ActionItem.children: child variables ---
 	const withChildren = new ActionItem(`${rootPath}/WithChildren`);
-	const status = withChildren.add.Variable("Status", 0);
-	const counter = withChildren.add.Variable("Counter", 0);
+	const status = withChildren.children.Variable("Status", 0);
+	const counter = withChildren.children.Variable("Counter", 0);
 	console.log(`Child variable: ${status.path.absolutePath()}`);
 	console.log(`Child variable: ${counter.path.absolutePath()}`);
 
@@ -66,8 +66,8 @@ export function main(): void {
 	});
 	console.log(`Created via appendable: ${via.path.absolutePath()}`);
 
-	// --- GenericFolder.add.ActionItem builder ---
-	const fromFolder = root.add.ActionItem("FromFolder", {
+	// --- GenericFolder.children.ActionItem builder ---
+	const fromFolder = root.children.ActionItem("FromFolder", {
 		script: `syslib.log(2, "FromFolder fired")`,
 	});
 	console.log(`Created from folder builder: ${fromFolder.path.absolutePath()}`);

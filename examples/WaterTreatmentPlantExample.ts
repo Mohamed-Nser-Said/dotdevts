@@ -111,12 +111,12 @@ export function main(): void {
     //
     //    Intake stage — raw water coming in from source
     // ─────────────────────────────────────────────────────────
-    const plantFolder   = root.add.GenericFolder("Plant");
+    const plantFolder   = root.children.GenericFolder("Plant");
 
-    const intakeFolder    = plantFolder.add.GenericFolder("Intake");
-    const intakePh        = intakeFolder.add.Variable("pH", 7.2);
-    const intakeTurbidity = intakeFolder.add.Variable("Turbidity", 3.5);
-    const intakeFlow      = intakeFolder.add.Variable("Flow", 1250.0);
+    const intakeFolder    = plantFolder.children.GenericFolder("Intake");
+    const intakePh        = intakeFolder.children.Variable("pH", 7.2);
+    const intakeTurbidity = intakeFolder.children.Variable("Turbidity", 3.5);
+    const intakeFlow      = intakeFolder.children.Variable("Flow", 1250.0);
 
     intakePh.archive.setDataStore(sensorTimeSeries, core);
     intakeTurbidity.archive.setDataStore(sensorTimeSeries, core);
@@ -125,10 +125,10 @@ export function main(): void {
     console.log(`[4] Intake sensors (pH, Turbidity, Flow) → SensorTimeSeries`);
 
     // Treatment stage — chlorination and filtration
-    const treatmentFolder       = plantFolder.add.GenericFolder("Treatment");
-    const treatmentChlorine     = treatmentFolder.add.Variable("Chlorine", 1.8);
-    const treatmentPh           = treatmentFolder.add.Variable("pH", 7.5);
-    const treatmentPressureDrop = treatmentFolder.add.Variable("PressureDrop", 0.4);
+    const treatmentFolder       = plantFolder.children.GenericFolder("Treatment");
+    const treatmentChlorine     = treatmentFolder.children.Variable("Chlorine", 1.8);
+    const treatmentPh           = treatmentFolder.children.Variable("pH", 7.5);
+    const treatmentPressureDrop = treatmentFolder.children.Variable("PressureDrop", 0.4);
 
     treatmentChlorine.archive.setDataStore(sensorTimeSeries, core);
     treatmentPh.archive.setDataStore(sensorTimeSeries, core);
@@ -137,10 +137,10 @@ export function main(): void {
     console.log(`[4] Treatment sensors (Chlorine, pH, PressureDrop) → SensorTimeSeries`);
 
     // Distribution stage — water leaving to consumers
-    const distFolder           = plantFolder.add.GenericFolder("Distribution");
-    const distPh               = distFolder.add.Variable("pH", 7.4);
-    const distResidualChlorine = distFolder.add.Variable("ResidualChlorine", 0.5);
-    const distFlow             = distFolder.add.Variable("Flow", 980.0);
+    const distFolder           = plantFolder.children.GenericFolder("Distribution");
+    const distPh               = distFolder.children.Variable("pH", 7.4);
+    const distResidualChlorine = distFolder.children.Variable("ResidualChlorine", 0.5);
+    const distFlow             = distFolder.children.Variable("Flow", 980.0);
 
     distPh.archive.setDataStore(sensorTimeSeries, core);
     distResidualChlorine.archive.setDataStore(sensorTimeSeries, core);

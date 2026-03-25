@@ -1,7 +1,7 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
-import { VariableAddFactory } from "../core/VariableAddFactory";
+import { VariableChildren } from "../children/VariableChildren";
 import { IDataStore } from "../Interfaces/IDataStore";
 import { inmationMongoConnectionString } from "./mongoConnectionString";
 
@@ -18,11 +18,11 @@ export type CustomEventDataStoreOptions = {
 export class CustomEventDataStore extends IObject implements IDataStore {
     public readonly type: string = "CustomEventDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
-    public readonly add: VariableAddFactory;
+    public readonly children: VariableChildren;
 
     constructor(path: string | number | Path, opts?: CustomEventDataStoreOptions) {
         super(path, syslib.model.classes.CustomEventDataStore);
-        this.add = new VariableAddFactory(() => this.path.absolutePath());
+        this.children = new VariableChildren(() => this.path.absolutePath());
         const connectionString = inmationMongoConnectionString(opts?.connectionString, "mongodbGP1:27017");
 
         if (!opts?.skipMass && !syslib.getobject(this.path.absolutePath())) {

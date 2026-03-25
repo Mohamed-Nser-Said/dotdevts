@@ -1,6 +1,6 @@
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
-import { ObjectAddFactory } from "./ObjectAddFactory";
+import { ObjectChildren } from "../children/ObjectChildren";
 
 export type ConnectorOptions = {
     hostnameOrIP?: string;
@@ -19,11 +19,11 @@ export type ConnectorOptions = {
 
 export class Connector extends IObject {
     public readonly type: string = "Connector";
-    public readonly add: ObjectAddFactory;
+    public readonly children: ObjectChildren;
 
     constructor(path: string | number | Path, opts?: ConnectorOptions) {
         super(path, syslib.model.classes.Connector);
-        this.add = new ObjectAddFactory(() => this.path.absolutePath());
+        this.children = new ObjectChildren(() => this.path.absolutePath());
 
         if (!opts?.skipMass && (!syslib.getobject(this.path.absolutePath()) || opts?.overwrite)) {
             const codes = syslib.model.codes;

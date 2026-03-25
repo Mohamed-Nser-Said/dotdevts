@@ -3,6 +3,7 @@ import { Path } from "../shared/Path";
 import { DataStoreConfiguration } from "./DataStoreConfiguration";
 import { VariableAddFactory } from "../core/VariableAddFactory";
 import { mq, MongoQueryBuilder } from "../std/MongoQuery";
+import { IDataStore } from "../Interfaces/IDataStore";
 
 export type CustomTimeSeriesDataStoreOptions = {
     connection: string | { port: number, host: string }
@@ -22,7 +23,7 @@ export type CustomTimeSeriesCollectionReadOptions<T extends Mongo.Document = Mon
     options?: Mongo.FindOptions;
 };
 
-export class CustomTimeSeriesDataStore extends IObject {
+export class CustomTimeSeriesDataStore extends IObject implements IDataStore {
     public readonly type = "CustomTimeSeriesDataStore";
     public readonly dataStoreConfiguration: DataStoreConfiguration;
     public readonly add: VariableAddFactory;

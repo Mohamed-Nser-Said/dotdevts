@@ -1,3 +1,4 @@
+import { IDataStore } from "../Interfaces/IDataStore";
 import { ActionItem } from "../objects/ActionItem";
 import { GenericFolder } from "../objects/GenericFolder";
 import { SchedulerItem, SchedulerItemOptions } from "../objects/Scheduler";
@@ -6,7 +7,8 @@ import { ScriptChunk } from "../shared/toLua";
 export type ScheduledActionOptions = {
     name?: string;
     absolutePath?: string;
-    cleanupExisting?: boolean; // If true, deletes existing scheduled actions folder with the same name before creating new one
+    cleanupExisting?: boolean; // If true, deletes existing scheduled actions folder with the same name before creating new one,
+    dataStore?: IDataStore
 
 } & SchedulerItemOptions;
 
@@ -15,8 +17,10 @@ export class ScheduledActions {
     private readonly folder: GenericFolder | undefined;
     private readonly scheduler: SchedulerItem;
     private readonly _actions = new Map<string, ActionItem>();
+    private readonly dataStore: IDataStore | undefined;
 
     constructor(path: string, options?: ScheduledActionOptions) {
+        this.dataStore = options?.dataStore;
         this.folder = new GenericFolder(path, { cleanupExisting: options?.cleanupExisting });
         const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } }
         this.scheduler = this.folder.add.SchedulerItem("__ScheduledActions", defaultOptions);
@@ -46,6 +50,9 @@ export class ScheduledActions {
                 script: scriptOrFn,
                 scheduler: this.scheduler.path.absolutePath(),
             });
+            if (this.dataStore) {
+                action.archive.setDataStore(this.dataStore);
+            }
             this._actions.set(unqName, action);
             return action;
         }

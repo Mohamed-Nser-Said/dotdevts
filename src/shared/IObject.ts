@@ -133,7 +133,7 @@ codes.ReferenceType.SECURITY +
 		syslib.mass([{ class: this.class, operation: syslib.model.codes.MassOp.UPSERT, path: this.path.absolutePath(), references: refs }]);
 	}
 
-	parentService(): unknown {
+	parentService(): string {
 		return syslib.getconnectorpath(this.path.absolutePath()) || syslib.getcorepath(this.path.absolutePath());
 	}
 

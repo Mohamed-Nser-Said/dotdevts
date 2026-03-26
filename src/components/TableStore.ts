@@ -1,6 +1,6 @@
+import { TableHolder } from "../objects/TableHolder";
 import { IObject } from "../shared/IObject";
 import { Path } from "../shared/Path";
-import { TableHolder } from "./TableHolder";
 import { DataFrame } from "../std/DataFrame";
 import { Query } from "../std/Query";
 

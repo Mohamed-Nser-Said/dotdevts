@@ -27,10 +27,10 @@ import { SetExample } from "./examples/SetExample";
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
 
-// SetExample();
+SetExample();
 
 // ScheduledActions();
-CustomTimeSeriesDataStore();
+// CustomTimeSeriesDataStore();
 
 
 // customTableExample();

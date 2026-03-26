@@ -6,6 +6,7 @@
     "build": "tstl",
     "dev": "tstl --watch",
     "mainc": "tstl && cts run ./build/main.lua",
+    "maind": "tstl && cts run ./build/main.lua -c dockerWEBAPI-BLESSED",
     "main": "tstl && froge run ./build/main.lua -c win1000",
     "verify:setfunc": "tstl && node ./scripts/verify-setfunc.js"
   },

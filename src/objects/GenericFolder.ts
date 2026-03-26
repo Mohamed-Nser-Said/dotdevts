@@ -4,8 +4,8 @@ import { VariableChildren } from "../children/VariableChildren";
 import { ActionItem, ActionItemOptions } from "./ActionItem";
 import { ScriptEvent } from "./ScriptEvent";
 import { TableHolder } from "./TableHolder";
-import { TableStore } from "./TableStore";
 import { SchedulerItem, SchedulerItemOptions } from "./Scheduler";
+import { TableStore } from "../components/TableStore";
 
 export type GenericFolderOptions = {
 	cleanupExisting?: boolean;

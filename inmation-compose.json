@@ -21,6 +21,13 @@
             "port": 8002,
             "usr": "so",
             "pwd": "12345678Aa"
+        },
+        {
+            "name": "dockerWEBAPI-BLESSED",
+            "hostname": "WEBAPI-BLESSED",
+            "port": 8002,
+            "usr": "so",
+            "pwd": "inmation"
         }
     ],
     "scriptReferences": [],

@@ -3,7 +3,6 @@ import { GenericItem, GenericItemOptions } from "../objects/GenericItem";
 import { ActionItem, ActionItemOptions } from "../objects/ActionItem";
 import { ScriptEvent } from "../objects/ScriptEvent";
 import { TableHolder } from "../objects/TableHolder";
-import { TableStore } from "../objects/TableStore";
 import { GTSB, GTSBOptions } from "../datastores/GTSB";
 import { CustomTimeSeriesDataStore, CustomTimeSeriesDataStoreOptions } from "../datastores/CustomTimeSeriesDataStore";
 import { CustomEventDataStore, CustomEventDataStoreOptions } from "../datastores/CustomEventDataStore";
@@ -15,6 +14,7 @@ import { MessageProcessor, MessageProcessorOptions } from "../objects/MessagePro
 import { OpcUaDataSource, OpcUaDataSourceOptions } from "../DataSources/OpcUaDataSource";
 import { SchedulerItem, SchedulerItemOptions } from "../objects/Scheduler";
 import { VariableChildren } from "./VariableChildren";
+import { TableStore } from "../components/TableStore";
 
 /**
  * Full **Connector / folder-level** child factory: folders, items, data stores, historians, etc.

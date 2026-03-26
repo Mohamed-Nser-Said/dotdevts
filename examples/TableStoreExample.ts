@@ -1,6 +1,5 @@
+import { TableStore } from "../src/components/TableStore";
 import { GenericFolder } from "../src/objects/GenericFolder";
-import { TableStore } from "../src/objects/TableStore";
-import { Query } from "../src/std/Query";
 
 type Sensor = {
     id: string;
@@ -45,25 +44,25 @@ export function main(): void {
     console.log("  [2] Write tables");
 
     store.set<Sensor>("Sensors", [
-        { id: "PT-101", tag: "Pressure_Inlet",    unit: "bar",  minLimit: 0,    maxLimit: 10,  location: "Line A" },
-        { id: "TT-201", tag: "Temperature_Vessel", unit: "°C",   minLimit: -10,  maxLimit: 150, location: "Reactor 1" },
-        { id: "FT-301", tag: "Flow_Coolant",       unit: "m³/h", minLimit: 0,    maxLimit: 50,  location: "Line B" },
-        { id: "LT-401", tag: "Level_Tank",         unit: "%",    minLimit: 5,    maxLimit: 95,  location: "Tank Farm" },
+        { id: "PT-101", tag: "Pressure_Inlet", unit: "bar", minLimit: 0, maxLimit: 10, location: "Line A" },
+        { id: "TT-201", tag: "Temperature_Vessel", unit: "°C", minLimit: -10, maxLimit: 150, location: "Reactor 1" },
+        { id: "FT-301", tag: "Flow_Coolant", unit: "m³/h", minLimit: 0, maxLimit: 50, location: "Line B" },
+        { id: "LT-401", tag: "Level_Tank", unit: "%", minLimit: 5, maxLimit: 95, location: "Tank Farm" },
     ]);
 
     const now = 1742000000000;
     store.set<SensorReading>("Readings", [
-        { sensorId: "PT-101", timestamp: now - 60000, value: 6.3,   quality: 192 },  // older, normal
-        { sensorId: "TT-201", timestamp: now - 60000, value: 87.4,  quality: 192 },  // older, normal
-        { sensorId: "FT-301", timestamp: now,         value: 23.1,  quality: 192 },
-        { sensorId: "LT-401", timestamp: now,         value: 72.0,  quality: 192 },
-        { sensorId: "PT-101", timestamp: now,         value: 10.5,  quality: 192 },  // latest — OVER max (10 bar)
-        { sensorId: "TT-201", timestamp: now,         value: 152.1, quality: 192 },  // latest — OVER max (150°C)
+        { sensorId: "PT-101", timestamp: now - 60000, value: 6.3, quality: 192 },  // older, normal
+        { sensorId: "TT-201", timestamp: now - 60000, value: 87.4, quality: 192 },  // older, normal
+        { sensorId: "FT-301", timestamp: now, value: 23.1, quality: 192 },
+        { sensorId: "LT-401", timestamp: now, value: 72.0, quality: 192 },
+        { sensorId: "PT-101", timestamp: now, value: 10.5, quality: 192 },  // latest — OVER max (10 bar)
+        { sensorId: "TT-201", timestamp: now, value: 152.1, quality: 192 },  // latest — OVER max (150°C)
     ]);
 
     store.set<Alarm>("Alarms", [
-        { sensorId: "TT-201", timestamp: now - 60000, severity: "HIGH",   message: "Temperature exceeded max limit (150°C)", acknowledged: false },
-        { sensorId: "PT-101", timestamp: now - 60000, severity: "WARNING", message: "Pressure approaching max limit (10 bar)",  acknowledged: true  },
+        { sensorId: "TT-201", timestamp: now - 60000, severity: "HIGH", message: "Temperature exceeded max limit (150°C)", acknowledged: false },
+        { sensorId: "PT-101", timestamp: now - 60000, severity: "WARNING", message: "Pressure approaching max limit (10 bar)", acknowledged: true },
     ]);
 
     console.log("      Tables written:", store.tables().join(", "));
@@ -110,7 +109,7 @@ export function main(): void {
     const lineFolder = new GenericFolder(basePath + "/LineA");
     const lineConfig = lineFolder.children.TableStore("Config");
     lineConfig.set("Thresholds", [
-        { tag: "PT-101", warnAt: 8.0,  tripAt: 9.5  },
+        { tag: "PT-101", warnAt: 8.0, tripAt: 9.5 },
         { tag: "TT-201", warnAt: 130.0, tripAt: 148.0 },
     ]);
     console.log("      LineA config tables:", lineConfig.tables().join(", "));

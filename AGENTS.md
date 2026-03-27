@@ -34,7 +34,7 @@ luabundle.json          Lua bundler config (ignored native modules)
 src/
 ├── core/               Core, Connector
 ├── children/           ObjectChildren, CoreChildren; `VariableChildren` / `GenericFolderChildren` re-exported from `objects/VariableGroup.ts` / `objects/GenericFolder.ts` (Lua require order)
-├── objects/            inmation object wrappers (Variable, GenericFolder, ActionItem, TableHolder, …)
+├── objects/            inmation object wrappers (Variable, GenericFolder, ActionItem, TableHolder, IndustrialScope, …)
 ├── datastores/         CustomTimeSeriesDataStore, GTSB, CustomEventDataStore, DataStoreGroup, DataStoreConfiguration
 ├── DataSources/        OpcUaDataSource
 ├── history/            Archive, HistoryTransporter, HistoryTransferController, HistorianMapping

@@ -3,9 +3,9 @@
 // (plus model metadata from the system-model docs)
 
 // Minimal LuaMultiReturn (mirrors @typescript-to-lua/language-extensions); declared before SysLib for nested aliases.
-declare type LuaMultiReturn<T extends unknown[]> = T & {
-  readonly __tstlMultiReturn: unknown;
-};
+// declare type LuaMultiReturn<T extends unknown[]> = T & {
+//   readonly __tstlMultiReturn: unknown;
+// };
 
 declare namespace SysLib {
   type NumID = number;
@@ -441,28 +441,415 @@ declare namespace SysLib {
     BrowseOptionCodes: BrowseOptionCodes;
   }
 
+  /**
+   * Dual-access class registry: `classes.TagName` → numeric code, `classes[code]` → `Model.Class` userdata.
+   * Iterating with `pairs()` in Lua yields `Model.Class` objects.
+   * Tags sourced from syslib.model.classes on a live system.
+   */
   interface Classes {
     [className: string]: number | Model.Class;
     [classCode: number]: Model.Class;
+
+    // ── System infrastructure ──
+    Root: number;
+    System: number;
     Core: number;
-    GenFolder: number;
-    HistoryTransporter: number;
-    ActionItem: number;
-    GenericTimeSeriesBuffer: number;
-    VariableGroup: number;
-    Variable: number;
-    SchedulerItem: number;
-    ScriptEvents: number;
-    TableHolder: number;
-    GenItem: number;
-    DataStoreGroup: number;
-    MessageBroker: number;
-    MessageProcessor: number;
-    HistoryController: number;
-    CustomEventDataStore: number;
-    CustomTimeSeriesDataStore: number;
     Connector: number;
     Datasource: number;
+    Server: number;
+    Relay: number;
+    Cache: number;
+    Broker: number;
+    WebAPIServer: number;
+    WebAPISecurityAdfs: number;
+    BootstrapperRoot: number;
+    RemoteServiceGroup: number;
+    RedundancyServiceGroup: number;
+    CoreServiceInstance: number;
+    SecurityPerimeter: number;
+    HealthMonitor: number;
+
+    // ── I/O model ──
+    IoNode: number;
+    IoItem: number;
+    IoProperty: number;
+    IoItemGroup: number;
+    IoTableHolder: number;
+    IoTypeOther: number;
+    IoTypeOpcUa: number;
+    IoTypeDropzone: number;
+    IoTypeOpcXmlDa: number;
+    IoTypePlcS7_300_400: number;
+    IoTypePlcAB_CIP: number;
+    IoTypeModbus: number;
+    IoTypeKafka: number;
+    IoTypeMqtt: number;
+    IoTypeIP21: number;
+    NodeTypeDropzone: number;
+    NodeTypeOpcUa: number;
+    NodeTypeOpcXmlDa: number;
+    NodeTypeOther: number;
+    NodeTypeModbus: number;
+    NodeTypeIP21Record: number;
+
+    // ── Connection types ──
+    ComConnection: number;
+    UaConnection: number;
+    DaConnection: number;
+    DaAeConnection: number;
+    DaHdaConnection: number;
+    DaAeHdaConnection: number;
+    AeConnection: number;
+    AeHdaConnection: number;
+    HdaConnection: number;
+    XmlDaConnection: number;
+    Dropzone: number;
+    TcpStream: number;
+    VirtualDataSource: number;
+    ODBCDatasource: number;
+    ITLogDatasource: number;
+    PlcConnection: number;
+    Modbus: number;
+    IP21gRPCConnection: number;
+    KafkaDatasource: number;
+    MqttSubscriber: number;
+
+    // ── Generic objects ──
+    GenFolder: number;
+    GenItem: number;
+    GenClass: number;
+    GenNumeric: number;
+    GenDtNumeric: number;
+    GenString: number;
+    GenDtTextual: number;
+    GenLuaScript: number;
+    GenEnv: number;
+    GenPerf: number;
+
+    // ── Variables & items ──
+    Variable: number;
+    VariableGroup: number;
+    ActionItem: number;
+    HolderItem: number;
+    AliasItem: number;
+    LinkItem: number;
+    TableHolder: number;
+    Parameter: number;
+    SchedulerItem: number;
+    ScriptEvents: number;
+    FeedbackItem: number;
+    ReportItem: number;
+    StandardReport: number;
+    ReportGenerator: number;
+
+    // ── Data stores ──
+    DataStoreGroup: number;
+    LogDataStore: number;
+    TimeSeriesDataStore: number;
+    EventStreamDataStore: number;
+    CustomDataStore: number;
+    CustomTimeSeriesDataStore: number;
+    CustomTimeSeriesDataStore2: number;
+    CustomEventDataStore: number;
+    CustomProductionTrackingDataStore: number;
+    CustomBigTableDataStore: number;
+    CustomFileDataStore: number;
+    BigTableDataStore: number;
+    ProductionTrackingDataStore: number;
+    FileStore: number;
+    AuditTrailDataStore: number;
+    GenericTimeSeriesBuffer: number;
+    GenericEventBuffer: number;
+    BatchRecord: number;
+
+    // ── History ──
+    HistoryTransporter: number;
+    HistoryController: number;
+    HistoryTransportManager: number;
+    HistoryTransportManagerBucketedConfiguration: number;
+    HistorySinkItem: number;
+    HistoryExporter: number;
+    HistorySupervisor: number;
+    HistoryItemGroup: number;
+    HistorySubscriber: number;
+    HistorySubscriberEventHandler: number;
+    HistorySubscriberEventBackfiller: number;
+
+    // ── Messaging ──
+    MessageBroker: number;
+    MessageConfiguration: number;
+    MessageProcessor: number;
+
+    // ── Cloud / DB sink ──
+    CloudSinkItem: number;
+    DBSinkItem: number;
+    DBObjectController: number;
+    DBDispatcherItem: number;
+    FileMonitor: number;
+    FileSource: number;
+    FileSink: number;
+
+    // ── IT Log ──
+    ITLogGroup: number;
+    ITLogAnalyzer: number;
+    ITLogConfigurator: number;
+
+    // ── Events ──
+    EventStream: number;
+    InternalEventStream: number;
+    RedStream: number;
+    RedItem: number;
+    Eventtracker: number;
+    EventType: number;
+    EventCategory: number;
+    EventCondition: number;
+    EventSubCondition: number;
+    EventSource: number;
+    EventAttribute: number;
+    EventArea: number;
+    EventNode: number;
+    EventCategoryUnassigned: number;
+    EventCategoryProcessAlarm: number;
+    EventCategoryPartialStrokeTest: number;
+    EventCategoryOperatorAction: number;
+    EventCategorySystemEvent: number;
+    EventCategoryProcessMessage: number;
+    EventCategoryBatchMessage: number;
+    EventCategoryAPC: number;
+    EventCategoryOther: number;
+
+    // ── Alarms ──
+    AlarmGenerator: number;
+    AlarmGenDigital: number;
+    AlarmGenLevel: number;
+    AlarmGenDiscrete: number;
+
+    // ── KPI / Charts ──
+    GenKPI: number;
+    KPIServer: number;
+    KPIInstance: number;
+    KPIProfile: number;
+    KPIProfileGroup: number;
+    KPIGroup: number;
+    KPIEmbeddedContent: number;
+    KPITable: number;
+    KPITableSql: number;
+    KPITableLua: number;
+    KPINoSPC: number;
+    KPIWesternElectricRules: number;
+    KPIDashboard: number;
+    KPIWidget: number;
+    KPIBookmark: number;
+    Chart: number;
+    BarChart: number;
+    ParetoChart: number;
+    PieChart: number;
+    TrendChart: number;
+    XYPlotChart: number;
+    AdvancedTrend: number;
+    AdvancedTrendPen: number;
+    AdvancedTrendXAxis: number;
+    AdvancedTrendYAxis: number;
+
+    // ── Analog / State measurement ──
+    AnalogMeasurement: number;
+    DiscreteState: number;
+    BinaryState: number;
+    TextualState: number;
+    DataDocument: number;
+    PerformanceIndex: number;
+    DataFolder: number;
+    PerformanceFolder: number;
+    CalculatedValue: number;
+
+    // ── Security / Users ──
+    Profile: number;
+    User: number;
+    UserGroup: number;
+    ScriptProfile: number;
+    ScriptProfileGroup: number;
+    StoredCredentialsGroup: number;
+    StoredCredential: number;
+
+    // ── Rules / Templates ──
+    RuleNode: number;
+    Rule: number;
+    TemplateNode: number;
+    LdapDirectory: number;
+
+    // ── SaF retention policies ──
+    SafRetentionPolicyInMemory: number;
+    SafRetentionPolicyDiskSize: number;
+    SafRetentionPolicyDiskUsage: number;
+    SafRetentionPolicyDiskDate: number;
+    SafRetentionPolicyNone: number;
+
+    // ── ISA-95 / S95 equipment model ──
+    S95EMEnterprise: number;
+    S95EMSite: number;
+    S95EMArea: number;
+    S95EMProcessCell: number;
+    S95EMPCUnit: number;
+    S95EMProductionUnit: number;
+    S95EMProductionLine: number;
+    S95EMWorkCell: number;
+    S95EMStorageZone: number;
+    S95EMStorageUnit: number;
+    S95EMWorkCenter: number;
+    S95EMWorkUnit: number;
+    S95EMEquipmentModule: number;
+    S95EMControlModule: number;
+    S95EMPUUnit: number;
+    S95EMEquipmentProperty: number;
+    S95EMGenericClass: number;
+
+    // ── ISA-95 / S88 plant hierarchy ──
+    Enterprise: number;
+    Division: number;
+    Site: number;
+    PlantCompound: number;
+    Plant: number;
+    Area: number;
+    ProcessCell: number;
+    Unit: number;
+    EquipmentModule: number;
+    ControlModule: number;
+    DCS: number;
+
+    // ── Material model ──
+    MaterialClass: number;
+    MaterialClassProperty: number;
+    MaterialDefinition: number;
+    MaterialDefinitionProperty: number;
+    MaterialLot: number;
+    MaterialLotProperty: number;
+    MaterialSublot: number;
+    MaterialTestSpecification: number;
+    MaterialTestResult: number;
+
+    // ── Batch ──
+    BatchTracker: number;
+    BatchTrackerBackfill: number;
+    BatchOperationDefinition: number;
+    BatchEquipmentPhaseDefinition: number;
+    BatchEquipmentStepDefinition: number;
+    BPRPublisher: number;
+
+    // ── OPC UA server ──
+    OpcUaTcpServer: number;
+    OpcUaTcpServerEndpoint: number;
+    UaTypeNode: number;
+    UaEventTypeNode: number;
+    UaEventTypeAttribute: number;
+    UaServerNode: number;
+    ServerTypes: number;
+    ServerEventTypes: number;
+    ServerForwardedEventType: number;
+    ServerEventTypeProperty: number;
+    IP21Server: number;
+
+    // ── Generic TCP ──
+    GenericTcpController: number;
+    GenericTcpRequester: number;
+    GenericHttpRequester: number;
+    GenericTcpSubscriber: number;
+    GenericTcpRecycleBin: number;
+
+    // ── Asset model ──
+    Asset: number;
+    GenericAsset: number;
+    Agitator: number;
+    HeatExchanger: number;
+    Bearing: number;
+    Pump: number;
+    SteamTrap: number;
+    Device: number;
+    Machine: number;
+    Train: number;
+    Motor: number;
+    Fan: number;
+    Compressor: number;
+    Blower: number;
+    Centrifuge: number;
+    Crusher: number;
+    Generator: number;
+    Spindle: number;
+    Turbine: number;
+    GearBox: number;
+    Column: number;
+    Reactor: number;
+    Boiler: number;
+    Furnace: number;
+    Condenser: number;
+    CoolingTower: number;
+    Mixer: number;
+    Filter: number;
+    Reboiler: number;
+    Separator: number;
+    Tank: number;
+    PressureReliefValve: number;
+    ControlLoop: number;
+    Route: number;
+    Analyzer: number;
+    Valve: number;
+    ElectricalDevice: number;
+    IODevice: number;
+    Pipe: number;
+    NetworkManagement: number;
+    PowerModule: number;
+    AirHandler: number;
+    Drum: number;
+
+    // ── TPM / OEE ──
+    TimezoneAndAvailabilityTracker: number;
+    TPMYearConfiguration: number;
+    TPMSiteConfiguration: number;
+    TPMShiftConfiguration: number;
+    TPMNotScheduled: number;
+    TPMUnscheduled: number;
+    TPMOEEEquipmentMonitor: number;
+    TPMOEEAvailabilityIndex: number;
+    TPMOEEQualityIndex: number;
+    TPMOEEPerformanceIndex: number;
+    TPMOEEIndex: number;
+    TPMTEEPIndex: number;
+    TPMOEEEquipmentStops: number;
+    TPMOEEProductionRuns: number;
+    TPMStopReasonConfiguration: number;
+    TPMOEETimeValue: number;
+    TPMPresetConfiguration: number;
+    TPMOEERecalculator: number;
+    TPMOEEAggregator: number;
+    TPMOEEAggregatorSubcomponent: number;
+    TPMOEEAggregatorHour: number;
+    TPMOEEAggregatorDay: number;
+    TPMOEEAggregatorWeek: number;
+    TPMOEEAggregatorMonth: number;
+    TPMOEEAggregatorCalendarYear: number;
+    TPMOEEAggregatorFiscalYear: number;
+    TPMOEEAggregatorShift: number;
+    TPMOEEGenericIndex: number;
+
+    // ── Schema ──
+    SchemaDefinition: number;
+
+    // ── Test classes (internal) ──
+    TestClassForArrays: number;
+    TestClassAmbgPrp: number;
+    TestSubClassAmbgPrpA: number;
+    TestSubClassAmbgPrpB: number;
+    TestClassPropLookupA: number;
+    TestClassPropLookupB: number;
+    TestSelectableSubObject001: number;
+    TestSelectableSubObject002: number;
+    TestNonSelectableSubObject001: number;
+    TestNonSelectableSubObject002: number;
+    TestSelectableSubObject003: number;
+    TestSelectableSubObject004: number;
+    TestClassExtendedColumns: number;
+    TestClassForFiles: number;
+    TestClassMoon: number;
+    TestClassGenerated: number;
   }
 
   /**

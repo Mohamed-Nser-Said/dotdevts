@@ -3,10 +3,11 @@
   
   "compilerOptions": {
     "moduleResolution": "Node",
-    "types": [],
+    "target": "ES2018",
+    "types": ["@typescript-to-lua/language-extensions"],
     "strict": true,
     "outDir": "build",
-    "lib": ["ES2015", "DOM"]
+    "lib": ["ES2018", "DOM"]
   },
   "tstl": {
     "sourceMapTraceback": false,

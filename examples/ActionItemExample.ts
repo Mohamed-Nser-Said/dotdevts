@@ -67,7 +67,7 @@ export function main(): void {
 	console.log(`Created via appendable: ${via.path.absolutePath()}`);
 
 	// --- GenericFolder.children.ActionItem builder ---
-	const fromFolder = root.children.ActionItem("FromFolder", {
+	const fromFolder = root.add.ActionItem("FromFolder", {
 		script: `syslib.log(2, "FromFolder fired")`,
 	});
 	console.log(`Created from folder builder: ${fromFolder.path.absolutePath()}`);

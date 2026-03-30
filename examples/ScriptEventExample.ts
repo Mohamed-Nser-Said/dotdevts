@@ -37,11 +37,11 @@ export function main(): void {
 
         console.log("  [6] GenericFolder.children.ScriptEvent shorthand");
         const gf = new GenericFolder(basePath + "/SubFolder");
-        const se2 = gf.children.ScriptEvent("InlineEvent");
+        const se2 = gf.add.ScriptEvent("InlineEvent");
         console.log("      Inline ScriptEvent:", se2.path.absolutePath());
 
         console.log("  [7] GenericFolder.children.Scheduler shorthand");
-        const sched2 = gf.children.SchedulerItem("InlineScheduler");
+        const sched2 = gf.add.SchedulerItem("InlineScheduler");
         console.log("      Inline Scheduler:", sched2.path.absolutePath());
 
         console.log("  ScriptEventExample done.");

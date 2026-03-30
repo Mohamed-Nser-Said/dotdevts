@@ -22,13 +22,12 @@ import { main as CustomTimeSeriesDataStore } from "./examples/CustomTimeSeriesDa
 import { main as ScheduledActions } from "./examples/ScheduledActionsExample";
 import * as mongo from "mongo";
 import { SetExample } from "./examples/SetExample";
-import { main as industrialScopeExample } from "./examples/IndustrialScopeExample";
 
 
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
 
-SetExample();
+// SetExample();
 
 // ScheduledActions();
 // CustomTimeSeriesDataStore();
@@ -40,15 +39,16 @@ SetExample();
 // variableExample();
 // dataFrameExample();
 // actionItemExample();
+
+
 // historyTransporterExample();
 // scriptEventExample();
 // tableHolderExample();
 // namespaceExample();
 // gtsbExample();
-// // fileExample();
+fileExample();
 // objectContainerExample();
 // waterTreatmentPlantExample();
 // systemDbExample();
 // bufferExample();
 // workspaceDocumentExample();
-industrialScopeExample();

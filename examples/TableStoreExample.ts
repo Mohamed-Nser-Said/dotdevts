@@ -29,13 +29,13 @@ export function main(): void {
     const basePath = "/System/Core/TableStoreExample";
 
     console.log("  [0] Setup parent folder");
-    new GenericFolder(basePath, { cleanupExisting: true });
+    const usecase = new GenericFolder(basePath, { cleanupExisting: true });
 
     // ─────────────────────────────────────────────────────────────────────
     // 1. Create a TableStore — acts as a mini plant historian DB
     // ─────────────────────────────────────────────────────────────────────
     console.log("  [1] Create TableStore");
-    const store = new TableStore(basePath + "/PlantDB");
+    const store = usecase.add.TableStore("PlantDB");
     console.log("      Path:", store.path.absolutePath());
 
     // ─────────────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ export function main(): void {
     // ─────────────────────────────────────────────────────────────────────
     console.log("  [6] Per-line config store via children factory");
     const lineFolder = new GenericFolder(basePath + "/LineA");
-    const lineConfig = lineFolder.children.TableStore("Config");
+    const lineConfig = lineFolder.add.TableStore("Config");
     lineConfig.set("Thresholds", [
         { tag: "PT-101", warnAt: 8.0, tripAt: 9.5 },
         { tag: "TT-201", warnAt: 130.0, tripAt: 148.0 },

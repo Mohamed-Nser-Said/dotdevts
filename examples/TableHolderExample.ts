@@ -30,7 +30,7 @@ export function main(): void {
 
         console.log("  [4] Use GenericFolder.children.TableHolder shorthand");
         const gf = new GenericFolder(basePath + "/SubFolder");
-        const th2 = gf.children.TableHolder("Config");
+        const th2 = gf.add.TableHolder("Config");
         th2.setTable([{ key: "value", count: 42 }]);
         console.log("      Config TableHolder:", th2.path.absolutePath());
 

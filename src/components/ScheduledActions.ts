@@ -23,7 +23,7 @@ export class ScheduledActions {
         this.dataStore = options?.dataStore;
         this.folder = new GenericFolder(path, { cleanupExisting: options?.cleanupExisting });
         const defaultOptions = options ?? { "recurrence": { "every": 30, "kind": "second" } };
-        this.scheduler = this.folder.children.SchedulerItem("__ScheduledActions", defaultOptions);
+        this.scheduler = this.folder.add.SchedulerItem("__ScheduledActions", defaultOptions);
 
     }
 
@@ -45,7 +45,7 @@ export class ScheduledActions {
 
         // Strings (and undefined) are handled directly.
         if (scriptOrFn === undefined || typeof scriptOrFn === "string") {
-            const action = this.folder.children.ActionItem(unqName, {
+            const action = this.folder.add.ActionItem(unqName, {
                 script: scriptOrFn,
                 scheduler: this.scheduler.path.absolutePath(),
             });

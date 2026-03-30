@@ -62,13 +62,13 @@ export class GenericFolderChildren extends VariableChildren {
 
 export class GenericFolder extends IObject {
 	public readonly type: string = "GenericFolder";
-	public readonly children: GenericFolderChildren;
+	public readonly add: GenericFolderChildren;
 
 	constructor(path: string | number | Path, opts?: GenericFolderOptions) {
 		super(path, syslib.model.classes.GenFolder);
 		if (opts?.cleanupExisting) this.delete(true);
 
-		this.children = new GenericFolderChildren(() => this.path.absolutePath());
+		this.add = new GenericFolderChildren(() => this.path.absolutePath());
 
 		if (opts?.recursive !== false) {
 			massRecursive(this.path);

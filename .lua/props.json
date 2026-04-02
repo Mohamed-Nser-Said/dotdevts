@@ -1,0 +1,124 @@
+{
+    "ObjectDescription": "The master core object which was created by the initial installation",
+    "ObjectName": "Core",
+    "ScriptLibrary.LuaModuleName": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "host",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "CustomOptions.CustomTables.CustomTableName": [
+        "TestTable"
+    ],
+    "CustomOptions.CustomTables.TableData": [
+        []
+    ],
+    "LuaSecurityOptions.LuaSecurityMode": 0,
+    "DataStoreConfiguration.DataStoreSets": [
+        {
+            "description": "Created by script",
+            "datastores": [
+                281477527764993
+            ],
+            "name": "MyCustomTimeSeriesDataStore",
+            "rowid": 33
+        },
+        {
+            "description": "Created by script",
+            "datastores": [
+                281477527896065
+            ],
+            "name": "MyCustomTimeSeriesDataStore2",
+            "rowid": 34
+        },
+        {
+            "description": "Created by script",
+            "datastores": [
+                281477533401089
+            ],
+            "name": "myDataStore",
+            "rowid": 35
+        },
+        {
+            "description": "Created by script",
+            "datastores": [
+                281477535760385
+            ],
+            "name": "myDataStore2",
+            "rowid": 36
+        }
+    ],
+    "LuaSecurityOptions.LuaStrictSecurityOptions.LuaRequireMode": 0,
+    "HostnameOrIP": "DESKTOP-HPJI511",
+    "ScriptLibrary.AdvancedLuaScript": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "-- luacheck: ignore\nlocal _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table\nlocal inspect = {Options = {}, }\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ninspect._VERSION = 'inspect.lua 3.1.0'\ninspect._URL = 'http://github.com/kikito/inspect.lua'\ninspect._DESCRIPTION = 'human-readable representations of tables'\ninspect._LICENSE = [[\n  MIT LICENSE\n\n  Copyright (c) 2022 Enrique García Cota\n\n  Permission is hereby granted, free of charge, to any person obtaining a\n  copy of this software and associated documentation files (the\n  \"Software\"), to deal in the Software without restriction, including\n  without limitation the rights to use, copy, modify, merge, publish,\n  distribute, sublicense, and/or sell copies of the Software, and to\n  permit persons to whom the Software is furnished to do so, subject to\n  the following conditions:\n\n  The above copyright notice and this permission notice shall be included\n  in all copies or substantial portions of the Software.\n\n  THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n]]\ninspect.KEY = setmetatable({}, { __tostring = function() return 'inspect.KEY' end })\ninspect.METATABLE = setmetatable({}, { __tostring = function() return 'inspect.METATABLE' end })\n\nlocal tostring = tostring\nlocal rep = string.rep\nlocal match = string.match\nlocal char = string.char\nlocal gsub = string.gsub\nlocal fmt = string.format\n\nlocal _rawget\nif rawget then\n   _rawget = rawget\nelse\n   _rawget = function(t, k) return t[k] end\nend\n\nlocal function rawpairs(t)\n   return next, t, nil\nend\n\n\n\nlocal function smartQuote(str)\n   if match(str, '\"') and not match(str, \"'\") then\n      return \"'\" .. str .. \"'\"\n   end\n   return '\"' .. gsub(str, '\"', '\\\\\"') .. '\"'\nend\n\n\nlocal shortControlCharEscapes = {\n   [\"\\a\"] = \"\\\\a\", [\"\\b\"] = \"\\\\b\", [\"\\f\"] = \"\\\\f\", [\"\\n\"] = \"\\\\n\",\n   [\"\\r\"] = \"\\\\r\", [\"\\t\"] = \"\\\\t\", [\"\\v\"] = \"\\\\v\", [\"\\127\"] = \"\\\\127\",\n}\nlocal longControlCharEscapes = { [\"\\127\"] = \"\\127\" }\nfor i = 0, 31 do\n   local ch = char(i)\n   if not shortControlCharEscapes[ch] then\n      shortControlCharEscapes[ch] = \"\\\\\" .. i\n      longControlCharEscapes[ch] = fmt(\"\\\\%03d\", i)\n   end\nend\n\nlocal function escape(str)\n   return (gsub(gsub(gsub(str, \"\\\\\", \"\\\\\\\\\"),\n   \"(%c)%f[0-9]\", longControlCharEscapes),\n   \"%c\", shortControlCharEscapes))\nend\n\nlocal luaKeywords = {\n   ['and'] = true,\n   ['break'] = true,\n   ['do'] = true,\n   ['else'] = true,\n   ['elseif'] = true,\n   ['end'] = true,\n   ['false'] = true,\n   ['for'] = true,\n   ['function'] = true,\n   ['goto'] = true,\n   ['if'] = true,\n   ['in'] = true,\n   ['local'] = true,\n   ['nil'] = true,\n   ['not'] = true,\n   ['or'] = true,\n   ['repeat'] = true,\n   ['return'] = true,\n   ['then'] = true,\n   ['true'] = true,\n   ['until'] = true,\n   ['while'] = true,\n}\n\nlocal function isIdentifier(str)\n   return type(str) == \"string\" and\n   not not str:match(\"^[_%a][_%a%d]*$\") and\n   not luaKeywords[str]\nend\n\nlocal flr = math.floor\nlocal function isSequenceKey(k, sequenceLength)\n   return type(k) == \"number\" and\n   flr(k) == k and\n   1 <= (k) and\n   k <= sequenceLength\nend\n\nlocal defaultTypeOrders = {\n   ['number'] = 1, ['boolean'] = 2, ['string'] = 3, ['table'] = 4,\n   ['function'] = 5, ['userdata'] = 6, ['thread'] = 7,\n}\n\nlocal function sortKeys(a, b)\n   local ta, tb = type(a), type(b)\n\n\n   if ta == tb and (ta == 'string' or ta == 'number') then\n      return (a) < (b)\n   end\n\n   local dta = defaultTypeOrders[ta] or 100\n   local dtb = defaultTypeOrders[tb] or 100\n\n\n   return dta == dtb and ta < tb or dta < dtb\nend\n\nlocal function getKeys(t)\n\n   local seqLen = 1\n   while _rawget(t, seqLen) ~= nil do\n      seqLen = seqLen + 1\n   end\n   seqLen = seqLen - 1\n\n   local keys, keysLen = {}, 0\n   for k in rawpairs(t) do\n      if not isSequenceKey(k, seqLen) then\n         keysLen = keysLen + 1\n         keys[keysLen] = k\n      end\n   end\n   table.sort(keys, sortKeys)\n   return keys, keysLen, seqLen\nend\n\nlocal function countCycles(x, cycles)\n   if type(x) == \"table\" then\n      if cycles[x] then\n         cycles[x] = cycles[x] + 1\n      else\n         cycles[x] = 1\n         for k, v in rawpairs(x) do\n            countCycles(k, cycles)\n            countCycles(v, cycles)\n         end\n         countCycles(getmetatable(x), cycles)\n      end\n   end\nend\n\nlocal function makePath(path, a, b)\n   local newPath = {}\n   local len = #path\n   for i = 1, len do newPath[i] = path[i] end\n\n   newPath[len + 1] = a\n   newPath[len + 2] = b\n\n   return newPath\nend\n\n\nlocal function processRecursive(process,\n   item,\n   path,\n   visited)\n   if item == nil then return nil end\n   if visited[item] then return visited[item] end\n\n   local processed = process(item, path)\n   if type(processed) == \"table\" then\n      local processedCopy = {}\n      visited[item] = processedCopy\n      local processedKey\n\n      for k, v in rawpairs(processed) do\n         processedKey = processRecursive(process, k, makePath(path, k, inspect.KEY), visited)\n         if processedKey ~= nil then\n            processedCopy[processedKey] = processRecursive(process, v, makePath(path, processedKey), visited)\n         end\n      end\n\n      local mt = processRecursive(process, getmetatable(processed), makePath(path, inspect.METATABLE), visited)\n      if type(mt) ~= 'table' then mt = nil end\n      setmetatable(processedCopy, mt)\n      processed = processedCopy\n   end\n   return processed\nend\n\nlocal function puts(buf, str)\n   buf.n = buf.n + 1\n   buf[buf.n] = str\nend\n\n\n\nlocal Inspector = {}\n\n\n\n\n\n\n\n\n\n\nlocal Inspector_mt = { __index = Inspector }\n\nlocal function tabify(inspector)\n   puts(inspector.buf, inspector.newline .. rep(inspector.indent, inspector.level))\nend\n\nfunction Inspector:getId(v)\n   local id = self.ids[v]\n   local ids = self.ids\n   if not id then\n      local tv = type(v)\n      id = (ids[tv] or 0) + 1\n      ids[v], ids[tv] = id, id\n   end\n   return tostring(id)\nend\n\nfunction Inspector:putValue(v)\n   local buf = self.buf\n   local tv = type(v)\n   if tv == 'string' then\n      puts(buf, smartQuote(escape(v)))\n   elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or\n      tv == 'cdata' or tv == 'ctype' then\n      puts(buf, tostring(v))\n   elseif tv == 'table' and not self.ids[v] then\n      local t = v\n\n      if t == inspect.KEY or t == inspect.METATABLE then\n         puts(buf, tostring(t))\n      elseif self.level >= self.depth then\n         puts(buf, '{...}')\n      else\n         if self.cycles[t] > 1 then puts(buf, fmt('<%d>', self:getId(t))) end\n\n         local keys, keysLen, seqLen = getKeys(t)\n\n         puts(buf, '{')\n         self.level = self.level + 1\n\n         for i = 1, seqLen + keysLen do\n            if i > 1 then puts(buf, ',') end\n            if i <= seqLen then\n               puts(buf, ' ')\n               self:putValue(t[i])\n            else\n               local k = keys[i - seqLen]\n               tabify(self)\n               if isIdentifier(k) then\n                  puts(buf, k)\n               else\n                  puts(buf, \"[\")\n                  self:putValue(k)\n                  puts(buf, \"]\")\n               end\n               puts(buf, ' = ')\n               self:putValue(t[k])\n            end\n         end\n\n         local mt = getmetatable(t)\n         if type(mt) == 'table' then\n            if seqLen + keysLen > 0 then puts(buf, ',') end\n            tabify(self)\n            puts(buf, '<metatable> = ')\n            self:putValue(mt)\n         end\n\n         self.level = self.level - 1\n\n         if keysLen > 0 or type(mt) == 'table' then\n            tabify(self)\n         elseif seqLen > 0 then\n            puts(buf, ' ')\n         end\n\n         puts(buf, '}')\n      end\n\n   else\n      puts(buf, fmt('<%s %d>', tv, self:getId(v)))\n   end\nend\n\n\n\n\nfunction inspect.inspect(root, options)\n   options = options or {}\n\n   local depth = options.depth or (math.huge)\n   local newline = options.newline or '\\n'\n   local indent = options.indent or '  '\n   local process = options.process\n\n   if process then\n      root = processRecursive(process, root, {}, {})\n   end\n\n   local cycles = {}\n   countCycles(root, cycles)\n\n   local inspector = setmetatable({\n      buf = { n = 0 },\n      ids = {},\n      cycles = cycles,\n      depth = depth,\n      level = 0,\n      newline = newline,\n      indent = indent,\n   }, Inspector_mt)\n\n   inspector:putValue(root)\n\n   return table.concat(inspector.buf)\nend\n\nsetmetatable(inspect, {\n   __call = function(_, root, options)\n      return inspect.inspect(root, options)\n   end,\n})\n\n-- return inspect\n\n_G._server = true\n_G.__serialize = function(v) return inspect(v) end\n_G._ip = '127.0.0.1'\n_G._port = '4051'\n-- luacheck: ignore\nlocal HTTP    = require(\"esi-lcurl-http-client\")\n\nlocal __J     = require(\"dkjson\")\nlocal client  = HTTP.NEW({})\n\nlocal baseUrl = (\"http://%s:%s/\"):format(_G._ip, _G._port)\n-- local baseUrl = \"http://192.168.0.131:3020/\"\nlocal url     = function(endpoint)\n    return baseUrl .. endpoint\nend\n\nHost          = {\n    io = {},\n    os = {},\n    compose = {},\n    workspace = {},\n    ai = {}\n}\n\n\nlocal function post(endpoint, params, body)\n\n    if not _G._server then\n        error(\"This function can only be used in server mode\", 2)\n    end\n    local res = client:POST(url(endpoint), params, body)\n\n\n    if res and res.data and res.data.error then\n        error(res.data.error, 2)\n    end\n\n    return res and res.data and res.data.result\nend\n\nfunction Host.io.read(filePath)\n    return post(\"readFile\", {}, { filePath = filePath, srcMeta = _ENV._srcMeta })\nend\n\nfunction Host.io.write(filePath, content)\n    if type(content) == \"table\" then\n        content = __serialize(content)\n    end\n\n    return post(\"writeFile\", {}, { filePath = filePath, content = content, srcMeta = _ENV._srcMeta })\nend\n\n\nfunction Host.compose.runAny(compose)\n    return post(\"runCompose\", {}, { compose = compose, srcMeta = _ENV._srcMeta })\nend\n\n\nfunction Host.compose.pushFiles(files, to)\n    to = to or syslib.getcorepath()\n    return client:POST(url(\"pushFiles\"), {}, { files = files, to = to, srcMeta = _ENV._srcMeta })\nend\n\nfunction Host.compose.pushDir(dirPath, to, includeDirName)\n    to = to or syslib.getcorepath()\n    includeDirName = includeDirName or false\n    return post(\"pushDir\", {}, { dirPath = dirPath, to = to, includeDirName = includeDirName, srcMeta = _ENV._srcMeta })\nend\n\n\nfunction Host.os.exec(src, args, cwd)\n    return post(\"systemExec\", {}, { src = src, args = args or {}, cwd = cwd, srcMeta = _ENV._srcMeta })\nend\n\nfunction Host.workspace.info()\n\n    return post(\"workspaceInfo\", {}, { srcMeta = _ENV._srcMeta })\nend\n\n--- OpenAI API integration\n--- @param apiKey string Your OpenAI API key\n--- @param model string The model to use (e.g., \"gpt-4\", \"gpt-3.5-turbo\")\n--- @param messages table Array of message objects with role and content\n--- @param options? table Optional parameters (temperature, max_tokens, etc.)\n--- @return table The OpenAI API response\nfunction Host.ai.openai(apiKey, model, messages, options)\n    if not _G._server then\n        error(\"OpenAI can only be used in server mode\", 2)\n    end\n    \n    local body = {\n        apiKey = apiKey,\n        model = model,\n        messages = messages,\n        options = options or {},\n        srcMeta = _ENV._srcMeta\n    }\n    \n    local res = client:POST(url(\"openai\"), {}, body)\n    \n    if res and res.data and res.data.error then\n        error(res.data.error, 2)\n    end\n    \n    if res and res.data and res.data.result then\n        return __J.decode(res.data.result)\n    end\n    \n    return nil\nend\n\n--- Generate images using DALL-E or compatible APIs\n--- @param apiKey string Your API key\n--- @param prompt string The text prompt describing the image to generate\n--- @param options? table Optional parameters (model, size, quality, style, etc.)\n--- @return table The image generation response with URLs or base64 data\nfunction Host.ai.generateImage(apiKey, prompt, options)\n    if not _G._server then\n        error(\"Image generation can only be used in server mode\", 2)\n    end\n    \n    local body = {\n        apiKey = apiKey,\n        prompt = prompt,\n        options = options or {},\n        srcMeta = _ENV._srcMeta\n    }\n    \n    local res = client:POST(url(\"generateImage\"), {}, body)\n    \n    if res and res.data and res.data.error then\n        error(res.data.error, 2)\n    end\n    \n    if res and res.data and res.data.result then\n        return __J.decode(res.data.result)\n    end\n    \n    return nil\nend\n\n\n_G.print = function(any)\n    local v = __serialize(any)\n\n    if not _G._server then\n        _G.__print = _G.__print or {}\n        table.insert(_G.__print, v)\n        return\n    end\n\n    return post(\"print\", {}, { v = v, srcMeta = _ENV._srcMeta })\nend\n\n\n_G.import = function(libraryPath)\n    if package.preload[libraryPath] then\n        return package.preload[libraryPath]\n    end\n\n    if not _G._server then\n        error(\"Import can only be used in server mode\", 2)\n    end\n\n    local res = (client:POST(url(\"importLibrary\"), {}, { libraryPath = libraryPath, srcMeta = _ENV._srcMeta }).data)\n\n    if res.error then\n        error(libraryPath .. \" library could not be loaded\\n\" .. res.error, 2)\n    end\n\n    if _ENV._bundle then\n        table.insert(_G._includedLibraries, libraryPath)\n    end\n\n    local out = load(res.result)()\n    package.preload[libraryPath] = out\n    return out\nend\n",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "LocalCoreSettings.LogStoreSettings.LogStoreBackend": 2,
+    "ScriptLibrary.LuaModuleMandatoryExecution": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ]
+}

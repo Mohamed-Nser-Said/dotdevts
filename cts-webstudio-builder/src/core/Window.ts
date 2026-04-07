@@ -1,17 +1,33 @@
 import {
     Action,
     ActionMessage,
+    ActionPipeline,
+    CollectAction,
     ConsoleLogAction,
+    ConvertAction,
+    CopyAction,
+    DelegateAction,
+    DismissAction,
+    FunctionAction,
     ModifyAction,
+    NamedAction,
     NotifyAction,
+    OpenFileAction,
     OpenLinkAction,
     ParallelGroup,
     PassthroughAction,
     PipelineStep,
+    PromptAction,
     ReadAction,
+    RefreshAction,
+    SaveFileAction,
+    ScreenCaptureAction,
     SendAction,
+    SubscribeAction,
+    SwitchAction,
     TransformAction,
     WaitAction,
+    WidgetTarget,
     WriteAction,
 } from "./types";
 
@@ -21,11 +37,8 @@ export interface WindowProps {
 
 /**
  * Action recorder — passed as `ctx` to widget event handlers (e.g. Button.onClicked).
- * Each method appends a typed action to the internal pipeline, then Button
- * harvests the recorded steps via getActions() and resets via reset().
- *
- * Pipeline model reference:
- *   https://docs.inmation.com/webapps/1.108/webstudio/ReferenceDocs/actions/index.html
+ * Each method appends a typed action to the internal pipeline, then widgets
+ * harvest the recorded steps via `getActions()` and clear them via `reset()`.
  */
 export class Window {
     _actions: PipelineStep[];
@@ -33,22 +46,48 @@ export class Window {
 
     constructor(props?: WindowProps) {
         this._actions = [];
-        this._defaultTopic = (props && props.defaultTopic) ? props.defaultTopic : "test";
+        this._defaultTopic = (props && props.defaultTopic) ? props.defaultTopic : "default";
+    }
+
+    private append(action: Action): this {
+        this._actions.push(action);
+        return this;
+    }
+
+    /** Push a prebuilt action or nested action group into the pipeline. */
+    push(step: PipelineStep): this {
+        this._actions.push(step);
+        return this;
     }
 
     // ── Sequential action helpers ─────────────────────────────────────────────
 
     /** Show a notification popup */
     notify(payload?: unknown, topic?: string): this {
-        const action: NotifyAction = {
-            type: "notify",
-            message: {
-                payload: payload,
-                topic: topic ? topic : this._defaultTopic,
-            },
-        };
-        this._actions.push(action);
-        return this;
+        const action: NotifyAction = { type: "notify" };
+        if (payload !== undefined || topic !== undefined) {
+            action.message = {};
+            if (payload !== undefined) {
+                action.message.payload = payload;
+            }
+            action.message.topic = topic ? topic : this._defaultTopic;
+        }
+        return this.append(action);
+    }
+
+    /** Invoke a named action declared on the widget or the root compilation */
+    action(name: string): this {
+        const action: NamedAction = { type: "action", name };
+        return this.append(action);
+    }
+
+    /** Collect data from another widget */
+    collect(from: WidgetTarget, key?: string): this {
+        const action: CollectAction = { type: "collect", from };
+        if (key !== undefined) {
+            action.key = key;
+        }
+        return this.append(action);
     }
 
     /** Read data from a data source / item path */
@@ -56,8 +95,7 @@ export class Window {
         const action: ReadAction = { type: "read" };
         if (message !== undefined) { action.message = message; }
         if (path !== undefined) { action.path = path; }
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
     /** Write data to a data source / item path */
@@ -65,69 +103,173 @@ export class Window {
         const action: WriteAction = { type: "write" };
         if (message !== undefined) { action.message = message; }
         if (path !== undefined) { action.path = path; }
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
     /** Send a message to another widget or topic */
-    send(message?: ActionMessage, to?: string): this {
+    send(message?: ActionMessage, to?: WidgetTarget): this {
         const action: SendAction = { type: "send" };
         if (message !== undefined) { action.message = message; }
         if (to !== undefined) { action.to = to; }
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
     /** Pass the incoming message through to the next step unchanged */
     passthrough(message?: ActionMessage): this {
         const action: PassthroughAction = { type: "passthrough" };
         if (message !== undefined) { action.message = message; }
-        this._actions.push(action);
-        return this;
+        return this.append(action);
+    }
+
+    /** Convert the payload to or from JSON/Base64 */
+    convert(options: { encode?: "json" | "base64"; decode?: "json" | "base64"; message?: ActionMessage }): this {
+        const action: ConvertAction = { type: "convert" };
+        if (options.message !== undefined) { action.message = options.message; }
+        if (options.encode !== undefined) { action.encode = options.encode; }
+        if (options.decode !== undefined) { action.decode = options.decode; }
+        return this.append(action);
+    }
+
+    /** Copy the current payload to the clipboard */
+    copy(message?: ActionMessage): this {
+        const action: CopyAction = { type: "copy" };
+        if (message !== undefined) { action.message = message; }
+        return this.append(action);
+    }
+
+    /** Close the active prompt or floating tab */
+    dismiss(): this {
+        const action: DismissAction = { type: "dismiss" };
+        return this.append(action);
     }
 
     /** Pause the pipeline for `duration` milliseconds */
     wait(duration: number): this {
         const action: WaitAction = { type: "wait", duration };
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
     /** Write a value to the browser console */
-    consoleLog(message: unknown): this {
+    consoleLog(message: unknown, tag?: string): this {
         const action: ConsoleLogAction = { type: "consoleLog", message };
-        this._actions.push(action);
-        return this;
+        if (tag !== undefined) {
+            action.tag = tag;
+        }
+        return this.append(action);
     }
 
     /** Navigate to a URL */
     openLink(url: string, target?: "_self" | "_blank" | "_parent" | "_top"): this {
         const action: OpenLinkAction = { type: "openLink", url };
         if (target !== undefined) { action.target = target; }
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
-    /** Run a custom script transform on the message */
-    transform(script: string): this {
-        const action: TransformAction = { type: "transform", script };
-        this._actions.push(action);
-        return this;
+    /** Open a file picker and load the content into the payload */
+    openFile(message?: ActionMessage): this {
+        const action: OpenFileAction = { type: "open-file" };
+        if (message !== undefined) { action.message = message; }
+        return this.append(action);
     }
 
-    /** Modify a widget's model property by UUID */
-    modify(id: string, set: Array<{ name: string; value: unknown }>): this {
+    /** Show a prompt dialog with a single widget payload */
+    prompt(payload: Record<string, unknown>, width?: string, height?: string): this {
+        const action: PromptAction = {
+            type: "prompt",
+            message: { payload },
+        };
+        if (width !== undefined) { action.width = width; }
+        if (height !== undefined) { action.height = height; }
+        return this.append(action);
+    }
+
+    /** Refresh a widget */
+    refresh(id?: WidgetTarget): this {
+        const action: RefreshAction = { type: "refresh" };
+        if (id !== undefined) {
+            action.id = id;
+        }
+        return this.append(action);
+    }
+
+    /** Save the payload to a browser download */
+    saveFile(filename: string, options?: { type?: string }): this {
+        const action: SaveFileAction = { type: "save-file", filename };
+        if (options !== undefined) {
+            action.options = options;
+        }
+        return this.append(action);
+    }
+
+    /** Export a widget or compilation as an image */
+    screenCapture(fileName?: string, id?: WidgetTarget, mimeType?: string): this {
+        const action: ScreenCaptureAction = { type: "screen-capture", subType: "image" };
+        if (fileName !== undefined) { action.fileName = fileName; }
+        if (id !== undefined) { action.id = id; }
+        if (mimeType !== undefined) { action.mimeType = mimeType; }
+        return this.append(action);
+    }
+
+    /** Subscribe to backend value changes */
+    subscribe(path: string): this {
+        const action: SubscribeAction = { type: "subscribe", path };
+        return this.append(action);
+    }
+
+    /** Invoke an Advanced Endpoint */
+    functionCall(lib: string, func?: string, farg?: unknown, ctx?: string): this {
+        const action: FunctionAction = { type: "function", lib };
+        if (func !== undefined) { action.func = func; }
+        if (farg !== undefined) { action.farg = farg; }
+        if (ctx !== undefined) { action.ctx = ctx; }
+        return this.append(action);
+    }
+
+    /** Execute different actions based on rule matches */
+    switch(caseList: Array<{ match: unknown; action: Action | ActionPipeline }>, options?: { checkAll?: boolean; completeMsgObject?: boolean }): this {
+        const action: SwitchAction = {
+            type: "switch",
+            case: caseList,
+        };
+        if (options && options.checkAll !== undefined) {
+            action.checkAll = options.checkAll;
+        }
+        if (options && options.completeMsgObject !== undefined) {
+            action.completeMsgObject = options.completeMsgObject;
+        }
+        return this.append(action);
+    }
+
+    /** Execute a nested action sequence in the context where it was defined */
+    delegate(actionToRun: Action | ActionPipeline): this {
+        const action: DelegateAction = { type: "delegate", action: actionToRun };
+        return this.append(action);
+    }
+
+    /** Run a WebStudio transform action */
+    transform(scriptOrConfig: string | Omit<TransformAction, "type">): this {
+        const action: TransformAction = { type: "transform" };
+        if (typeof scriptOrConfig === "string") {
+            action.script = scriptOrConfig;
+        } else {
+            for (const key in scriptOrConfig) {
+                (action as Record<string, unknown>)[key] = (scriptOrConfig as Record<string, unknown>)[key];
+            }
+        }
+        return this.append(action);
+    }
+
+    /** Modify a widget's model property by ID or route */
+    modify(id: WidgetTarget, set: Array<{ name: string; value: unknown }>): this {
         const action: ModifyAction = { type: "modify", id, set };
-        this._actions.push(action);
-        return this;
+        return this.append(action);
     }
 
     /**
-     * Add a parallel execution group — the provided actions will run
-     * simultaneously as a nested array in the pipeline.
-     * Usage: ctx.parallel([ctx.buildNotify(...), ctx.buildModify(...)])
+     * Add a nested action group. In WebStudio these arrays receive the same
+     * input message when they appear sequentially in a pipeline.
      */
-    parallel(actions: Action[]): this {
+    parallel(actions: PipelineStep[]): this {
         const group: ParallelGroup = actions;
         this._actions.push(group);
         return this;
@@ -140,9 +282,10 @@ export class Window {
         return this._actions;
     }
 
-    /** Clear the recorded pipeline (called by Button after harvesting) */
-    reset(): void {
+    /** Clear the recorded pipeline so the same recorder can be reused */
+    reset(): this {
         this._actions = [];
+        return this;
     }
 }
 

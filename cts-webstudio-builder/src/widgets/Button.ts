@@ -1,4 +1,4 @@
-import { ButtonModel, PipelineStep, StyleProps } from "../core/types";
+import { ButtonActions, ButtonModel, PipelineStep, StyleProps } from "../core/types";
 import { Window } from "../core/Window";
 
 export interface ButtonProps {
@@ -6,6 +6,7 @@ export interface ButtonProps {
     label?: string;
     style?: Partial<StyleProps>;
     disabled?: boolean;
+    actions?: ButtonActions;
     window?: Window;
 }
 
@@ -35,10 +36,36 @@ export class Button {
             label: props.label || props.name || "Button",
             id: syslib.uuid(),
             disabled: props.disabled || false,
-            actions: { onClick: [] },
+            actions: props.actions || { onClick: [] },
             options: { style: props.style || defaultStyle },
             toolbars: [],
         };
+    }
+
+    private registerHook(hook: string, handler: (ctx: Window) => void): this {
+        if (!this.model.actions) {
+            this.model.actions = {};
+        }
+        if (!this.model.actions[hook]) {
+            this.model.actions[hook] = [];
+        }
+
+        handler(this.window);
+
+        const recorded: PipelineStep[] = this.window.getActions();
+        const pipeline = this.model.actions[hook] as PipelineStep[];
+        for (const step of recorded) {
+            pipeline.push(step);
+        }
+
+        // Reset so the same Window can be reused for other buttons
+        this.window.reset();
+        return this;
+    }
+
+    /** Register any button action hook supported by WebStudio. */
+    on(hook: string, handler: (ctx: Window) => void): this {
+        return this.registerHook(hook, handler);
     }
 
     /**
@@ -48,23 +75,7 @@ export class Button {
      * resets the recorder for the next use.
      */
     onClicked(handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            (this.model as any).actions = { onClick: [] };
-        }
-        if (!this.model.actions.onClick) {
-            this.model.actions.onClick = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        for (const step of recorded) {
-            this.model.actions.onClick.push(step);
-        }
-
-        // Reset so the same Window can be reused for other buttons
-        this.window.reset();
-        return this;
+        return this.registerHook("onClick", handler);
     }
 
     getModel(): ButtonModel {

@@ -1,11 +1,14 @@
-import { TabsModel } from "../core/types";
+import { TabsModel, WidgetActions } from "../core/types";
 import { Tab } from "./Tab";
 
 export interface TabContainerProps {
     name?: string;
     description?: string;
-    tabAlignment?: "left" | "center" | "right";
+    tabAlignment?: "top" | "bottom" | "left" | "right";
+    showTabBar?: boolean;
     captionBar?: boolean;
+    actions?: WidgetActions;
+    appearance?: TabsModel["appearance"];
 }
 
 // A tabs widget — renders as type "tabs" in WebStudio.
@@ -21,17 +24,21 @@ export class TabContainer {
             description: props.description || "Tab Container",
             id: syslib.uuid(),
             captionBar: props.captionBar !== false,
+            appearance: props.appearance || { type: "docked" },
             options: {
+                showTabBar: props.showTabBar !== false,
                 indicator: {
                     style: {
-                        fontSize: "24px",
+                        fontSize: "16px",
                         justifyContent: "center",
-                        padding: "3px",
+                        padding: "6px 10px",
                     },
                 },
-                tabAlignment: props.tabAlignment || "left",
+                tabAlignment: props.tabAlignment || "top",
             },
             tabs: [],
+            toolbars: {},
+            actions: props.actions || {},
         };
     }
 

@@ -1,6 +1,7 @@
-import { Compilation, CompilationOptions } from "./types";
+import { ActionSequence, Compilation, CompilationOptions, WidgetActions } from "./types";
 import { GridLayout, GridLayoutOptions } from "../layouts/GridLayout";
 import { WidgetRegistry } from "../widgets/WidgetRegistry";
+import { Window } from "./Window";
 
 export interface AppConfig {
     layout?: GridLayout;
@@ -50,6 +51,7 @@ export class App {
                 padding: { x: 0, y: 0 },
                 spacing: { x: 0, y: 0 },
             },
+            actions: {},
         };
     }
 
@@ -98,6 +100,27 @@ export class App {
         return this.add(widget, col, row);
     }
 
+    setActions(actions: WidgetActions): this {
+        this.compilation.actions = actions;
+        return this;
+    }
+
+    addAction(name: string, action: ActionSequence | ((ctx: Window) => void)): this {
+        if (!this.compilation.actions) {
+            this.compilation.actions = {};
+        }
+
+        if (typeof action === "function") {
+            const ctx = new Window();
+            action(ctx);
+            this.compilation.actions[name] = ctx.getActions();
+        } else {
+            this.compilation.actions[name] = action;
+        }
+
+        return this;
+    }
+
     compile(config: { layout?: GridLayout; widgets?: WidgetConfig[] }): Compilation {
         config = config || {};
         if (config.layout) {
@@ -135,6 +158,7 @@ export class App {
             return this.layout.getModel();
         }
 
+        const actions = this.compilation.actions;
         const compilation: Compilation = {
             version: "1",
             widgets: [],
@@ -145,6 +169,7 @@ export class App {
                 padding: { x: 0, y: 0 },
                 spacing: { x: 0, y: 0 },
             },
+            actions: actions && Object.keys(actions).length > 0 ? actions : undefined,
         };
 
         for (const widget of this.widgets) {

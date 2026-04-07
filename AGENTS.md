@@ -6,19 +6,22 @@
 
 ## Build and run
 
-| Command                  | Description                                                            |
-| ------------------------ | ---------------------------------------------------------------------- |
-| `npm run build`          | Compile TS → Lua (output in `build/`)                                  |
-| `npm run dev`            | Compile in watch mode                                                  |
-| `npm run main`           | Build + run via `froge` against the `win1000` connection               |
-| `npm run mainc`          | Build + run via `cts`                                                  |
-| `npm run verify:setfunc` | Build + verify the TSTL plugin rewrote `setFunc`/`onTriggerFunc` calls |
+| Command                  | Description                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| `npm run build`          | Compile TS → Lua (output in `build/`)                                              |
+| `npm run dev`            | Compile in watch mode                                                              |
+| `npm run main`           | Build + run via `froge` against the `win1000` connection                           |
+| `npm run mainc`          | Build + run via `cts`                                                              |
+| `npm run webstudio:run`  | Build + run the simple WebStudio page with `cts run ./build/examples/webstudio/page.lua` |
+| `npm run webstudio:push` | Build + push the simple WebStudio page with `cts ws --push ... --func createSimpleWebStudioPage` |
+| `npm run verify:setfunc` | Build + verify the TSTL plugin rewrote `setFunc`/`onTriggerFunc` calls             |
 
 Entry point: `main.ts` → imports examples, calls one of them. Toggle which example runs by editing `main.ts`.
+WebStudio entry: `examples/webstudio/page.ts` → exports `createSimpleWebStudioPage()` for `cts ws --push`.
 
 ## Tests
 
-- Validation is done via example scripts under `examples/` and `npm run main`.
+- Validation is done via example scripts under `examples/`, `npm run main`, and the WebStudio checks `npm run webstudio:run` / `npm run webstudio:push`.
 - `scripts/verify-setfunc.js` is a post-build assertion that plugin-compiled Lua is correct.
 - No test runner (jest/vitest) is configured yet.
 
@@ -43,7 +46,9 @@ src/
 ├── std/                MongoQuery (fluent builder), Query (LINQ), DataFrame, Debug, Document, File, Workspace
 └── extern/             Type declarations (.d.ts) for syslib, mongo, dkjson, syslib-mongo-augment
 
-examples/               20 runnable examples (one per feature area)
+examples/               Runnable examples (feature demos + WebStudio page)
+├── webstudio/
+│   └── page.ts         Very simple WebStudio example (title, status text, button)
 tstl-plugins/           TypeScriptToLua compiler plugin
 scripts/                Post-build verification scripts
 build/                  Generated Lua output (do not edit)
@@ -95,6 +100,7 @@ The plugin at `tstl-plugins/toLuaString.js` rewrites certain call patterns **at 
 - Generated code runs inside inmation's Lua VM. JS built-ins like `Date`, `Promise`, `Array.from` do **not** exist.
 - `console.log(...)` compiles to `print(...)`. In some inmation environments only the first argument prints — use single-string interpolation: `` console.log(`value=${x}`) ``.
 - Use `syslib.now()` for timestamps instead of `Date.now()`.
+- Standalone runnable modules (for example `examples/webstudio/page.ts`) should import the workspace `prelude` first so TSTL globals like `__TS__Class` / `__TS__New` are available when executing the compiled Lua directly.
 
 ### Types are compile-time only
 - TypeScript types are erased. You cannot reflect on them at runtime.

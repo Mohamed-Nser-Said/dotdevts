@@ -2,6 +2,13 @@
     "version": "0.1",
     "connections": [
         {
+            "name": "dockerWEBAPI-BASF-MDI",
+            "hostname": "WEBAPI-BASF-MDI",
+            "port": 8002,
+            "usr": "so",
+            "pwd": "inmation"
+        },
+        {
             "name": "dockerWEBAPI-BLESSED",
             "hostname": "WEBAPI-BLESSED",
             "port": 8002,

@@ -1,7 +1,7 @@
 import { ImageModel, StyleProps } from "../core/types";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface ImageProps {
-    name?: string;
+export interface ImageProps extends BaseWidgetProps {
     url?: string;
     base64?: string;
     mimeType?: string;
@@ -15,27 +15,27 @@ const defaultStyle: StyleProps = {
     borderRadius: "12px",
 };
 
-export class Image {
-    model: ImageModel;
-
+export class Image extends BaseWidget<ImageModel> {
     constructor(props?: ImageProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
+
         this.model = {
             type: "image",
-            name: props.name || "Image",
-            description: "Image Widget",
-            actions: {},
+            name: this.getName(props, "Image"),
+            description: this.getDescription(props, "Image Widget"),
+            actions: this.getActions(props),
             base64: props.base64 || "",
-            dataSource: {},
+            dataSource: this.getDataSource(props),
             mimeType: props.mimeType || "",
             options: {
                 size: props.size || "contain",
                 style: props.style || defaultStyle,
             },
-            toolbars: {},
+            toolbars: this.getToolbars(props),
             tooltip: {},
             url: props.url || "",
-            id: syslib.uuid(),
+            id: this.createId(),
         };
     }
 

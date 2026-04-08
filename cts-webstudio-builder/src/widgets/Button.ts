@@ -1,13 +1,11 @@
-import { ButtonActions, ButtonModel, PipelineStep, StyleProps } from "../core/types";
+import { ButtonActions, ButtonModel, StyleProps } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface ButtonProps {
-    name?: string;
+export interface ButtonProps extends BaseWidgetProps<ButtonActions> {
     label?: string;
     style?: Partial<StyleProps>;
     disabled?: boolean;
-    actions?: ButtonActions;
-    window?: Window;
 }
 
 const defaultStyle: StyleProps = {
@@ -19,47 +17,45 @@ const defaultStyle: StyleProps = {
     cursor: "pointer",
 };
 
-export class Button {
-    model: ButtonModel;
-    window: Window;
-
+export class Button extends BaseWidget<ButtonModel, ButtonActions> {
     constructor(props?: ButtonProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        // Use the provided Window or create a private one — a Window is always
-        // available so onClicked handlers never need a null check.
-        this.window = props.window ? props.window : new Window();
+
         this.model = {
             type: "button",
-            name: props.name || "Button",
+            name: this.getName(props, "Button"),
             captionBar: false,
-            description: "Button",
+            description: this.getDescription(props, "Button"),
             label: props.label || props.name || "Button",
-            id: syslib.uuid(),
+            id: this.createId(),
             disabled: props.disabled || false,
-            actions: props.actions || { onClick: [] },
+            actions: this.getActions(props, { onClick: [] }),
             options: { style: props.style || defaultStyle },
             toolbars: [],
         };
     }
 
+    setLabel(label: string): this {
+        this.model.label = label;
+        return this;
+    }
+
+    setDisabled(disabled = true): this {
+        this.model.disabled = disabled;
+        return this;
+    }
+
+    setStyle(style: Partial<StyleProps>): this {
+        this.model.options.style = {
+            ...(this.model.options.style || {}),
+            ...style,
+        };
+        return this;
+    }
+
     private registerHook(hook: string, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        const pipeline = this.model.actions[hook] as PipelineStep[];
-        for (const step of recorded) {
-            pipeline.push(step);
-        }
-
-        // Reset so the same Window can be reused for other buttons
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

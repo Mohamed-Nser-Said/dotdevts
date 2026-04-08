@@ -19,6 +19,7 @@ export class HLayoutContainer {
             options: {
                 spacing: { x: options.gap || 0, y: 0 },
             },
+            captionBar: false,
         };
     }
 

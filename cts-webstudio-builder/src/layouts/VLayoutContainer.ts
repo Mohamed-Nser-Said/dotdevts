@@ -19,6 +19,7 @@ export class VLayoutContainer {
             options: {
                 spacing: { x: 0, y: options.gap || 0 },
             },
+            captionBar: false,
         };
     }
 

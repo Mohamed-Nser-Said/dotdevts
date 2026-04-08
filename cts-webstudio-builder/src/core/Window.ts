@@ -1,5 +1,6 @@
 import {
     Action,
+    ActionAssignment,
     ActionMessage,
     ActionPipeline,
     CollectAction,
@@ -23,6 +24,7 @@ import {
     SaveFileAction,
     ScreenCaptureAction,
     SendAction,
+    StyleProps,
     SubscribeAction,
     SwitchAction,
     TransformAction,
@@ -260,9 +262,46 @@ export class Window {
     }
 
     /** Modify a widget's model property by ID or route */
-    modify(id: WidgetTarget, set: Array<{ name: string; value: unknown }>): this {
+    modify(id: WidgetTarget, set: ActionAssignment[], options?: { refresh?: boolean }): this {
         const action: ModifyAction = { type: "modify", id, set };
+        if (options && options.refresh !== undefined) {
+            action.refresh = options.refresh;
+        }
         return this.append(action);
+    }
+
+    /** Modify a single widget model field. */
+    modifyValue(id: WidgetTarget, name: string, value: unknown, refresh?: boolean): this {
+        return this.modify(id, [{ name, value }], { refresh });
+    }
+
+    /** Convenience helper for widgets exposing `model.text`. */
+    setText(id: WidgetTarget, text: string, refresh?: boolean): this {
+        return this.modifyValue(id, "model.text", text, refresh);
+    }
+
+    /** Convenience helper for widgets exposing `model.disabled`. */
+    setDisabled(id: WidgetTarget, disabled = true, refresh?: boolean): this {
+        return this.modifyValue(id, "model.disabled", disabled, refresh);
+    }
+
+    /** Patch one or more `model.options.style.*` fields on a widget. */
+    setStyle(id: WidgetTarget, style: Partial<StyleProps>, refresh?: boolean): this {
+        const styleRecord = style as Record<string, unknown>;
+        const set: ActionAssignment[] = [];
+
+        for (const key in styleRecord) {
+            const value = styleRecord[key];
+            if (value !== undefined) {
+                set.push({ name: `model.options.style.${key}`, value });
+            }
+        }
+
+        if (set.length === 0) {
+            return this;
+        }
+
+        return this.modify(id, set, { refresh });
     }
 
     /**

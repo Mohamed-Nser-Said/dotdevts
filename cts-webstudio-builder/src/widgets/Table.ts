@@ -1,5 +1,4 @@
 import {
-    PipelineStep,
     StyleProps,
     TableActionHook,
     TableActions,
@@ -8,23 +7,15 @@ import {
     TableRow,
     TableSchemaColumn,
     TableState,
-    TextCaptionBar,
 } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface TableProps {
-    name?: string;
-    title?: string;
-    description?: string;
-    showCaption?: boolean;
+export interface TableProps extends BaseWidgetProps<TableActions> {
     data?: TableRow[];
-    dataSource?: Record<string, unknown>;
     schema?: TableSchemaColumn[];
     options?: TableOptions;
     state?: TableState;
-    toolbars?: Record<string, unknown>;
-    actions?: TableActions;
-    window?: Window;
 }
 
 const defaultStyle: StyleProps = {
@@ -57,32 +48,24 @@ const defaultOptions: TableOptions = {
     },
 };
 
-export class Table {
-    model: TableModel;
-    window: Window;
-
+export class Table extends BaseWidget<TableModel, TableActions> {
     constructor(props?: TableProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
-
-        const showCaption = props.showCaption === true;
-        const captionBar: TextCaptionBar | false = showCaption
-            ? { hidden: false, title: props.title || props.name || "Table Widget" }
-            : false;
 
         this.model = {
             type: "table",
-            name: props.name || "Table",
-            description: props.description || "Table Widget",
-            id: syslib.uuid(),
-            captionBar,
+            name: this.getName(props, "Table"),
+            description: this.getDescription(props, "Table Widget"),
+            id: this.createId(),
+            captionBar: this.getCaptionBar(props, "Table Widget", "hidden"),
             data: props.data || [],
             dataSource: props.dataSource,
             schema: props.schema || [],
             options: this.mergeOptions(props.options),
             state: props.state,
-            actions: props.actions || {},
-            toolbars: props.toolbars || {},
+            actions: this.getActions(props),
+            toolbars: this.getToolbars(props),
         };
     }
 
@@ -111,21 +94,7 @@ export class Table {
     }
 
     private registerHook(hook: TableActionHook, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        for (const step of recorded) {
-            this.model.actions[hook]!.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

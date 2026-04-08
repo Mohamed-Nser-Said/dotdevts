@@ -5,18 +5,14 @@ import {
     StyleProps,
     WidgetActions,
 } from "../core/types";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface MarkdownViewerProps {
-    name?: string;
-    description?: string;
+export interface MarkdownViewerProps extends BaseWidgetProps<WidgetActions> {
     content?: string;
-    dataSource?: Record<string, unknown>;
     markdownOptions?: Record<string, unknown>;
     mermaidOptions?: Record<string, unknown>;
     options?: MarkdownViewerOptions;
     style?: Partial<StyleProps>;
-    toolbars?: Record<string, unknown>;
-    actions?: WidgetActions;
 }
 
 const defaultStyle: Partial<StyleProps> = {
@@ -34,10 +30,9 @@ const defaultOptions: MarkdownViewerOptions = {
     style: defaultStyle,
 };
 
-export class MarkdownViewer {
-    model: MarkdownViewerModel;
-
+export class MarkdownViewer extends BaseWidget<MarkdownViewerModel> {
     constructor(props?: MarkdownViewerProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
 
         const providedOptions = props.options || {};
@@ -53,12 +48,12 @@ export class MarkdownViewer {
 
         this.model = {
             type: "markdownviewer",
-            name: props.name || "MarkdownViewer",
-            description: props.description || "Markdown Viewer Widget",
-            id: syslib.uuid(),
-            actions: props.actions || {},
+            name: this.getName(props, "MarkdownViewer"),
+            description: this.getDescription(props, "Markdown Viewer Widget"),
+            id: this.createId(),
+            actions: this.getActions(props),
             content: props.content || "# Markdown Viewer\n\nAdd your markdown content here.",
-            dataSource: props.dataSource || {},
+            dataSource: this.getDataSource(props),
             markdownOptions: props.markdownOptions || {
                 breaks: false,
                 linkify: true,
@@ -68,7 +63,7 @@ export class MarkdownViewer {
                 theme: "default",
             },
             options: mergedOptions,
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
         };
     }
 

@@ -17,8 +17,9 @@ export class GridLayoutContainer {
             id: syslib.uuid(),
             compilation: {},
             options: {
-                spacing: { x: 0, y: 0 },
+                spacing: { x: options.gap || 0, y: options.gap || 0 },
             },
+            captionBar: false,
         };
     }
 

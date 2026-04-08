@@ -16,6 +16,7 @@ export class VLayout {
         const grid = new Grid({
             columns: [1],
             rows: options.rows,
+            gap: options.gap,
         });
         this.layout = new Layout(grid);
     }

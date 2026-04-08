@@ -32,6 +32,7 @@ export interface Position {
     y: number;
     w: number;
     h: number;
+    static?: boolean;
 }
 
 // ─── Action message (passed between pipeline steps) ───────────────────────────
@@ -362,12 +363,14 @@ export interface CompilationOptions {
     numberOfRows: { type: string; value: number };
     padding: { x: number; y: number };
     spacing: { x: number; y: number };
+    showDevTools?: boolean;
 }
 
 export type WidgetActions = Partial<Record<string, ActionSequence>>;
 
 export interface Compilation {
     version: string;
+    name?: string;
     widgets: object[];
     options: CompilationOptions;
     actions?: WidgetActions;
@@ -430,6 +433,31 @@ export interface ImageModel {
     id: string;
     layout?: Position;
 }
+
+export interface PlotlyWidgetOptions {
+    refreshInterval?: string | number;
+    style?: Partial<StyleProps>;
+    styleByTheme?: Record<string, Partial<StyleProps>>;
+    [key: string]: unknown;
+}
+
+export interface PlotlyModel {
+    type: "plotly";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown> | Array<Record<string, unknown>>;
+    data?: unknown[];
+    options?: PlotlyWidgetOptions;
+    plotlyOptions?: Record<string, unknown>;
+    toolbars?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+}
+
 export interface IFrameOptions {
     allowFullScreen?: boolean;
     style?: Partial<StyleProps>;
@@ -455,9 +483,12 @@ export interface FaceplateModel {
     name: string;
     description: string;
     actions: Record<string, unknown>;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
     dataSource: Record<string, unknown>;
     path: string;
     toolbars: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
     id: string;
     layout?: Position;
 }
@@ -1018,6 +1049,7 @@ export interface ChartModel {
     description: string;
     id: string;
     actions?: ChartActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
     chart?: ChartTrendModel;
     dataSource?: Record<string, unknown> | ActionSequence;
     inspector?: ChartInspector;
@@ -1027,6 +1059,8 @@ export interface ChartModel {
     ranges?: ChartRanges;
     tagSearchTable?: ChartTagSearchTable;
     toolbars?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
     layout?: Position;
 }
 
@@ -1041,9 +1075,12 @@ export interface ContainerModel {
     compilation: object;
     options: {
         spacing: { x: number; y: number };
+        style?: Partial<StyleProps>;
+        styleByTheme?: Record<string, Partial<StyleProps>>;
     };
     actions?: WidgetActions;
     layout?: Position;
+    captionBar: boolean;
 }
 
 // ─── Tab / Tabs widget models ─────────────────────────────────────────────────

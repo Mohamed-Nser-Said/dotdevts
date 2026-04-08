@@ -4,24 +4,18 @@ import {
     EditorModel,
     EditorOptions,
     ModifyAction,
-    PipelineStep,
     StyleProps,
 } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface EditorProps {
-    name?: string;
-    description?: string;
+export interface EditorProps extends BaseWidgetProps<EditorActions> {
     content?: unknown;
     contentToCompare?: unknown;
-    dataSource?: Record<string, unknown>;
     editorOptions?: Record<string, unknown>;
     language?: "json" | "lua" | "markdown" | "txt" | "xml" | string;
     schema?: Record<string, unknown>;
     options?: EditorOptions;
-    toolbars?: Record<string, unknown>;
-    actions?: EditorActions;
-    window?: Window;
 }
 
 const defaultStyle: Partial<StyleProps> = {
@@ -50,13 +44,10 @@ const defaultEditorOptions: Record<string, unknown> = {
     },
 };
 
-export class Editor {
-    model: EditorModel;
-    window: Window;
-
+export class Editor extends BaseWidget<EditorModel, EditorActions> {
     constructor(props?: EditorProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
 
         const providedOptions = props.options || {};
         const mergedOptions: EditorOptions = {
@@ -70,13 +61,13 @@ export class Editor {
 
         this.model = {
             type: "editor",
-            name: props.name || "Editor",
-            description: props.description || "Editor Widget",
-            id: syslib.uuid(),
-            actions: props.actions || {},
+            name: this.getName(props, "Editor"),
+            description: this.getDescription(props, "Editor Widget"),
+            id: this.createId(),
+            actions: this.getActions(props),
             content: props.content !== undefined ? props.content : {},
             contentToCompare: props.contentToCompare,
-            dataSource: props.dataSource || {},
+            dataSource: this.getDataSource(props),
             editorOptions: {
                 ...defaultEditorOptions,
                 ...(props.editorOptions || {}),
@@ -84,26 +75,12 @@ export class Editor {
             language: props.language || "json",
             schema: props.schema || {},
             options: mergedOptions,
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
         };
     }
 
     private registerHook(hook: EditorActionHook, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        for (const step of recorded) {
-            this.model.actions[hook]!.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

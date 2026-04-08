@@ -1,31 +1,27 @@
 import { IFrameModel, IFrameOptions, WidgetActions } from "../core/types";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface IFrameProps {
-    name?: string;
-    description?: string;
+export interface IFrameProps extends BaseWidgetProps<WidgetActions> {
     url?: string;
-    actions?: WidgetActions;
-    dataSource?: Record<string, unknown>;
     iframeOptions?: IFrameOptions;
-    toolbars?: Record<string, unknown>;
 }
 
-export class IFrame {
-    model: IFrameModel;
-
+export class IFrame extends BaseWidget<IFrameModel> {
     constructor(props?: IFrameProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
+
         this.model = {
             type: "iframe",
-            name: props.name || "IFrame",
-            description: props.description || "IFrame Widget",
-            id: syslib.uuid(),
-            actions: props.actions || {},
-            dataSource: props.dataSource || {},
+            name: this.getName(props, "IFrame"),
+            description: this.getDescription(props, "IFrame Widget"),
+            id: this.createId(),
+            actions: this.getActions(props),
+            dataSource: this.getDataSource(props),
             iframeOptions: props.iframeOptions || {
                 allowFullScreen: true,
             },
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
             url: props.url || "",
         };
     }

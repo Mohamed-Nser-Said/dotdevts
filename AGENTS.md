@@ -130,6 +130,16 @@ The plugin at `tstl-plugins/toLuaString.js` rewrites certain call patterns **at 
 - `dkjson.encode()` crashes on Mongo `_id` fields (`userdata`). Use `Debug.dump()` for safe logging.
 - `cursor.iterator(handler)` may behave inconsistently — mapping is done in the TS wrapper post-iteration for reliability.
 
+## WebStudio layout / scaling notes
+
+- `options.numberOfRows` controls whether a page scales-to-fit or becomes scrollable:
+  - omit it / `type: "square"` → row height follows column width (default auto behavior).
+  - `type: "count"` → the full compilation is scaled to fit the current viewport height. This is good for single-screen dashboards, but long pages will look cramped because all rows shrink to fit.
+  - `type: "height"` → each grid row gets a fixed pixel height (`value`), so tall pages can scroll normally. Prefer this for long WebStudio pages like `examples/webstudio/page.ts`.
+- For long pages, use something like `numberOfRows: { type: "height", value: 30 }` instead of a large numeric count such as `numberOfRows: 320`.
+- `gap` and `padding` in `GridLayout` map to WebStudio `spacing` / `padding`; with `count` mode, very large row counts make widgets appear jammed together because the rows are compressed.
+- `cts-webstudio-builder/src/layouts/Grid.ts` was adjusted to preserve row units in fixed-height modes (`height` / `square`) so spacing and scrolling behave correctly after compilation.
+
 ## Coding conventions
 
 - **Object creation**: use `syslib.mass([{ class, operation: MassOp.UPSERT, path, ... }])`.

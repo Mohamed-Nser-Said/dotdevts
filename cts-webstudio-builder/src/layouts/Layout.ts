@@ -1,16 +1,26 @@
 import { Compilation } from "../core/types";
 import { Grid } from "./Grid";
 
-function makeCompilation(): Compilation {
+function makeCompilation(grid: Grid): Compilation {
     return {
         version: "1",
         widgets: [],
         options: {
-            stacking: "none",
-            numberOfColumns: 96,
-            numberOfRows: { type: "count", value: 96 },
-            padding: { x: 0, y: 0 },
-            spacing: { x: 0, y: 0 },
+            stacking: grid.modelOptions.stacking,
+            numberOfColumns: grid.modelOptions.numberOfColumns,
+            numberOfRows: {
+                type: grid.modelOptions.numberOfRows.type,
+                value: grid.modelOptions.numberOfRows.value,
+            },
+            padding: {
+                x: grid.modelOptions.padding.x,
+                y: grid.modelOptions.padding.y,
+            },
+            spacing: {
+                x: grid.modelOptions.spacing.x,
+                y: grid.modelOptions.spacing.y,
+            },
+            showDevTools: grid.modelOptions.showDevTools,
         },
     };
 }
@@ -20,8 +30,8 @@ export class Layout {
     grid: Grid;
 
     constructor(grid: Grid) {
-        this.model = makeCompilation();
         this.grid = grid;
+        this.model = makeCompilation(grid);
     }
 
     addWidget(widget: any, col: number, row: number): void {

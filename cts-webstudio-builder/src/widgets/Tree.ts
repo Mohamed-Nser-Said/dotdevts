@@ -1,6 +1,5 @@
 import {
     ModifyAction,
-    PipelineStep,
     SendAction,
     StyleProps,
     TreeActionHook,
@@ -13,22 +12,17 @@ import {
     TreeState,
 } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface TreeProps {
-    name?: string;
-    description?: string;
+export interface TreeProps extends BaseWidgetProps<TreeActions> {
     data?: TreeNode[];
-    dataSource?: Record<string, unknown>;
     schema?: TreeSchema;
     schemaExtension?: TreeSchema;
     searchTable?: TreeSearchTable;
     options?: TreeOptions;
     state?: TreeState;
-    toolbars?: Record<string, unknown>;
-    actions?: TreeActions;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    window?: Window;
 }
 
 const defaultStyle: Partial<StyleProps> = {
@@ -49,28 +43,25 @@ const defaultOptions: TreeOptions = {
     style: defaultStyle,
 };
 
-export class Tree {
-    model: TreeModel;
-    window: Window;
-
+export class Tree extends BaseWidget<TreeModel, TreeActions> {
     constructor(props?: TreeProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
 
         this.model = {
             type: "tree",
-            name: props.name || "Tree",
-            description: props.description || "Tree Widget",
-            id: syslib.uuid(),
-            actions: props.actions || {},
+            name: this.getName(props, "Tree"),
+            description: this.getDescription(props, "Tree Widget"),
+            id: this.createId(),
+            actions: this.getActions(props),
             data: props.data || [],
-            dataSource: props.dataSource || {},
+            dataSource: this.getDataSource(props),
             options: this.mergeOptions(props.options),
             schema: props.schema || {},
             schemaExtension: props.schemaExtension || {},
             searchTable: props.searchTable || {},
             state: props.state || { expandedNodes: [] },
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
             dragSource: props.dragSource,
             dropTarget: props.dropTarget,
         };
@@ -101,21 +92,7 @@ export class Tree {
     }
 
     private registerHook(hook: TreeActionHook, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        for (const step of recorded) {
-            this.model.actions[hook]!.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

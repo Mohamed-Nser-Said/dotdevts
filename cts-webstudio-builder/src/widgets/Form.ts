@@ -4,23 +4,14 @@ import {
     FormEntry,
     FormModel,
     FormOptions,
-    PipelineStep,
     StyleProps,
-    TextCaptionBar,
 } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface FormProps {
-    name?: string;
-    title?: string;
-    description?: string;
-    showCaption?: boolean;
+export interface FormProps extends BaseWidgetProps<FormActions> {
     entries?: FormEntry[];
-    dataSource?: Record<string, unknown>;
     options?: FormOptions;
-    toolbars?: Record<string, unknown>;
-    actions?: FormActions;
-    window?: Window;
 }
 
 const defaultStyle: StyleProps = {
@@ -40,30 +31,22 @@ const defaultOptions: FormOptions = {
     },
 };
 
-export class Form {
-    model: FormModel;
-    window: Window;
-
+export class Form extends BaseWidget<FormModel, FormActions> {
     constructor(props?: FormProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
-
-        const showCaption = props.showCaption === true;
-        const captionBar: TextCaptionBar | false = showCaption
-            ? { hidden: false, title: props.title || props.name || "Form Widget" }
-            : false;
 
         this.model = {
             type: "form",
-            name: props.name || "Form",
-            description: props.description || "Form Widget",
-            id: syslib.uuid(),
-            captionBar,
-            actions: props.actions || {},
-            dataSource: props.dataSource || {},
+            name: this.getName(props, "Form"),
+            description: this.getDescription(props, "Form Widget"),
+            id: this.createId(),
+            captionBar: this.getCaptionBar(props, "Form Widget", "hidden"),
+            actions: this.getActions(props),
+            dataSource: this.getDataSource(props),
             entries: props.entries || [],
             options: this.mergeOptions(props.options),
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
         };
     }
 
@@ -93,21 +76,7 @@ export class Form {
     }
 
     private registerHook(hook: FormActionHook, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        for (const step of recorded) {
-            this.model.actions[hook]!.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 
@@ -118,6 +87,34 @@ export class Form {
 
     setOptions(options: FormOptions): this {
         this.model.options = this.mergeOptions(options);
+        return this;
+    }
+
+    setSubmitLabel(label: string): this {
+        const currentOptions = this.model.options || {};
+        const currentSubmitButton = currentOptions.submitButton || {};
+
+        this.model.options = this.mergeOptions({
+            ...currentOptions,
+            submitButton: {
+                ...currentSubmitButton,
+                label,
+            },
+        });
+        return this;
+    }
+
+    setStyle(style: Partial<StyleProps>): this {
+        const currentOptions = this.model.options || {};
+        const currentStyle = currentOptions.style || {};
+
+        this.model.options = this.mergeOptions({
+            ...currentOptions,
+            style: {
+                ...currentStyle,
+                ...style,
+            },
+        });
         return this;
     }
 

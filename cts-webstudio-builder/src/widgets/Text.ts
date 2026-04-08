@@ -1,14 +1,10 @@
-import { ModifyAction, PipelineStep, StyleProps, TextCaptionBar, TextModel, WidgetActions } from "../core/types";
+import { ModifyAction, StyleProps, TextModel, WidgetActions } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface TextProps {
-    name?: string;
+export interface TextProps extends BaseWidgetProps<WidgetActions> {
     text?: string;
-    title?: string;
     style?: Partial<StyleProps>;
-    showCaption?: boolean;
-    actions?: WidgetActions;
-    window?: Window;
 }
 
 const defaultStyle: StyleProps = {
@@ -19,26 +15,20 @@ const defaultStyle: StyleProps = {
     fontFamily: '"Courier New", Courier, sans-serif',
 };
 
-export class Text {
-    model: TextModel;
-    window: Window;
-
+export class Text extends BaseWidget<TextModel> {
     constructor(props?: TextProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
-        const showCaption = props.showCaption !== false;
-        const captionBar: TextCaptionBar | false = showCaption
-            ? { hidden: false, title: props.title || props.name || "Text Widget" }
-            : false;
+
         this.model = {
             type: "text",
-            name: props.name || "Text",
-            description: "Text Widget",
+            name: this.getName(props, "Text"),
+            description: this.getDescription(props, "Text Widget"),
             text: props.text || "Your text here",
-            captionBar,
+            captionBar: this.getCaptionBar(props, "Text Widget", "visible"),
             options: { style: props.style || defaultStyle },
-            id: syslib.uuid(),
-            actions: props.actions,
+            id: this.createId(),
+            actions: this.getActions(props),
         };
     }
 
@@ -53,22 +43,7 @@ export class Text {
     }
 
     private registerHook(hook: string, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        const pipeline = this.model.actions[hook] as PipelineStep[];
-        for (const step of recorded) {
-            pipeline.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

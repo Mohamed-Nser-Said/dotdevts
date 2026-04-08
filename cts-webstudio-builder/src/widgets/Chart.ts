@@ -15,21 +15,19 @@ import {
     PipelineStep,
 } from "../core/types";
 import { Window } from "../core/Window";
+import { BaseWidget, BaseWidgetProps } from "./BaseWidget";
 
-export interface ChartProps {
-    name?: string;
-    description?: string;
+export interface ChartProps extends BaseWidgetProps<ChartActions> {
+    captionBar?: boolean | Record<string, unknown>;
     chart?: ChartTrendModel;
-    dataSource?: Record<string, unknown>;
     inspector?: ChartInspector;
     legend?: ChartLegend;
     modelRoot?: ChartModelRoot;
     options?: ChartOptions;
     ranges?: ChartRanges;
     tagSearchTable?: Record<string, unknown>;
-    toolbars?: Record<string, unknown>;
-    actions?: ChartActions;
-    window?: Window;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
 }
 
 const defaultXAxis: ChartXAxis = {
@@ -138,22 +136,20 @@ const defaultOptions: ChartOptions = {
     },
 };
 
-export class Chart {
-    model: ChartModel;
-    window: Window;
-
+export class Chart extends BaseWidget<ChartModel, ChartActions> {
     constructor(props?: ChartProps) {
+        super(props && props.window ? props.window : undefined);
         props = props || {};
-        this.window = props.window ? props.window : new Window();
 
         this.model = {
             type: "chart",
-            name: props.name || "Chart",
-            description: props.description || "Chart Widget",
-            id: syslib.uuid(),
-            actions: props.actions || {},
+            name: this.getName(props, "Chart"),
+            description: this.getDescription(props, "Chart Widget"),
+            id: this.createId(),
+            actions: this.getActions(props),
+            captionBar: props.captionBar !== undefined ? props.captionBar : this.getCaptionBar(props, "Chart Widget"),
             chart: this.mergeChart(props.chart),
-            dataSource: props.dataSource || {},
+            dataSource: this.getDataSource(props),
             inspector: props.inspector || {},
             legend: props.legend,
             modelRoot: props.modelRoot,
@@ -163,7 +159,9 @@ export class Chart {
             },
             ranges: props.ranges,
             tagSearchTable: props.tagSearchTable,
-            toolbars: props.toolbars || {},
+            toolbars: this.getToolbars(props),
+            dragSource: props.dragSource,
+            dropTarget: props.dropTarget,
         };
     }
 
@@ -187,22 +185,7 @@ export class Chart {
     }
 
     private registerHook(hook: ChartActionHook | string, handler: (ctx: Window) => void): this {
-        if (!this.model.actions) {
-            this.model.actions = {};
-        }
-        if (!this.model.actions[hook]) {
-            this.model.actions[hook] = [];
-        }
-
-        handler(this.window);
-
-        const recorded: PipelineStep[] = this.window.getActions();
-        const pipeline = this.model.actions[hook] as PipelineStep[];
-        for (const step of recorded) {
-            pipeline.push(step);
-        }
-
-        this.window.reset();
+        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 

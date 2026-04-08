@@ -16,6 +16,7 @@ export class HLayout {
         const grid = new Grid({
             columns: options.columns,
             rows: [1],
+            gap: options.gap,
         });
         this.layout = new Layout(grid);
     }

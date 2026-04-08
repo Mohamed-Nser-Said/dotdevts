@@ -1,9 +1,12 @@
 import "../../prelude";
 
 import { App } from "../../cts-webstudio-builder/src/core/App";
-import { PrimaryButton } from "../../cts-webstudio-builder/src/components/PrimaryButton";
-import { WarningButton } from "../../cts-webstudio-builder/src/components/WarningButton";
 import { CriticalActionButton } from "../../cts-webstudio-builder/src/components/CriticalActionButton";
+import { InfoPanel } from "../../cts-webstudio-builder/src/components/InfoPanel";
+import { KpiCard } from "../../cts-webstudio-builder/src/components/KpiCard";
+import { PrimaryButton } from "../../cts-webstudio-builder/src/components/PrimaryButton";
+import { SectionHeader } from "../../cts-webstudio-builder/src/components/SectionHeader";
+import { WarningButton } from "../../cts-webstudio-builder/src/components/WarningButton";
 import { Compilation } from "../../cts-webstudio-builder/src/core/types";
 import { GridLayout } from "../../cts-webstudio-builder/src/layouts/GridLayout";
 import { Chart } from "../../cts-webstudio-builder/src/widgets/Chart";
@@ -22,57 +25,28 @@ import { TabContainer } from "../../cts-webstudio-builder/src/widgets/TabContain
 import { Text } from "../../cts-webstudio-builder/src/widgets/Text";
 
 function makeKpiCard(name: string, value: string, backgroundColor: string, borderColor: string): Text {
-    return new Text({
+    return new KpiCard({
         name,
-        text: `${name} • ${value}`,
-        showCaption: false,
-        style: {
-            backgroundColor,
-            color: "#ffffff",
-            padding: "16px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            textAlign: "center",
-            borderRadius: "14px",
-            border: `2px solid ${borderColor}`,
-            boxShadow: "0 10px 24px rgba(15, 23, 42, 0.18)",
-        },
+        label: name,
+        value,
+        backgroundColor,
+        borderColor,
     });
 }
 
 function makePanelText(name: string, text: string, backgroundColor = "#f8fafc", color = "#0f172a"): Text {
-    return new Text({
+    return new InfoPanel({
         name,
         text,
-        showCaption: false,
-        style: {
-            backgroundColor,
-            color,
-            padding: "14px",
-            fontSize: "16px",
-            textAlign: "left",
-            borderRadius: "12px",
-            border: "1px solid #dbeafe",
-            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.08)",
-        },
+        backgroundColor,
+        color,
     });
 }
 
 function makeSectionHeader(name: string, text: string): Text {
-    return new Text({
+    return new SectionHeader({
         name,
         text,
-        showCaption: false,
-        style: {
-            backgroundColor: "#0f172a",
-            color: "#ffffff",
-            padding: "14px",
-            fontSize: "20px",
-            fontWeight: "bold",
-            textAlign: "center",
-            borderRadius: "12px",
-            border: "1px solid #1d4ed8",
-        },
     });
 }
 
@@ -188,6 +162,82 @@ export function createSimpleWebStudioPage(): Compilation {
         "#fff7ed",
         "#9a3412",
     );
+
+    const helpButton = new PrimaryButton({
+        name: "ActionHelpButton",
+        label: "Action Help",
+        style: {
+            backgroundColor: "#4338ca",
+            color: "#ffffff",
+            padding: "12px 14px",
+            fontSize: "14px",
+            fontWeight: "bold",
+            borderRadius: "10px",
+            border: "2px solid #3730a3",
+            boxShadow: "0 4px 12px rgba(67, 56, 202, 0.22)",
+        },
+    }).onClicked((ctx) => {
+        ctx.action("showActionHelp")
+            .notify("Opened the action help overlay")
+            .setText(activityLog.model.id, "Activity • Action help opened from the quick tools panel.");
+    });
+
+    const snapshotButton = new PrimaryButton({
+        name: "SnapshotButton",
+        label: "Snapshot",
+        style: {
+            backgroundColor: "#0f766e",
+            color: "#ffffff",
+            padding: "12px 14px",
+            fontSize: "14px",
+            fontWeight: "bold",
+            borderRadius: "10px",
+            border: "2px solid #0f766e",
+            boxShadow: "0 4px 12px rgba(15, 118, 110, 0.22)",
+        },
+    }).onClicked((ctx) => {
+        ctx.screenCapture("plant-operations-dashboard.png", undefined, "image/png")
+            .notify("Dashboard snapshot exported")
+            .setText(activityLog.model.id, "Activity • Snapshot exported for the current dashboard view.");
+    });
+
+    const docsButton = new WarningButton({
+        name: "DocsButton",
+        label: "Docs",
+        style: {
+            backgroundColor: "#7c3aed",
+            color: "#ffffff",
+            padding: "12px 14px",
+            fontSize: "14px",
+            fontWeight: "bold",
+            borderRadius: "10px",
+            border: "2px solid #6d28d9",
+            boxShadow: "0 4px 12px rgba(124, 58, 237, 0.22)",
+        },
+    }).onClicked((ctx) => {
+        ctx.openLink("https://docs.inmation.com/webapps/1.110/webstudio/ReferenceDocs/index.html", "_blank")
+            .notify("Opened WebStudio docs in a new tab")
+            .setText(operatorGuide.model.id, "Next step • Review the docs, then return here to extend the page with more widgets.");
+    });
+
+    const quickTools = new HLayoutContainer({
+        name: "QuickTools",
+        description: "Helpful shortcuts",
+        columns: [1, 1, 1],
+        gap: 1,
+    });
+    quickTools.addWidget(helpButton, 1);
+    quickTools.addWidget(snapshotButton, 2);
+    quickTools.addWidget(docsButton, 3);
+
+    const activityToolsRow = new HLayoutContainer({
+        name: "ActivityToolsRow",
+        description: "Recent activity and quick tools",
+        columns: [2, 3],
+        gap: 2,
+    });
+    activityToolsRow.addWidget(activityLog, 1);
+    activityToolsRow.addWidget(quickTools, 2);
 
     const trendHeader = makeSectionHeader(
         "TrendHeader",
@@ -353,7 +403,7 @@ export function createSimpleWebStudioPage(): Compilation {
             bottomPanel: false,
             play: "none",
             relativeXAxis: false,
-            showToolbar: true,
+            showToolbar: false,
         },
         inspector: {
             showCrosshairPanel: true,
@@ -362,24 +412,18 @@ export function createSimpleWebStudioPage(): Compilation {
             showPropertiesPanel: true,
         },
     }).onDataPointClick((ctx) => {
-        ctx.notify("Trend data point clicked");
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Trend point selected on the chart" },
-            { name: "model.options.style.backgroundColor", value: "#ecfeff" },
-            { name: "model.options.style.color", value: "#155e75" },
-            { name: "model.options.style.border", value: "1px solid #a5f3fc" },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Trend point clicked — inspect the chart legend and cursor values." },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Use the trend toolbar to zoom, pan, or inspect another pen." },
-        ]);
+        ctx.notify("Trend data point clicked")
+            .setText(actionStatus.model.id, "Status • Trend point selected on the chart")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#ecfeff",
+                color: "#155e75",
+                border: "1px solid #a5f3fc",
+            })
+            .setText(activityLog.model.id, "Activity • Trend point clicked — inspect the chart legend and cursor values.")
+            .setText(operatorGuide.model.id, "Next step • Use the trend toolbar to zoom, pan, or inspect another pen.");
     }).onNewChart((ctx) => {
-        ctx.notify("New chart initialized");
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Chart reset from the toolbar — add new pens or time spans as needed." },
-        ]);
+        ctx.notify("New chart initialized")
+            .setText(activityLog.model.id, "Activity • Chart reset from the toolbar — add new pens or time spans as needed.");
     });
 
     const tableHeader = makeSectionHeader(
@@ -471,7 +515,7 @@ export function createSimpleWebStudioPage(): Compilation {
             alternateRowColoring: true,
             allowSorting: true,
             pagination: false,
-            showToolbar: true,
+            showToolbar: false,
             showRefreshButton: false,
             showRowNumbers: true,
             style: {
@@ -492,13 +536,9 @@ export function createSimpleWebStudioPage(): Compilation {
             showColumnFilters: true,
         },
     }).onSelect((ctx) => {
-        ctx.notify("Batch table row selected");
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Batch table row selected for review." },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Compare the selected batch row with the KPI cards above." },
-        ]);
+        ctx.notify("Batch table row selected")
+            .setText(activityLog.model.id, "Activity • Batch table row selected for review.")
+            .setText(operatorGuide.model.id, "Next step • Compare the selected batch row with the KPI cards above.");
     });
 
     const startButton = new PrimaryButton({
@@ -514,35 +554,21 @@ export function createSimpleWebStudioPage(): Compilation {
             boxShadow: "0 6px 16px rgba(37, 99, 235, 0.25)",
         },
     }).onClicked((ctx) => {
-        ctx.notify("Production start requested");
-        ctx.consoleLog("Production start requested");
-        ctx.modify(hero.model.id, [
-            { name: "model.text", value: "Plant Operations Dashboard • RUNNING" },
-        ]);
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Production is ramping up" },
-            { name: "model.options.style.backgroundColor", value: "#dcfce7" },
-            { name: "model.options.style.color", value: "#166534" },
-            { name: "model.options.style.border", value: "1px solid #86efac" },
-        ]);
-        ctx.modify(modePanel.model.id, [
-            { name: "model.text", value: "Mode • RUNNING" },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Monitor throughput and quality indicators." },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Start Batch pressed — line is now running." },
-        ]);
-        ctx.modify(lineState.model.id, [
-            { name: "model.text", value: "Line State • RUNNING" },
-        ]);
-        ctx.modify(throughput.model.id, [
-            { name: "model.text", value: "Throughput • 31.2 t/h" },
-        ]);
-        ctx.modify(alarms.model.id, [
-            { name: "model.text", value: "Alarms • 0 active" },
-        ]);
+        ctx.notify("Production start requested")
+            .consoleLog("Production start requested")
+            .setText(hero.model.id, "Plant Operations Dashboard • RUNNING")
+            .setText(actionStatus.model.id, "Status • Production is ramping up")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#dcfce7",
+                color: "#166534",
+                border: "1px solid #86efac",
+            })
+            .setText(modePanel.model.id, "Mode • RUNNING")
+            .setText(operatorGuide.model.id, "Next step • Monitor throughput and quality indicators.")
+            .setText(activityLog.model.id, "Activity • Start Batch pressed — line is now running.")
+            .setText(lineState.model.id, "Line State • RUNNING")
+            .setText(throughput.model.id, "Throughput • 31.2 t/h")
+            .setText(alarms.model.id, "Alarms • 0 active");
     });
 
     const maintainButton = new WarningButton({
@@ -558,35 +584,21 @@ export function createSimpleWebStudioPage(): Compilation {
             boxShadow: "0 6px 16px rgba(245, 158, 11, 0.25)",
         },
     }).onClicked((ctx) => {
-        ctx.notify("Maintenance mode enabled");
-        ctx.consoleLog("Maintenance mode enabled");
-        ctx.modify(hero.model.id, [
-            { name: "model.text", value: "Plant Operations Dashboard • MAINTENANCE" },
-        ]);
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Maintenance mode scheduled" },
-            { name: "model.options.style.backgroundColor", value: "#fef3c7" },
-            { name: "model.options.style.color", value: "#92400e" },
-            { name: "model.options.style.border", value: "1px solid #fcd34d" },
-        ]);
-        ctx.modify(modePanel.model.id, [
-            { name: "model.text", value: "Mode • SERVICE" },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Finish inspection and then reset the dashboard." },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Maintenance selected — operators have been notified." },
-        ]);
-        ctx.modify(lineState.model.id, [
-            { name: "model.text", value: "Line State • SERVICE" },
-        ]);
-        ctx.modify(throughput.model.id, [
-            { name: "model.text", value: "Throughput • 12.0 t/h" },
-        ]);
-        ctx.modify(alarms.model.id, [
-            { name: "model.text", value: "Alarms • 1 low" },
-        ]);
+        ctx.notify("Maintenance mode enabled")
+            .consoleLog("Maintenance mode enabled")
+            .setText(hero.model.id, "Plant Operations Dashboard • MAINTENANCE")
+            .setText(actionStatus.model.id, "Status • Maintenance mode scheduled")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#fef3c7",
+                color: "#92400e",
+                border: "1px solid #fcd34d",
+            })
+            .setText(modePanel.model.id, "Mode • SERVICE")
+            .setText(operatorGuide.model.id, "Next step • Finish inspection and then reset the dashboard.")
+            .setText(activityLog.model.id, "Activity • Maintenance selected — operators have been notified.")
+            .setText(lineState.model.id, "Line State • SERVICE")
+            .setText(throughput.model.id, "Throughput • 12.0 t/h")
+            .setText(alarms.model.id, "Alarms • 1 low");
     });
 
     const stopButton = new CriticalActionButton({
@@ -602,35 +614,21 @@ export function createSimpleWebStudioPage(): Compilation {
             boxShadow: "0 6px 16px rgba(220, 38, 38, 0.25)",
         },
     }).onClicked((ctx) => {
-        ctx.notify("Emergency stop triggered");
-        ctx.consoleLog("Emergency stop triggered");
-        ctx.modify(hero.model.id, [
-            { name: "model.text", value: "Plant Operations Dashboard • STOPPED" },
-        ]);
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Emergency stop active" },
-            { name: "model.options.style.backgroundColor", value: "#fee2e2" },
-            { name: "model.options.style.color", value: "#991b1b" },
-            { name: "model.options.style.border", value: "1px solid #fca5a5" },
-        ]);
-        ctx.modify(modePanel.model.id, [
-            { name: "model.text", value: "Mode • STOPPED" },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Investigate alarms and reset only when safe." },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Emergency stop pressed — line halted immediately." },
-        ]);
-        ctx.modify(lineState.model.id, [
-            { name: "model.text", value: "Line State • STOPPED" },
-        ]);
-        ctx.modify(throughput.model.id, [
-            { name: "model.text", value: "Throughput • 0.0 t/h" },
-        ]);
-        ctx.modify(alarms.model.id, [
-            { name: "model.text", value: "Alarms • 3 high" },
-        ]);
+        ctx.notify("Emergency stop triggered")
+            .consoleLog("Emergency stop triggered")
+            .setText(hero.model.id, "Plant Operations Dashboard • STOPPED")
+            .setText(actionStatus.model.id, "Status • Emergency stop active")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#fee2e2",
+                color: "#991b1b",
+                border: "1px solid #fca5a5",
+            })
+            .setText(modePanel.model.id, "Mode • STOPPED")
+            .setText(operatorGuide.model.id, "Next step • Investigate alarms and reset only when safe.")
+            .setText(activityLog.model.id, "Activity • Emergency stop pressed — line halted immediately.")
+            .setText(lineState.model.id, "Line State • STOPPED")
+            .setText(throughput.model.id, "Throughput • 0.0 t/h")
+            .setText(alarms.model.id, "Alarms • 3 high");
     });
 
     const resetButton = new PrimaryButton({
@@ -646,35 +644,21 @@ export function createSimpleWebStudioPage(): Compilation {
             boxShadow: "0 6px 16px rgba(71, 85, 105, 0.25)",
         },
     }).onClicked((ctx) => {
-        ctx.notify("Dashboard reset to default state");
-        ctx.consoleLog("Dashboard reset to default state");
-        ctx.modify(hero.model.id, [
-            { name: "model.text", value: "Plant Operations Dashboard" },
-        ]);
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Waiting for operator input" },
-            { name: "model.options.style.backgroundColor", value: "#eff6ff" },
-            { name: "model.options.style.color", value: "#1d4ed8" },
-            { name: "model.options.style.border", value: "1px solid #bfdbfe" },
-        ]);
-        ctx.modify(modePanel.model.id, [
-            { name: "model.text", value: "Mode • READY" },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Press Start Batch to simulate production start." },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Dashboard reset to default state." },
-        ]);
-        ctx.modify(lineState.model.id, [
-            { name: "model.text", value: "Line State • READY" },
-        ]);
-        ctx.modify(throughput.model.id, [
-            { name: "model.text", value: "Throughput • 24.8 t/h" },
-        ]);
-        ctx.modify(alarms.model.id, [
-            { name: "model.text", value: "Alarms • 0 active" },
-        ]);
+        ctx.notify("Dashboard reset to default state")
+            .consoleLog("Dashboard reset to default state")
+            .setText(hero.model.id, "Plant Operations Dashboard")
+            .setText(actionStatus.model.id, "Status • Waiting for operator input")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#eff6ff",
+                color: "#1d4ed8",
+                border: "1px solid #bfdbfe",
+            })
+            .setText(modePanel.model.id, "Mode • READY")
+            .setText(operatorGuide.model.id, "Next step • Press Start Batch to simulate production start.")
+            .setText(activityLog.model.id, "Activity • Dashboard reset to default state.")
+            .setText(lineState.model.id, "Line State • READY")
+            .setText(throughput.model.id, "Throughput • 24.8 t/h")
+            .setText(alarms.model.id, "Alarms • 0 active");
     });
 
     const actionButtons = new HLayoutContainer({
@@ -749,7 +733,7 @@ export function createSimpleWebStudioPage(): Compilation {
         ],
         options: {
             showRefreshButton: false,
-            showToolbar: true,
+            showToolbar: false,
             submitButton: { label: "Submit Dispatch Request" },
             style: {
                 backgroundColor: "#ffffff",
@@ -758,20 +742,44 @@ export function createSimpleWebStudioPage(): Compilation {
             },
         },
     }).onSubmit((ctx) => {
-        ctx.notify("Dispatch form submitted");
-        ctx.consoleLog("Dispatch form submitted");
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Dispatch request submitted for review" },
-            { name: "model.options.style.backgroundColor", value: "#ede9fe" },
-            { name: "model.options.style.color", value: "#5b21b6" },
-            { name: "model.options.style.border", value: "1px solid #c4b5fd" },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Form submitted — review the request and confirm the next batch." },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Review the submitted form and then press Start Batch when approved." },
-        ]);
+        ctx.notify("Dispatch form submitted")
+            .consoleLog("Dispatch form submitted")
+            .setText(actionStatus.model.id, "Status • Dispatch request submitted for review")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#ede9fe",
+                color: "#5b21b6",
+                border: "1px solid #c4b5fd",
+            })
+            .setText(modePanel.model.id, "Mode • REVIEW")
+            .setText(activityLog.model.id, "Activity • Form submitted — review the request and confirm the next batch.")
+            .setText(operatorGuide.model.id, "Next step • Review the submitted form and then press Start Batch when approved.");
+        ctx.prompt({
+            type: "text",
+            text: "Dispatch request queued. Review the recipe, start time, and priority, then use Start Batch when operations approval is complete.",
+            captionBar: {
+                hidden: false,
+                title: "Dispatch Submitted",
+            },
+            options: {
+                style: {
+                    backgroundColor: "#f5f3ff",
+                    color: "#5b21b6",
+                    padding: "18px",
+                    fontSize: "15px",
+                    textAlign: "left",
+                    borderRadius: "12px",
+                    border: "1px solid #c4b5fd",
+                    cursor: "pointer",
+                },
+            },
+            actions: {
+                onClick: [
+                    {
+                        type: "dismiss",
+                    },
+                ],
+            },
+        }, "520px", "220px");
     });
 
     const overviewPanels = new GridLayoutContainer({
@@ -1007,7 +1015,7 @@ graph LR
             ],
             options: {
                 pagination: false,
-                showToolbar: true,
+                showToolbar: false,
             },
             state: {
                 search: { value: "" },
@@ -1018,7 +1026,7 @@ graph LR
             allowSearch: true,
             collapseOnSearchSelection: false,
             showRefreshButton: false,
-            showToolbar: true,
+            showToolbar: false,
             style: {
                 backgroundColor: "#ffffff",
                 color: "#0f172a",
@@ -1033,13 +1041,9 @@ graph LR
             expandedNodes: ["site-1", "site-1-area-a", "site-1-area-a-line-1"],
         },
     }).onSelect((ctx) => {
-        ctx.notify("Asset tree selection changed");
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Asset tree selection changed — browse or search for a unit in the hierarchy." },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Use the Asset Tree tab to inspect the plant hierarchy and jump to a unit quickly." },
-        ]);
+        ctx.notify("Asset tree selection changed")
+            .setText(activityLog.model.id, "Activity • Asset tree selection changed — browse or search for a unit in the hierarchy.")
+            .setText(operatorGuide.model.id, "Next step • Use the Asset Tree tab to inspect the plant hierarchy and jump to a unit quickly.");
     });
 
     const operationsTabs = new TabContainer({
@@ -1135,7 +1139,7 @@ graph LR
             },
         },
         options: {
-            showToolbar: true,
+            showToolbar: false,
             showLanguageSelection: true,
             showStatusBar: true,
             style: {
@@ -1149,18 +1153,14 @@ graph LR
             },
         },
     }).onContentChange((ctx) => {
-        ctx.modify(actionStatus.model.id, [
-            { name: "model.text", value: "Status • Recipe draft updated in the editor" },
-            { name: "model.options.style.backgroundColor", value: "#ecfeff" },
-            { name: "model.options.style.color", value: "#155e75" },
-            { name: "model.options.style.border", value: "1px solid #a5f3fc" },
-        ]);
-        ctx.modify(activityLog.model.id, [
-            { name: "model.text", value: "Activity • Editor content changed — review the updated dispatch JSON." },
-        ]);
-        ctx.modify(operatorGuide.model.id, [
-            { name: "model.text", value: "Next step • Validate the JSON draft and submit the dispatch request when ready." },
-        ]);
+        ctx.setText(actionStatus.model.id, "Status • Recipe draft updated in the editor")
+            .setStyle(actionStatus.model.id, {
+                backgroundColor: "#ecfeff",
+                color: "#155e75",
+                border: "1px solid #a5f3fc",
+            })
+            .setText(activityLog.model.id, "Activity • Editor content changed — review the updated dispatch JSON.")
+            .setText(operatorGuide.model.id, "Next step • Validate the JSON draft and submit the dispatch request when ready.");
     });
 
     const footer = new Text({
@@ -1184,7 +1184,14 @@ graph LR
     });
 
     const app = new App({
-        layout: new GridLayout({ columns: [1], rows: [1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1] }),
+        layout: new GridLayout({
+            columns: [1],
+            rows: [4, 3, 8, 2, 8, 4, 2, 5, 4, 4, 2, 9, 4, 2, 12, 2, 10, 8, 12, 2, 10, 2, 12, 3],
+            gap: 2,
+            padding: { x: 2, y: 2 },
+            numberOfRows: { type: "height", value: 30 },
+            showDevTools: false,
+        }),
     });
 
     app.addAction("showActionHelp", (ctx) => {
@@ -1229,7 +1236,7 @@ graph LR
     app.add(infoRow, { col: 1, row: 10 });
     app.add(formHeader, { col: 1, row: 11 });
     app.add(dispatchForm, { col: 1, row: 12 });
-    app.add(activityLog, { col: 1, row: 13 });
+    app.add(activityToolsRow, { col: 1, row: 13 });
     app.add(trendHeader, { col: 1, row: 14 });
     app.add(processTrend, { col: 1, row: 15 });
     app.add(tableHeader, { col: 1, row: 16 });

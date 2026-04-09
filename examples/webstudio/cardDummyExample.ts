@@ -1,11 +1,11 @@
 import "../../prelude";
 
-import { App } from "../../cts-webstudio-builder/src/core/App";
-import { Compilation } from "../../cts-webstudio-builder/src/core/types";
-import { GridLayout } from "../../cts-webstudio-builder/src/layouts/GridLayout";
-import { Text } from "../../cts-webstudio-builder/src/widgets/Text";
-import { CardHolder } from "../../cts-webstudio-builder/src/components/CardHolder";
-import { TextCard } from "../../cts-webstudio-builder/src/components/TextCard";
+import { App } from "../../webstudio-builder/src/core/App";
+import { Compilation } from "../../webstudio-builder/src/core/types";
+import { GridLayout } from "../../webstudio-builder/src/layouts/GridLayout";
+import { Text } from "../../webstudio-builder/src/widgets/Text";
+import { CardHolder } from "../../webstudio-builder/src/components/CardHolder";
+import { TextCard } from "../../webstudio-builder/src/components/TextCard";
 
 export function createCardDummyExample(): Compilation {
     const title = new Text({

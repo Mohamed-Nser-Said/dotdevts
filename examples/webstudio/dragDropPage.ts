@@ -1,12 +1,12 @@
 import "../../prelude";
 
-import { App } from "../../cts-webstudio-builder/src/core/App";
-import { Compilation } from "../../cts-webstudio-builder/src/core/types";
-import { Chart } from "../../cts-webstudio-builder/src/widgets/Chart";
-import { Faceplate } from "../../cts-webstudio-builder/src/widgets/Faceplate";
-import { Plotly } from "../../cts-webstudio-builder/src/widgets/Plotly";
-import { Text } from "../../cts-webstudio-builder/src/widgets/Text";
-import { Tree } from "../../cts-webstudio-builder/src/widgets/Tree";
+import { App } from "../../webstudio-builder/src/core/App";
+import { Compilation } from "../../webstudio-builder/src/core/types";
+import { Chart } from "../../webstudio-builder/src/widgets/Chart";
+import { Faceplate } from "../../webstudio-builder/src/widgets/Faceplate";
+import { Plotly } from "../../webstudio-builder/src/widgets/Plotly";
+import { Text } from "../../webstudio-builder/src/widgets/Text";
+import { Tree } from "../../webstudio-builder/src/widgets/Tree";
 
 function setAbsoluteLayout<T extends { model: object }>(
     widget: T,

@@ -1,20 +1,20 @@
 import "../../prelude";
 
-import { App } from "../../cts-webstudio-builder/src/core/App";
-import { CriticalActionButton } from "../../cts-webstudio-builder/src/components/CriticalActionButton";
-import { KpiCard } from "../../cts-webstudio-builder/src/components/KpiCard";
-import { PrimaryButton } from "../../cts-webstudio-builder/src/components/PrimaryButton";
-import { SectionHeader } from "../../cts-webstudio-builder/src/components/SectionHeader";
-import { WarningButton } from "../../cts-webstudio-builder/src/components/WarningButton";
-import { Compilation } from "../../cts-webstudio-builder/src/core/types";
-import { GridLayout } from "../../cts-webstudio-builder/src/layouts/GridLayout";
-import { Chart } from "../../cts-webstudio-builder/src/widgets/Chart";
-import { Form } from "../../cts-webstudio-builder/src/widgets/Form";
-import { MarkdownViewer } from "../../cts-webstudio-builder/src/widgets/MarkdownViewer";
-import { Table } from "../../cts-webstudio-builder/src/widgets/Table";
-import { Text } from "../../cts-webstudio-builder/src/widgets/Text";
-import { CardHolder } from "../../cts-webstudio-builder/src/components/CardHolder";
-import { TextCard } from "../../cts-webstudio-builder/src/components/TextCard";
+import { App } from "../../webstudio-builder/src/core/App";
+import { CriticalActionButton } from "../../webstudio-builder/src/components/CriticalActionButton";
+import { KpiCard } from "../../webstudio-builder/src/components/KpiCard";
+import { PrimaryButton } from "../../webstudio-builder/src/components/PrimaryButton";
+import { SectionHeader } from "../../webstudio-builder/src/components/SectionHeader";
+import { WarningButton } from "../../webstudio-builder/src/components/WarningButton";
+import { Compilation } from "../../webstudio-builder/src/core/types";
+import { GridLayout } from "../../webstudio-builder/src/layouts/GridLayout";
+import { Chart } from "../../webstudio-builder/src/widgets/Chart";
+import { Form } from "../../webstudio-builder/src/widgets/Form";
+import { MarkdownViewer } from "../../webstudio-builder/src/widgets/MarkdownViewer";
+import { Table } from "../../webstudio-builder/src/widgets/Table";
+import { Text } from "../../webstudio-builder/src/widgets/Text";
+import { CardHolder } from "../../webstudio-builder/src/components/CardHolder";
+import { TextCard } from "../../webstudio-builder/src/components/TextCard";
 
 function makeKpi(name: string, value: string, backgroundColor: string, borderColor: string): Text {
     return new KpiCard({

@@ -9,12 +9,7 @@
     "mainc": "tstl && cts run ./build/main.lua",
     "maind": "tstl && cts run ./build/main.lua -c dockerWEBAPI-BLESSED",
     "main": "tstl && cts run ./build/main.lua -c win1000",
-    "webstudio:run": "tstl && cts run ./build/examples/webstudio/operationsCenterApp.lua -c win1000",
-    "webstudio:push": "tstl && cts ws --push ./build/examples/webstudio/operationsCenterApp.lua -c win1000 --func createOperationsCenterApp",
     "webstudio:push:all": "node ./scripts/push-webstudio-examples.js",
-    "webstudio:run:demo": "tstl && cts run ./build/examples/webstudio/page.lua -c win1000",
-    "webstudio:push:demo": "tstl && cts ws --push ./build/examples/webstudio/page.lua -c win1000 --func createSimpleWebStudioPage",
-    "webstudio:push:dragdrop": "tstl && cts ws --push ./build/examples/webstudio/dragDropPage.lua -c win1000 --func createDragDropWebStudioPage",
     "verify:setfunc": "tstl && node ./scripts/verify-setfunc.js"
   },
   "devDependencies": {

@@ -25,7 +25,7 @@ function parseArgs(argv) {
             options.noBuild = true;
         } else if (arg === "--help" || arg === "-h") {
             options.help = true;
-        } else if ((arg === "--connection" || arg === "-c") && argv[i + 1]) {
+        } else if ((arg === "--connection" || arg === "-n") && argv[i + 1]) {
             options.connection = argv[i + 1];
             i += 1;
         } else if ((arg === "--example" || arg === "-e") && argv[i + 1]) {
@@ -134,7 +134,7 @@ function main() {
 
         runCommand(
             "cts",
-            ["ws", "--push", example.luaPath, "-c", options.connection, "--func", example.functionName],
+            ["ws", "--push", example.luaPath, "-n", options.connection, "--func", example.functionName],
             options.dryRun,
         );
     });

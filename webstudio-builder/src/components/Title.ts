@@ -1,5 +1,5 @@
 import { StyleProps } from "../core/types";
-import { Text, TextProps } from "../widgets/Text";
+import { Text, TextProps } from "../widgets/GenericWidgets/Text";
 
 export interface TitleProps extends TextProps {
     fontSize?: string;

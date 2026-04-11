@@ -47,10 +47,10 @@ export class Grid {
         const spacing = options.spacing || {};
         const numberOfRows = options.numberOfRows;
         const resolvedNumberOfRows = typeof numberOfRows === "number"
-            ? { type: "count", value: numberOfRows }
+            ? { type: "height", value: numberOfRows }
             : {
-                type: (numberOfRows && numberOfRows.type) ? numberOfRows.type : "count",
-                value: (numberOfRows && numberOfRows.value !== undefined) ? numberOfRows.value : 96,
+                type: (numberOfRows && numberOfRows.type) ? numberOfRows.type : "square",
+                value: (numberOfRows && numberOfRows.value !== undefined) ? numberOfRows.value : 0,
             };
 
         this.columns = options.columns || [1];

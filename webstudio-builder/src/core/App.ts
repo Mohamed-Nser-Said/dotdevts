@@ -4,7 +4,9 @@ import { WidgetRegistry } from "../widgets/WidgetRegistry";
 import { Window } from "./Window";
 
 export interface AppConfig {
+    name?: string;
     layout?: GridLayout;
+    style?: Record<string, unknown>;
 }
 
 export interface WidgetPosition {
@@ -119,6 +121,10 @@ export class App {
         }
 
         return this;
+    }
+
+    addDelegatedAction(name: string, action: ActionSequence | ((ctx: Window) => void)): this {
+        return this.addAction(name, action);
     }
 
     compile(config: { layout?: GridLayout; widgets?: WidgetConfig[] }): Compilation {

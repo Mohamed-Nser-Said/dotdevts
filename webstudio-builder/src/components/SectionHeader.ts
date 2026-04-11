@@ -1,5 +1,5 @@
 import { StyleProps } from "../core/types";
-import { Text, TextProps } from "../widgets/Text";
+import { Text, TextProps } from "../widgets/GenericWidgets/Text";
 
 const sectionHeaderStyle: StyleProps = {
     backgroundColor: "#0f172a",

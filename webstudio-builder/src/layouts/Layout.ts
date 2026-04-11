@@ -4,6 +4,9 @@ import { Grid } from "./Grid";
 function makeCompilation(grid: Grid): Compilation {
     return {
         version: "1",
+        info: {},
+        rootOnly: {},
+        actions: {},
         widgets: [],
         options: {
             stacking: grid.modelOptions.stacking,
@@ -49,7 +52,13 @@ export class Layout {
         }
 
         const cell = this.grid.getCell(col, row);
+        const existingLayout = widgetModel.layout as { static?: boolean } | undefined;
+
         widgetCopy.layout = { x: cell.x, y: cell.y, w: cell.w, h: cell.h };
+        if (existingLayout && existingLayout.static === true) {
+            (widgetCopy.layout as Record<string, unknown>).static = true;
+        }
+
         this.model.widgets.push(widgetCopy as object);
     }
 

@@ -1,4 +1,5 @@
-import { Button, ButtonProps } from "../widgets/Button";
+import { Button, ButtonProps } from "../widgets/GenericWidgets/Button";
+
 
 const primaryStyle = {
     background: "#3a56d4",

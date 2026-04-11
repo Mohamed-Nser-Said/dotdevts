@@ -9,7 +9,12 @@ import {
     CopyAction,
     DelegateAction,
     DismissAction,
+    EnvironmentAction,
+    FetchAction,
     FunctionAction,
+    GetTimeAction,
+    InternationalizationAction,
+    LoadCompilationAction,
     ModifyAction,
     NamedAction,
     NotifyAction,
@@ -24,6 +29,7 @@ import {
     SaveFileAction,
     ScreenCaptureAction,
     SendAction,
+    SetActiveDiagramsPageAction,
     StyleProps,
     SubscribeAction,
     SwitchAction,
@@ -67,6 +73,31 @@ export class Window {
     /** Show a notification popup */
     notify(payload?: unknown, topic?: string): this {
         const action: NotifyAction = { type: "notify" };
+
+        if (typeof payload === "string" || typeof payload === "number" || typeof payload === "boolean") {
+            action.text = String(payload);
+        } else if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+            const record = payload as Record<string, unknown>;
+            if (typeof record.title === "string") {
+                action.title = record.title;
+            }
+            if (typeof record.text === "string") {
+                action.text = record.text;
+            }
+            if (typeof record.duration === "number") {
+                action.duration = record.duration;
+            }
+            if (typeof record.transition === "string") {
+                action.transition = record.transition;
+            }
+            if (record.style && typeof record.style === "object") {
+                action.style = record.style as Record<string, unknown>;
+            }
+            if (record.styleByTheme && typeof record.styleByTheme === "object") {
+                action.styleByTheme = record.styleByTheme as Record<string, unknown>;
+            }
+        }
+
         if (payload !== undefined || topic !== undefined) {
             action.message = {};
             if (payload !== undefined) {
@@ -312,6 +343,60 @@ export class Window {
         const group: ParallelGroup = actions;
         this._actions.push(group);
         return this;
+    }
+
+    // ── New action helpers (schema-derived) ──────────────────────────────────
+
+    /** Fetch data by path */
+    fetch(path?: string, message?: ActionMessage): this {
+        const action: FetchAction = { type: "fetch" };
+        if (path !== undefined) { action.path = path; }
+        if (message !== undefined) { action.message = message; }
+        return this.append(action);
+    }
+
+    /** Load a compilation from the backend */
+    loadCompilation(options: {
+        subType?: "function" | "object-name" | "compilation-field";
+        lib?: string;
+        func?: string;
+        farg?: unknown;
+        objspec?: string | number;
+        name?: string;
+        ctx?: string;
+        history?: { type?: "replaceState" | "pushState" | "none" };
+    }): this {
+        const action: LoadCompilationAction = { type: "load-compilation" };
+        for (const key in options) {
+            (action as Record<string, unknown>)[key] = (options as Record<string, unknown>)[key];
+        }
+        return this.append(action);
+    }
+
+    /** Read browser environment values (locale, theme, timezone) */
+    environment(set: Array<{ name: string; query: "getLocale" | "getTheme" | "getTimezone" }>): this {
+        const action: EnvironmentAction = { type: "environment", set };
+        return this.append(action);
+    }
+
+    /** Convert time values */
+    getTime(set: Array<{ name: string; value: unknown; asEpoch?: boolean; timezone?: string; format?: string }>): this {
+        const action: GetTimeAction = { type: "gettime", set };
+        return this.append(action);
+    }
+
+    /** Read internationalization settings */
+    internationalization(set: Array<{ name: string; query: "getLocale" | "getTimezone" }>): this {
+        const action: InternationalizationAction = { type: "internationalization", set };
+        return this.append(action);
+    }
+
+    /** Set the active page in a diagrams widget */
+    setActiveDiagramsPage(id?: WidgetTarget, name?: string): this {
+        const action: SetActiveDiagramsPageAction = { type: "setActiveDiagramsPage" };
+        if (id !== undefined) { action.id = id; }
+        if (name !== undefined) { action.name = name; }
+        return this.append(action);
     }
 
     // ── Pipeline access ───────────────────────────────────────────────────────

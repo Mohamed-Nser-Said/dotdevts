@@ -2,11 +2,11 @@ import "../../prelude";
 
 import { App } from "../../webstudio-builder/src/core/App";
 import { Compilation } from "../../webstudio-builder/src/core/types";
-import { Chart } from "../../webstudio-builder/src/widgets/Chart";
-import { Faceplate } from "../../webstudio-builder/src/widgets/Faceplate";
-import { Plotly } from "../../webstudio-builder/src/widgets/Plotly";
-import { Text } from "../../webstudio-builder/src/widgets/Text";
-import { Tree } from "../../webstudio-builder/src/widgets/Tree";
+import { Chart } from "../../webstudio-builder/src/widgets/SpecificWidgets/Chart";
+import { Faceplate } from "../../webstudio-builder/src/widgets/SpecificWidgets/Faceplate";
+import { Plotly } from "../../webstudio-builder/src/widgets/GenericWidgets/Plotly";
+import { Text } from "../../webstudio-builder/src/widgets/GenericWidgets/Text";
+import { Tree } from "../../webstudio-builder/src/widgets/GenericWidgets/Tree";
 
 function setAbsoluteLayout<T extends { model: object }>(
     widget: T,
@@ -557,6 +557,6 @@ export function createDragDropWebStudioPage(): Compilation {
     return compilation;
 }
 
-export const page = createDragDropWebStudioPage();
+// export const page = createDragDropWebStudioPage();
 
-export default page;
+// export default page;

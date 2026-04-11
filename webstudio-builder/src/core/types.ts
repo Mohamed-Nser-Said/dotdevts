@@ -7,6 +7,8 @@ export interface StyleProps {
     fontSize?: string;
     borderRadius?: string;
     backgroundColor?: string;
+    backgroundImage?: string;
+    backgroundSize?: string;
     color?: string;
     padding?: string;
     cursor?: string;
@@ -35,335 +37,122 @@ export interface Position {
     static?: boolean;
 }
 
-// ─── Action message (passed between pipeline steps) ───────────────────────────
+// ─── Action types (re-exported from action-types.ts) ──────────────────────────
 
-export interface ActionMessage {
-    topic?: string | null;
-    payload?: unknown;
-    [key: string]: unknown;
-}
+import type { ActionPipeline, ActionSequence } from "./action-types";
 
-export type WidgetTarget = "self" | string | { route: string[] };
-
-export interface ActionAssignment {
-    name: string;
-    value?: unknown;
-    query?: string;
-    idx?: number;
-    item?: unknown;
-    condition?: unknown;
-    [key: string]: unknown;
-}
-
-export type ActionPipeline = Array<Action | ActionPipeline>;
-export type ActionSequence = Action | ActionPipeline;
-
-// ─── Catch block (error handler for any action) ───────────────────────────────
-
-export interface ActionCatch {
-    type?: "continue" | "break" | "throw";
-    action?: ActionSequence;
-}
-
-interface ActionBase<TType extends string> {
-    type: TType;
-    catch?: ActionCatch;
-    key?: string;
-    skip?: boolean;
-    [key: string]: unknown;
-}
-
-// ─── Individual action types ──────────────────────────────────────────────────
-
-/** Invoke a named action declared on the widget or the root compilation */
-export interface NamedAction extends ActionBase<"action"> {
-    name: string;
-}
-
-/** Collect data from another widget */
-export interface CollectAction extends ActionBase<"collect"> {
-    from: WidgetTarget;
-    message?: ActionMessage;
-}
-
-/** Write the current payload to the browser console */
-export interface ConsoleLogAction extends ActionBase<"consoleLog"> {
-    message?: unknown;
-    tag?: string;
-}
-
-/** Convert the payload to or from JSON/Base64 */
-export interface ConvertAction extends ActionBase<"convert"> {
-    message?: ActionMessage;
-    encode?: "json" | "base64";
-    decode?: "json" | "base64";
-}
-
-/** Copy the current payload to the clipboard */
-export interface CopyAction extends ActionBase<"copy"> {
-    message?: ActionMessage;
-}
-
-/** Delegate a nested pipeline to the definition context */
-export interface DelegateAction extends ActionBase<"delegate"> {
-    action: ActionSequence;
-    message?: ActionMessage;
-}
-
-/** Dismiss the active prompt or floating tab */
-export interface DismissAction extends ActionBase<"dismiss"> {}
-
-/** Read browser theme/locale/timezone values */
-export interface EnvironmentAction extends ActionBase<"environment"> {
-    message?: ActionMessage;
-    set?: ActionAssignment[];
-}
-
-/** Invoke an Advanced Endpoint */
-export interface FunctionAction extends ActionBase<"function"> {
-    message?: ActionMessage;
-    lib: string;
-    func?: string;
-    farg?: unknown;
-    ctx?: string;
-}
-
-/** Convert one or more time values */
-export interface GetTimeAction extends ActionBase<"gettime"> {
-    message?: ActionMessage;
-    set?: Array<{
-        name?: string;
-        value?: unknown;
-        asEpoch?: boolean;
-        timezone?: string;
-        format?: string;
-        [key: string]: unknown;
-    }>;
-}
-
-/** Read the browser locale/timezone */
-export interface InternationalizationAction extends ActionBase<"internationalization"> {
-    message?: ActionMessage;
-    set?: ActionAssignment[];
-}
-
-/** Load a compilation from the backend, a function, or the message payload */
-export interface LoadCompilationAction extends ActionBase<"load-compilation"> {
-    message?: ActionMessage;
-    subType?: "object-name" | "function" | "compilation-field" | string;
-    history?: { type?: "replaceState" | "pushState" | "none" | string };
-    objspec?: string;
-    name?: string;
-    ctx?: string;
-    lib?: string;
-    func?: string;
-    farg?: unknown;
-}
-
-/** Modify a widget model at runtime */
-export interface ModifyAction extends ActionBase<"modify"> {
-    id: WidgetTarget;
-    message?: ActionMessage;
-    set?: ActionAssignment[];
-    unset?: string[];
-    addToArray?: ActionAssignment[];
-    removeFromArray?: ActionAssignment[];
-    filter?: ActionAssignment[];
-    refresh?: boolean;
-    debug?: boolean;
-}
-
-/** Show a notification popup */
-export interface NotifyAction extends ActionBase<"notify"> {
-    message?: ActionMessage;
-    title?: string;
-    text?: string;
-    duration?: number;
-    transition?: "slide" | "bounce" | "zoom" | "flip" | string;
-    style?: Record<string, unknown>;
-    styleByTheme?: Record<string, unknown>;
-}
-
-/** Load a file from disk into the message payload */
-export interface OpenFileAction extends ActionBase<"open-file"> {
-    message?: ActionMessage;
-}
-
-/** Open a URL */
-export interface OpenLinkAction extends ActionBase<"openLink"> {
-    url: string;
-    target?: "_self" | "_blank" | "_parent" | "_top";
-}
-
-/** Merge an optional message into the incoming message and pass it through */
-export interface PassthroughAction extends ActionBase<"passthrough"> {
-    message?: ActionMessage;
-}
-
-/** Show a prompt dialog */
-export interface PromptAction extends ActionBase<"prompt"> {
-    message?: ActionMessage;
-    width?: string;
-    height?: string;
-}
-
-/** Read data from the backend */
-export interface ReadAction extends ActionBase<"read"> {
-    message?: ActionMessage;
-    path?: string;
-    opt?: Record<string, unknown>;
-    item?: Record<string, unknown>;
-    items?: Array<Record<string, unknown>>;
-}
-
-/** Read aggregated historical data */
-export interface ReadHistoricalDataAction extends ActionBase<"read-historical-data"> {
-    message?: ActionMessage;
-    query: Record<string, unknown>;
-}
-
-/** Read model information from the backend */
-export interface ReadModelAction extends ActionBase<"read-model"> {
-    message?: ActionMessage;
-    objspec?: string;
-    items?: Array<Record<string, unknown>>;
-    depth?: number;
-    properties?: unknown[];
-}
-
-/** Read raw historical data */
-export interface ReadRawHistoricalDataAction extends ActionBase<"read-raw-historical-data"> {
-    message?: ActionMessage;
-    query: Record<string, unknown>;
-}
-
-/** Widget read/write binding */
-export interface ReadWriteAction extends ActionBase<"read-write"> {
-    message?: ActionMessage;
-    path: string;
-}
-
-/** Refresh a widget */
-export interface RefreshAction extends ActionBase<"refresh"> {
-    id?: WidgetTarget;
-}
-
-/** Save the payload to a file */
-export interface SaveFileAction extends ActionBase<"save-file"> {
-    filename: string;
-    options?: { type?: string };
-}
-
-/** Export a widget or compilation as an image */
-export interface ScreenCaptureAction extends ActionBase<"screen-capture"> {
-    subType?: "image" | string;
-    fileName?: string;
-    id?: WidgetTarget;
-    mimeType?: string;
-}
-
-/** Send a message to another widget */
-export interface SendAction extends ActionBase<"send"> {
-    message?: ActionMessage;
-    to?: WidgetTarget;
-}
-
-/** Subscribe to backend data changes */
-export interface SubscribeAction extends ActionBase<"subscribe"> {
-    message?: ActionMessage;
-    path: string;
-}
-
-/** Execute different actions based on rule matches */
-export interface SwitchAction extends ActionBase<"switch"> {
-    message?: ActionMessage;
-    checkAll?: boolean;
-    completeMsgObject?: boolean;
-    case?: Array<{
-        match: unknown;
-        action: ActionSequence;
-    }>;
-}
-
-/** Transform the payload using WebStudio's aggregation/query syntax */
-export interface TransformAction extends ActionBase<"transform"> {
-    message?: ActionMessage;
-    aggregate?: unknown[];
-    aggregateOne?: unknown[];
-    query?: Record<string, unknown>;
-    queryOne?: Record<string, unknown>;
-    completeMsgObject?: boolean;
-    // Kept for backwards compatibility with the current builder API.
-    script?: string;
-}
-
-/** Pause pipeline execution */
-export interface WaitAction extends ActionBase<"wait"> {
-    duration: number;
-}
-
-/** Write data to the backend */
-export interface WriteAction extends ActionBase<"write"> {
-    message?: ActionMessage;
-    path?: string;
-    item?: Record<string, unknown>;
-    items?: Array<Record<string, unknown>>;
-}
-
-// ─── Union of all action types ────────────────────────────────────────────────
-
-export type Action =
-    | NamedAction
-    | CollectAction
-    | ConsoleLogAction
-    | ConvertAction
-    | CopyAction
-    | DelegateAction
-    | DismissAction
-    | EnvironmentAction
-    | FunctionAction
-    | GetTimeAction
-    | InternationalizationAction
-    | LoadCompilationAction
-    | ModifyAction
-    | NotifyAction
-    | OpenFileAction
-    | OpenLinkAction
-    | PassthroughAction
-    | PromptAction
-    | ReadAction
-    | ReadHistoricalDataAction
-    | ReadModelAction
-    | ReadRawHistoricalDataAction
-    | ReadWriteAction
-    | RefreshAction
-    | SaveFileAction
-    | ScreenCaptureAction
-    | SendAction
-    | SubscribeAction
-    | SwitchAction
-    | TransformAction
-    | WaitAction
-    | WriteAction;
-
-/**
- * Nested action arrays behave like WebStudio pipeline groups.
- * Example pipeline: [actionA, [actionB, actionC], actionD]
- */
-export type ParallelGroup = ActionPipeline;
-
-/** A single step inside an action pipeline — either one action or a nested action array */
-export type PipelineStep = Action | ActionPipeline;
+export {
+    ActionMessage,
+    WidgetTarget,
+    ActionAssignment,
+    ActionPipeline,
+    ActionSequence,
+    ActionCatch,
+    NamedAction,
+    CollectAction,
+    ConsoleLogAction,
+    ConvertAction,
+    CopyAction,
+    DelegateAction,
+    DismissAction,
+    EnvironmentAction,
+    FetchAction,
+    FunctionAction,
+    GetTimeAction,
+    InternationalizationAction,
+    LoadCompilationAction,
+    ModifyAction,
+    NotifyAction,
+    OpenFileAction,
+    OpenLinkAction,
+    PassthroughAction,
+    PromptAction,
+    ReadAction,
+    ReadHistoricalDataAction,
+    ReadModelAction,
+    ReadRawHistoricalDataAction,
+    ReadWriteAction,
+    RefreshAction,
+    SaveFileAction,
+    ScreenCaptureAction,
+    SendAction,
+    SetActiveDiagramsPageAction,
+    SubscribeAction,
+    SwitchAction,
+    TransformAction,
+    WaitAction,
+    WriteAction,
+    Action,
+    ParallelGroup,
+    PipelineStep,
+} from "./action-types";
 
 // ─── Compilation model ────────────────────────────────────────────────────────
 
+export interface CompilationInfo {
+    title?: string;
+    favicon?: string;
+}
+
+export interface CompilationBackground {
+    style?: Partial<StyleProps>;
+}
+
+export interface CompilationNumberOfRows {
+    type: string;
+    value: number;
+}
+
 export interface CompilationOptions {
-    stacking: string;
+    stacking: "none" | "vertical" | "horizontal" | string;
     numberOfColumns: number;
-    numberOfRows: { type: string; value: number };
+    numberOfRows: CompilationNumberOfRows;
     padding: { x: number; y: number };
     spacing: { x: number; y: number };
     showDevTools?: boolean;
+    background?: CompilationBackground;
+    theme?: "light" | "dark" | string;
+    width?: number;
+    style?: Partial<StyleProps>;
+    styleByTheme?: Record<string, Partial<StyleProps>>;
+}
+
+export interface CompilationOptionsInput extends Partial<Omit<CompilationOptions, "numberOfRows">> {
+    numberOfRows?: number | Partial<CompilationNumberOfRows>;
+}
+
+export interface AppBarDefaultConfig {
+    hidden?: boolean;
+}
+
+export interface AppBarSectionConfig {
+    default?: AppBarDefaultConfig;
+    toolsOrder?: string[];
+    [key: string]: unknown;
+}
+
+export interface AppBarToolGroup {
+    disabled?: boolean;
+    hidden?: boolean;
+    toolsOrder?: string[];
+    [key: string]: unknown;
+}
+
+export interface AppBarConfig {
+    tools?: Record<string, Record<string, unknown>>;
+    toolGroups?: Record<string, AppBarToolGroup>;
+    left?: AppBarSectionConfig;
+    center?: AppBarSectionConfig;
+    right?: AppBarSectionConfig;
+    default?: AppBarDefaultConfig;
+    style?: Record<string, unknown>;
+    styleByTheme?: Record<string, Record<string, unknown>>;
+    [key: string]: unknown;
+}
+
+export interface CompilationRootOnly {
+    appBar?: AppBarConfig;
+    [key: string]: unknown;
 }
 
 export type WidgetActions = Partial<Record<string, ActionSequence>>;
@@ -371,6 +160,8 @@ export type WidgetActions = Partial<Record<string, ActionSequence>>;
 export interface Compilation {
     version: string;
     name?: string;
+    info?: CompilationInfo;
+    rootOnly?: CompilationRootOnly;
     widgets: object[];
     options: CompilationOptions;
     actions?: WidgetActions;
@@ -1157,4 +948,280 @@ export interface TabsModel {
     toolbars?: Record<string, unknown>;
     actions?: WidgetActions;
     layout?: Position;
+}
+
+// ─── Container widget model ───────────────────────────────────────────────────
+// Note: ContainerModel is already defined above (~line 1130).
+
+// ─── Diagrams widget models ───────────────────────────────────────────────────
+
+export interface DiagramsAnimationProperty<T> {
+    value?: T;
+    path?: string;
+}
+
+export interface DiagramsAnimationRule {
+    type: "equal" | "range" | "match" | "isNull" | "isUndefined";
+    name?: string;
+    value?: unknown;
+    range?: { from?: number | string; to?: number | string };
+    match?: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
+export interface DiagramsAnimation {
+    type: "fill" | "stroke" | "blink" | "rotate" | "flow" | "level" | "displayText";
+    color?: DiagramsAnimationProperty<string>;
+    fill?: DiagramsAnimationProperty<string>;
+    rules?: DiagramsAnimationRule[];
+    [key: string]: unknown;
+}
+
+export interface DiagramsShapeModel {
+    type: "shape" | "group";
+    name?: string;
+    dataSource?: Record<string, unknown>;
+    animations?: DiagramsAnimation[];
+    actions?: Record<string, unknown>;
+}
+
+export interface DiagramsPageModel {
+    id: string;
+    name?: string;
+    pageData?: string;
+    items?: Record<string, DiagramsShapeModel>;
+}
+
+export interface DiagramsOptions {
+    enableCssDarkMode?: boolean;
+    defaultFonts?: string[];
+    customFonts?: string[];
+    presetColors?: string[];
+    customPresetColors?: string[];
+    defaultColors?: string[];
+    defaultLibraries?: string;
+    enabledLibraries?: string[];
+    showRemoteCursors?: boolean;
+    restrictExport?: boolean;
+    lockdown?: boolean;
+    compressXml?: boolean;
+    css?: string;
+    fontCss?: string;
+    globalVars?: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
+export interface DiagramsModel {
+    type: "diagrams";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    pages?: DiagramsPageModel[];
+    diagramsData?: string;
+    diagramsTheme?: "dark" | "kennedy" | string;
+    diagramsOptions?: DiagramsOptions;
+    state?: { activePageId?: string };
+}
+
+// ─── Advanced Form widget model ───────────────────────────────────────────────
+
+export interface AdvancedFormSchemaProperty {
+    type?: string | string[];
+    title?: string;
+    description?: string;
+    default?: unknown;
+    enum?: unknown[];
+    enumNames?: string[];
+    format?: string;
+    minimum?: number;
+    maximum?: number;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+    items?: Record<string, unknown>;
+    properties?: Record<string, AdvancedFormSchemaProperty>;
+    required?: string[];
+    readOnly?: boolean;
+    [key: string]: unknown;
+}
+
+export interface AdvancedFormSchema {
+    type: "object";
+    title?: string;
+    description?: string;
+    required?: string[];
+    properties: Record<string, AdvancedFormSchemaProperty>;
+    dependencies?: Record<string, Record<string, unknown>>;
+    definitions?: Record<string, Record<string, unknown>>;
+    readOnly?: boolean;
+}
+
+export interface AdvancedFormUISchema {
+    "ui:order"?: string[];
+    [key: string]: unknown;
+}
+
+export type AdvancedFormActionHook =
+    | "onChange" | "onFocus" | "onBlur" | "onChanged"
+    | "onValidationError" | "onSubmit" | "onValidate";
+
+export type AdvancedFormActions = Partial<Record<AdvancedFormActionHook, ActionPipeline>> & WidgetActions;
+
+export interface AdvancedFormOptions {
+    style?: Partial<StyleProps>;
+    styleByTheme?: Record<string, Partial<StyleProps>>;
+    refreshInterval?: number;
+    showToolbar?: boolean;
+    showRefreshButton?: boolean;
+    submitButton?: { label?: string };
+    [key: string]: unknown;
+}
+
+export interface AdvancedFormModel {
+    type: "advancedform";
+    name: string;
+    description: string;
+    id: string;
+    actions?: AdvancedFormActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: AdvancedFormOptions;
+    schema: AdvancedFormSchema;
+    uiSchema?: AdvancedFormUISchema;
+    data?: Record<string, unknown>;
+    formOptions?: {
+        entryOptions?: Record<string, Record<string, unknown>>;
+        styleByClassName?: Record<string, Partial<StyleProps>>;
+        showValidationErrors?: boolean;
+        liveOmit?: boolean;
+        liveValidate?: boolean;
+        readOnly?: boolean;
+        [key: string]: unknown;
+    };
+}
+
+// ─── Event Table widget model ─────────────────────────────────────────────────
+
+export interface EventTableModel {
+    type: "eventtable";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    data?: unknown[];
+    starttime?: string | number;
+    endtime?: string | number;
+    maxDuration?: string;
+    table?: Record<string, unknown>;
+}
+
+// ─── Time Period Table widget model ───────────────────────────────────────────
+
+export interface TimePeriodTableModel {
+    type: "timeperiodtable";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    data?: unknown[];
+    starttime?: string | number;
+    endtime?: string | number;
+    maxDuration?: string;
+    table?: Record<string, unknown>;
+}
+
+// ─── Video widget model ───────────────────────────────────────────────────────
+
+export interface VideoOptions {
+    autoplay?: boolean;
+    controls?: boolean;
+    loop?: boolean;
+    muted?: boolean;
+    style?: Partial<StyleProps>;
+    styleByTheme?: Record<string, Partial<StyleProps>>;
+    [key: string]: unknown;
+}
+
+export interface VideoModel {
+    type: "video";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    url: string;
+    mimeType: string;
+    videoOptions: VideoOptions;
+}
+
+// ─── Model Tree widget model ──────────────────────────────────────────────────
+
+export interface ModelTreeModel {
+    type: "modeltree";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    modelRoot?: string | Record<string, unknown>;
+    schemaExtension?: Record<string, unknown>;
+    searchTable?: Record<string, unknown>;
+}
+
+// ─── Report Viewer widget model ───────────────────────────────────────────────
+
+export interface ReportViewerModel {
+    type: "reportviewer";
+    name: string;
+    description: string;
+    id: string;
+    actions?: WidgetActions;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    dataSource?: Record<string, unknown>;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Position;
+    toolbars?: Record<string, unknown>;
+    options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
+    viewerOptions?: Record<string, unknown>;
+    reportData?: unknown;
+    designs?: unknown[];
 }

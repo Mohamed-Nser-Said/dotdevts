@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from "../widgets/Button";
+import { Button, ButtonProps } from "../widgets/GenericWidgets/Button";
 
 const criticalStyle = {
     background: "#e74c3c",

@@ -8,11 +8,11 @@ import { SectionHeader } from "../../webstudio-builder/src/components/SectionHea
 import { WarningButton } from "../../webstudio-builder/src/components/WarningButton";
 import { Compilation } from "../../webstudio-builder/src/core/types";
 import { GridLayout } from "../../webstudio-builder/src/layouts/GridLayout";
-import { Chart } from "../../webstudio-builder/src/widgets/Chart";
-import { Form } from "../../webstudio-builder/src/widgets/Form";
-import { MarkdownViewer } from "../../webstudio-builder/src/widgets/MarkdownViewer";
-import { Table } from "../../webstudio-builder/src/widgets/Table";
-import { Text } from "../../webstudio-builder/src/widgets/Text";
+import { Chart } from "../../webstudio-builder/src/widgets/SpecificWidgets/Chart";
+import { Form } from "../../webstudio-builder/src/widgets/GenericWidgets/Form";
+import { MarkdownViewer } from "../../webstudio-builder/src/widgets/GenericWidgets/MarkdownViewer";
+import { Table } from "../../webstudio-builder/src/widgets/GenericWidgets/Table";
+import { Text } from "../../webstudio-builder/src/widgets/GenericWidgets/Text";
 import { CardHolder } from "../../webstudio-builder/src/components/CardHolder";
 import { TextCard } from "../../webstudio-builder/src/components/TextCard";
 

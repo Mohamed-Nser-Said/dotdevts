@@ -13,6 +13,8 @@ function parseArgs(argv) {
         dryRun: false,
         noBuild: false,
         example: null,
+        run: false,
+        bundle: false,
         help: false,
     };
 
@@ -23,6 +25,10 @@ function parseArgs(argv) {
             options.dryRun = true;
         } else if (arg === "--no-build") {
             options.noBuild = true;
+        } else if (arg === "--run") {
+            options.run = true;
+        } else if (arg === "--bundle" || arg === "-b") {
+            options.bundle = true;
         } else if (arg === "--help" || arg === "-h") {
             options.help = true;
         } else if ((arg === "--connection" || arg === "-n") && argv[i + 1]) {
@@ -44,9 +50,11 @@ function printHelp() {
 
 Options:
   -c, --connection <name>   inmation connection profile (default: win1000)
-  -e, --example <name>      push only one example by file name, e.g. page or operationsCenterApp
+  -e, --example <name>      target a single example by file name, e.g. ContainersDemo
+      --run                 run the compiled Lua with 'cts run' instead of pushing to WebStudio
+  -b, --bundle              pass --bundle to 'cts run' (only applies with --run)
       --no-build            skip npm run build
-      --dry-run             print commands without executing cts push
+      --dry-run             print commands without executing cts
   -h, --help                show this help message
 `);
 }
@@ -80,7 +88,7 @@ function discoverExamples(selectedExample) {
         .map((entry) => {
             const tsPath = path.join(webstudioDir, entry.name);
             const source = fs.readFileSync(tsPath, "utf8");
-            const match = source.match(/export function\s+(create[A-Za-z0-9_]+)/);
+            const match = source.match(/export function\s+([A-Za-z][A-Za-z0-9_]*)/);
 
             if (!match) {
                 return null;
@@ -132,14 +140,21 @@ function main() {
             throw new Error(`Compiled Lua file not found: ${example.luaPath}`);
         }
 
-        runCommand(
-            "cts",
-            ["ws", "--push", example.luaPath, "-n", options.connection, "--func", example.functionName],
-            options.dryRun,
-        );
+        if (options.run) {
+            const runArgs = ["run", example.luaPath, "-n", options.connection];
+            if (options.bundle) runArgs.push("--bundle");
+            runCommand("cts", runArgs, options.dryRun);
+        } else {
+            runCommand(
+                "cts",
+                ["ws", "--push", example.luaPath, "-n", options.connection, "--func", example.functionName, "-b"],
+                options.dryRun,
+            );
+        }
     });
 
-    console.log(`\nCompleted push workflow for ${examples.length} WebStudio example(s).`);
+    const verb = options.run ? "run" : "push";
+    console.log(`\nCompleted ${verb} workflow for ${examples.length} WebStudio example(s).`);
 }
 
 try {

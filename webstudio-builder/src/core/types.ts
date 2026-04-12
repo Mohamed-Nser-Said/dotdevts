@@ -29,12 +29,13 @@ export interface StyleProps {
 
 // ─── Layout position ──────────────────────────────────────────────────────────
 
-export interface Position {
+export type Layout = {
     x: number;
     y: number;
     w: number;
     h: number;
     static?: boolean;
+
 }
 
 // ─── Action types (re-exported from action-types.ts) ──────────────────────────
@@ -96,22 +97,23 @@ export interface CompilationInfo {
 
 export interface CompilationBackground {
     style?: Partial<StyleProps>;
+    [key: string]: unknown;
 }
 
 export interface CompilationNumberOfRows {
-    type: string;
+    type: "height" | "count" | "square";
     value: number;
 }
 
 export interface CompilationOptions {
-    stacking: "none" | "vertical" | "horizontal" | string;
+    stacking: "none" | "vertical" | "horizontal";
     numberOfColumns: number;
     numberOfRows: CompilationNumberOfRows;
     padding: { x: number; y: number };
     spacing: { x: number; y: number };
     showDevTools?: boolean;
     background?: CompilationBackground;
-    theme?: "light" | "dark" | string;
+    theme?: "light" | "dark";
     width?: number;
     style?: Partial<StyleProps>;
     styleByTheme?: Record<string, Partial<StyleProps>>;
@@ -184,7 +186,7 @@ export interface ButtonModel {
     actions: ButtonActions;
     options: { style: Partial<StyleProps> };
     toolbars: never[];
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface TextCaptionBar {
@@ -192,16 +194,8 @@ export interface TextCaptionBar {
     title: string;
 }
 
-export interface TextModel {
-    type: "text";
-    name: string;
-    description: string;
-    text: string;
-    captionBar: TextCaptionBar | false;
-    options: { style: Partial<StyleProps> };
-    id: string;
-    actions?: WidgetActions;
-    layout?: Position;
+export interface ButtonOptions {
+    style?: Partial<StyleProps>;
 }
 
 export interface ImageOptions {
@@ -222,7 +216,7 @@ export interface ImageModel {
     tooltip: Record<string, unknown>;
     url: string;
     id: string;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface PlotlyWidgetOptions {
@@ -246,7 +240,7 @@ export interface PlotlyModel {
     toolbars?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface IFrameOptions {
@@ -266,7 +260,7 @@ export interface IFrameModel {
     iframeOptions: IFrameOptions;
     toolbars: Record<string, unknown>;
     url: string;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface FaceplateModel {
@@ -281,7 +275,7 @@ export interface FaceplateModel {
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
     id: string;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface MarkdownViewerOptions {
@@ -304,7 +298,7 @@ export interface MarkdownViewerModel {
     mermaidOptions: Record<string, unknown>;
     options: MarkdownViewerOptions;
     toolbars: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface EditorOptions {
@@ -334,7 +328,7 @@ export interface EditorModel {
     schema: Record<string, unknown>;
     options: EditorOptions;
     toolbars: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export type TableRow = Record<string, unknown>;
@@ -392,7 +386,7 @@ export interface FormModel {
     entries: FormEntry[];
     options?: FormOptions;
     toolbars?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface TableRule {
@@ -499,7 +493,7 @@ export interface TableModel {
     state?: TableState;
     actions?: TableActions;
     toolbars?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface TreeRule {
@@ -600,7 +594,7 @@ export interface TreeModel {
     toolbars?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
 export interface ChartVisualStyle {
@@ -852,27 +846,9 @@ export interface ChartModel {
     toolbars?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
 }
 
-// ─── Container widget model ───────────────────────────────────────────────────
-// A container embeds another compilation (the result of a nested layout).
-
-export interface ContainerModel {
-    type: "container";
-    name: string;
-    description: string;
-    id: string;
-    compilation: object;
-    options: {
-        spacing: { x: number; y: number };
-        style?: Partial<StyleProps>;
-        styleByTheme?: Record<string, Partial<StyleProps>>;
-    };
-    actions?: WidgetActions;
-    layout?: Position;
-    captionBar: boolean;
-}
 
 // ─── Tab / Tabs widget models ─────────────────────────────────────────────────
 
@@ -947,11 +923,30 @@ export interface TabsModel {
     tabs: TabModel[];
     toolbars?: Record<string, unknown>;
     actions?: WidgetActions;
-    layout?: Position;
+    layout?: Layout;
 }
 
 // ─── Container widget model ───────────────────────────────────────────────────
-// Note: ContainerModel is already defined above (~line 1130).
+
+export interface ContainerModel {
+    type: "container";
+    name: string;
+    description: string;
+    id: string;
+    compilation: Compilation | Record<string, unknown>;
+    captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
+    actions?: WidgetActions;
+    dragSource?: Record<string, unknown>;
+    dropTarget?: Record<string, unknown>;
+    layout?: Layout;
+    toolbars?: Record<string, unknown>;
+    options: {
+        spacing?: { x?: number; y?: number };
+        style?: Partial<StyleProps>;
+        styleByTheme?: Record<string, Partial<StyleProps>>;
+        [key: string]: unknown;
+    };
+}
 
 // ─── Diagrams widget models ───────────────────────────────────────────────────
 
@@ -1021,7 +1016,7 @@ export interface DiagramsModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     pages?: DiagramsPageModel[];
@@ -1095,7 +1090,7 @@ export interface AdvancedFormModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: AdvancedFormOptions;
     schema: AdvancedFormSchema;
@@ -1124,7 +1119,7 @@ export interface EventTableModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     data?: unknown[];
@@ -1146,7 +1141,7 @@ export interface TimePeriodTableModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     data?: unknown[];
@@ -1178,7 +1173,7 @@ export interface VideoModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     url: string;
@@ -1198,7 +1193,7 @@ export interface ModelTreeModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     modelRoot?: string | Record<string, unknown>;
@@ -1218,7 +1213,7 @@ export interface ReportViewerModel {
     dataSource?: Record<string, unknown>;
     dragSource?: Record<string, unknown>;
     dropTarget?: Record<string, unknown>;
-    layout?: Position;
+    layout?: Layout;
     toolbars?: Record<string, unknown>;
     options?: { style?: Partial<StyleProps>; styleByTheme?: Record<string, Partial<StyleProps>>; [key: string]: unknown };
     viewerOptions?: Record<string, unknown>;

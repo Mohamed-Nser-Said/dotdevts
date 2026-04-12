@@ -1,164 +1,102 @@
-export interface GridSpacing {
-    x?: number;
-    y?: number;
-}
+import { CompilationNumberOfRows, CompilationOptions, Layout } from "../core/types";
 
 export interface GridOptions {
     columns?: number[];
     rows?: number[];
     gap?: number;
-    padding?: GridSpacing;
-    spacing?: GridSpacing;
+    padding?: { x?: number; y?: number };
+    spacing?: { x?: number; y?: number };
     numberOfColumns?: number;
-    numberOfRows?: number | { type?: string; value?: number };
-    stacking?: string;
-    showDevTools?: boolean;
-}
-
-export interface CellLayout {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-}
-
-interface GridModelOptions {
-    numberOfColumns: number;
-    numberOfRows: { type: string; value: number };
-    padding: { x: number; y: number };
-    spacing: { x: number; y: number };
-    stacking: string;
+    numberOfRows?: number | Partial<CompilationNumberOfRows>;
+    stacking?: "none" | "vertical" | "horizontal";
     showDevTools?: boolean;
 }
 
 // Calculates pixel-grid cell positions from fractional column/row weights.
-// All positions are expressed as fractions of 96 virtual columns/rows.
+// All positions are expressed as fractions of virtual columns/rows.
 export class Grid {
     columns: number[];
     rows: number[];
-    totalColumnsSize: number;
-    totalRowsSize: number;
-    modelOptions: GridModelOptions;
+    modelOptions: CompilationOptions;
 
-    constructor(options?: GridOptions) {
-        options = options || {};
-        const gap = options.gap !== undefined ? options.gap : 0;
-        const padding = options.padding || {};
-        const spacing = options.spacing || {};
-        const numberOfRows = options.numberOfRows;
-        const resolvedNumberOfRows = typeof numberOfRows === "number"
-            ? { type: "height", value: numberOfRows }
-            : {
-                type: (numberOfRows && numberOfRows.type) ? numberOfRows.type : "square",
-                value: (numberOfRows && numberOfRows.value !== undefined) ? numberOfRows.value : 0,
-            };
+    constructor(options: GridOptions = {}) {
+        this.columns = options.columns ?? [1];
+        this.rows = options.rows ?? [1];
 
-        this.columns = options.columns || [1];
-        this.rows = options.rows || [1];
+        const spacingX = options.gap ?? options.spacing?.x ?? 0;
+        const spacingY = options.gap ?? options.spacing?.y ?? 0;
+
+        const numberOfRows: CompilationNumberOfRows = typeof options.numberOfRows === "number"
+            ? { type: "count", value: options.numberOfRows }
+            : { type: options.numberOfRows?.type ?? "count", value: options.numberOfRows?.value ?? 96 };
+
         this.modelOptions = {
-            numberOfColumns: options.numberOfColumns !== undefined ? options.numberOfColumns : 96,
-            numberOfRows: resolvedNumberOfRows,
-            padding: {
-                x: padding.x !== undefined ? padding.x : 0,
-                y: padding.y !== undefined ? padding.y : 0,
-            },
-            spacing: {
-                x: spacing.x !== undefined ? spacing.x : gap,
-                y: spacing.y !== undefined ? spacing.y : gap,
-            },
-            stacking: options.stacking || "none",
-            showDevTools: options.showDevTools,
+            numberOfColumns: options.numberOfColumns ?? 96,
+            numberOfRows,
+            stacking: options.stacking ?? "none",
+            padding: { x: options.padding?.x ?? 0, y: options.padding?.y ?? 0 },
+            spacing: { x: spacingX, y: spacingY },
+            showDevTools: options.showDevTools ?? false,
         };
-        this.totalColumnsSize = 0;
-        this.totalRowsSize = 0;
-
-        for (const col of this.columns) {
-            this.totalColumnsSize += col;
-        }
-        for (const row of this.rows) {
-            this.totalRowsSize += row;
-        }
     }
 
-    private getAvailableColumnSpace(): number {
-        const totalSpacing = (this.columns.length - 1) * this.modelOptions.spacing.x;
-        const totalPadding = this.modelOptions.padding.x * 2;
-        const available = this.modelOptions.numberOfColumns - totalSpacing - totalPadding;
-        return available > 0 ? available : 0;
+    private get colTotal(): number {
+        return this.columns.reduce((s, w) => s + w, 0);
     }
 
-    private usesFixedRowHeight(): boolean {
-        const rowType = this.modelOptions.numberOfRows.type;
-        return rowType === "height" || rowType === "square";
+    private get rowTotal(): number {
+        return this.rows.reduce((s, w) => s + w, 0);
     }
 
-    private getAvailableRowSpace(): number {
-        if (this.usesFixedRowHeight()) {
-            return this.totalRowsSize;
-        }
-
-        const totalSpacing = (this.rows.length - 1) * this.modelOptions.spacing.y;
-        const totalPadding = this.modelOptions.padding.y * 2;
-        const available = this.modelOptions.numberOfRows.value - totalSpacing - totalPadding;
-        return available > 0 ? available : 0;
+    private get availableCols(): number {
+        const { numberOfColumns, spacing, padding } = this.modelOptions;
+        return Math.max(0, numberOfColumns - (this.columns.length - 1) * spacing.x - padding.x * 2);
     }
 
-    getCell(col: number, row: number): CellLayout {
+    // In "height" mode WebStudio applies spacing/padding itself; row coords are pure weight units.
+    private get isHeightMode(): boolean {
+        return this.modelOptions.numberOfRows.type === "height";
+    }
+
+    private get availableRows(): number {
+        if (this.isHeightMode) return this.rowTotal;
+        const { numberOfRows, spacing, padding } = this.modelOptions;
+        return Math.max(0, numberOfRows.value - (this.rows.length - 1) * spacing.y - padding.y * 2);
+    }
+
+    getCell(col: number, row: number): Layout {
         return {
-            x: this.getColumnStartingPosition(col),
-            y: this.getRowStartingPosition(row),
-            w: this.getColumnSize(col),
-            h: this.getRowSize(row),
+            x: this.cellX(col),
+            y: this.cellY(row),
+            w: this.cellW(col),
+            h: this.cellH(row),
         };
     }
 
-    // col is 1-based (matches the Lua convention used by callers)
-    getColumnSize(col: number): number {
-        if (col < 1 || col > this.columns.length) {
-            return 0;
-        }
-        return Math.floor(
-            this.getAvailableColumnSpace() *
-            (this.columns[col - 1] / this.totalColumnsSize)
-        );
+    // col/row are 1-based
+    private cellW(col: number): number {
+        if (col < 1 || col > this.columns.length) return 0;
+        return Math.floor(this.availableCols * this.columns[col - 1] / this.colTotal);
     }
 
-    // row is 1-based
-    getRowSize(row: number): number {
-        if (row < 1 || row > this.rows.length) {
-            return 0;
-        }
-        return Math.floor(
-            this.getAvailableRowSpace() *
-            (this.rows[row - 1] / this.totalRowsSize)
-        );
+    private cellH(row: number): number {
+        if (row < 1 || row > this.rows.length) return 0;
+        return Math.floor(this.availableRows * this.rows[row - 1] / this.rowTotal);
     }
 
-    getColumnStartingPosition(col: number): number {
-        if (col < 1 || col > this.columns.length) {
-            return 0;
-        }
+    private cellX(col: number): number {
+        if (col < 1 || col > this.columns.length) return 0;
         let x = this.modelOptions.padding.x;
-        for (let idx = 1; idx < col; idx++) {
-            x += this.getColumnSize(idx) + this.modelOptions.spacing.x;
-        }
+        for (let i = 1; i < col; i++) x += this.cellW(i) + this.modelOptions.spacing.x;
         return x;
     }
 
-    getRowStartingPosition(row: number): number {
-        if (row < 1 || row > this.rows.length) {
-            return 0;
-        }
-
-        // In fixed-height modes, padding/spacing are already applied by WebStudio
-        // as pixel values, so we keep the layout coordinates in pure row units.
-        let y = this.usesFixedRowHeight() ? 0 : this.modelOptions.padding.y;
-        for (let idx = 1; idx < row; idx++) {
-            y += this.getRowSize(idx);
-            if (!this.usesFixedRowHeight()) {
-                y += this.modelOptions.spacing.y;
-            }
-        }
+    private cellY(row: number): number {
+        if (row < 1 || row > this.rows.length) return 0;
+        const padY = this.isHeightMode ? 0 : this.modelOptions.padding.y;
+        const spacY = this.isHeightMode ? 0 : this.modelOptions.spacing.y;
+        let y = padY;
+        for (let i = 1; i < row; i++) y += this.cellH(i) + spacY;
         return y;
     }
 }

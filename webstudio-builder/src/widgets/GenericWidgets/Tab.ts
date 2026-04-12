@@ -1,6 +1,7 @@
 import { TabModel } from "../../core/types";
-import { Grid } from "../../layouts/Grid";
-import { Layout } from "../../layouts/Layout";
+import { IWidget } from "../../interfaces/IWidget";
+import { GridContainer } from "../../layouts/Containers";
+import { GridOptions } from "../../layouts/Grid";
 
 export interface TabProps {
     name?: string;
@@ -12,12 +13,12 @@ export interface TabProps {
 // Embeds its own Grid layout; widgets are placed into it via addWidget().
 export class Tab {
     model: TabModel;
-    layout: Layout;
+    layout: GridContainer;
 
     constructor(props: TabProps) {
         props = props || { columns: [1], rows: [1] };
-        const grid = new Grid({ columns: props.columns, rows: props.rows });
-        this.layout = new Layout(grid);
+        const options: GridOptions = { columns: props.columns, rows: props.rows };
+        this.layout = new GridContainer(options);
         this.model = {
             id: syslib.uuid(),
             name: props.name || "Tab",
@@ -25,7 +26,7 @@ export class Tab {
         };
     }
 
-    addWidget(widget: object, col: number, row: number): void {
+    addWidget(widget: IWidget, col: number, row: number): void {
         this.layout.addWidget(widget, col, row);
     }
 

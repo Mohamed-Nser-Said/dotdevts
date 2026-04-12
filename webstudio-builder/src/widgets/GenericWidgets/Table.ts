@@ -1,17 +1,14 @@
 import {
     StyleProps,
-    TableActionHook,
-    TableActions,
     TableModel,
     TableOptions,
     TableRow,
     TableSchemaColumn,
     TableState,
 } from "../../core/types";
-import { Window } from "../../core/Window";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
+import { WidgetActions } from "../../core/types";
 
-export interface TableProps extends BaseWidgetProps<TableActions> {
+export interface TableProps {
     data?: TableRow[];
     schema?: TableSchemaColumn[];
     options?: TableOptions;
@@ -48,93 +45,71 @@ const defaultOptions: TableOptions = {
     },
 };
 
-export class Table extends BaseWidget<TableModel, TableActions> {
-    constructor(props?: TableProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+export class Table {
+    public readonly type = "table";
+    public readonly id: string;
+    public name: string;
 
-        this.model = {
-            type: "table",
-            name: this.getName(props, "Table"),
-            description: this.getDescription(props, "Table Widget"),
-            id: this.createId(),
-            captionBar: this.getCaptionBar(props, "Table Widget", "hidden"),
-            data: props.data || [],
-            dataSource: props.dataSource,
-            schema: props.schema || [],
-            options: this.mergeOptions(props.options),
-            state: props.state,
-            actions: this.getActions(props),
-            toolbars: this.getToolbars(props),
-        };
+    constructor(
+        public data: TableRow[] = [],
+        public schema: TableSchemaColumn[] = [],
+        public options: TableOptions = defaultOptions,
+        public state?: TableState,
+        name?: string,
+        public description: string = "Table Widget",
+        public actions?: WidgetActions,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("Table" + this.id);
     }
 
-    private mergeOptions(options?: TableOptions): TableOptions {
-        const nextOptions = options || {};
-        const merged: TableOptions = {
-            ...defaultOptions,
-            ...nextOptions,
+    getModel(): TableModel {
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            captionBar: false,
+            data: this.data,
+            schema: this.schema,
+            options: this.options,
+            state: this.state,
+            actions: this.actions,
         };
-
-        merged.style = {
-            ...(defaultOptions.style || {}),
-            ...(nextOptions.style || {}),
-        };
-
-        merged.header = {
-            ...(defaultOptions.header || {}),
-            ...(nextOptions.header || {}),
-            style: {
-                ...((defaultOptions.header && defaultOptions.header.style) || {}),
-                ...((nextOptions.header && nextOptions.header.style) || {}),
-            },
-        };
-
-        return merged;
-    }
-
-    private registerHook(hook: TableActionHook, handler: (ctx: Window) => void): this {
-        this.model.actions = this.addHook(this.model.actions, hook, handler);
-        return this;
     }
 
     setData(data: TableRow[]): this {
-        this.model.data = data;
+        this.data = data;
         return this;
     }
 
     setSchema(schema: TableSchemaColumn[]): this {
-        this.model.schema = schema;
+        this.schema = schema;
         return this;
     }
 
     setOptions(options: TableOptions): this {
-        this.model.options = this.mergeOptions(options);
+        this.options = {
+            ...defaultOptions,
+            ...options,
+            style: {
+                ...defaultOptions.style,
+                ...options.style,
+            },
+            header: {
+                ...defaultOptions.header,
+                ...options.header,
+                style: {
+                    ...defaultHeaderStyle,
+                    ...options.header?.style,
+                },
+            },
+        };
         return this;
     }
 
     setState(state: TableState): this {
-        this.model.state = state;
+        this.state = state;
         return this;
-    }
-
-    onSave(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSave", handler);
-    }
-
-    onSelect(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSelect", handler);
-    }
-
-    onSelectionChanged(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSelectionChanged", handler);
-    }
-
-    onSubmit(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSubmit", handler);
-    }
-
-    getModel(): TableModel {
-        return this.model;
     }
 }

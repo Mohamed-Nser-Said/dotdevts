@@ -1,14 +1,14 @@
-import { Window } from "../core/Window";
 import { PipelineStep } from "../core/types";
 
 /**
- * ActionContext — fluent builder for assembling a WebStudio action pipeline
- * outside a widget callback.
+ * ActionContext — fluent builder for assembling a WebStudio action pipeline.
+ * TODO: re-implement after action system rework.
  */
-export class ActionContext extends Window {
-    /** Return the assembled pipeline */
+export class ActionContext {
+    private actions: PipelineStep[] = [];
+
     build(): PipelineStep[] {
-        return this.getActions();
+        return this.actions;
     }
 }
 

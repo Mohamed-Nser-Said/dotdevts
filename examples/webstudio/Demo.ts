@@ -1,35 +1,23 @@
-import { Compilation } from "../../webstudio-builder/src/core/Compilation";
+import "../../prelude";
+import { Compilation } from "../../webstudio-builder/src/layouts/Compilation";
+import { Text } from "../../webstudio-builder/src/widgets/GenericWidgets/Text";
 
 
 
-export default function index() {
+export function index() {
 
     const compilation = new Compilation("Demo Compilation");
-    compilation.addWidget({
-        "type": "text",
-        "name": "Simple Text",
-        "description": "Simple Text",
-        "text": "Your text here",
-        "captionBar": {
-            "hidden": false,
-            "title": "Simple Text Widget"
-        },
-        "options": {
-            "style": {
-                "color": "grey",
-                "textAlign": "center",
-                "fontSize": "26px",
-                "fontWeight": "bold",
-                "fontFamily": "\"Courier New\", Courier, sans-serif"
-            }
-        },
-        "layout": {
-            "x": 0,
-            "y": 0,
-            "w": 32,
-            "h": 32
-        }
-    });
+    const text = new Text("myTExt");
+    compilation.addWidget(text);
+    compilation.addWidgetMany([
+        new Text("Another text"),
+        new Text("And another one"),
+        new Text("And another one"),
+        new Text("And another one"),
+        new Text("And another one"),
+        new Text("And another one"),
+        new Text("And another one"),
+    ]);
     return compilation.getModel();
 
 

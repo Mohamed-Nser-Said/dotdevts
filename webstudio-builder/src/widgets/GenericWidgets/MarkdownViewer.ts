@@ -3,79 +3,64 @@ import {
     MarkdownViewerOptions,
     ModifyAction,
     StyleProps,
-    WidgetActions,
 } from "../../core/types";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
 
-export interface MarkdownViewerProps extends BaseWidgetProps<WidgetActions> {
+export interface MarkdownViewerProps {
     content?: string;
-    markdownOptions?: Record<string, unknown>;
-    mermaidOptions?: Record<string, unknown>;
     options?: MarkdownViewerOptions;
-    style?: Partial<StyleProps>;
+    name?: string;
+    description?: string;
+    actions?: object;
 }
 
 const defaultStyle: Partial<StyleProps> = {
     backgroundColor: "#ffffff",
     color: "#0f172a",
-    padding: "16px",
+    padding: "12px",
     borderRadius: "12px",
     border: "1px solid #dbeafe",
     boxShadow: "0 8px 20px rgba(37, 99, 235, 0.08)",
-    height: "320px",
+    height: "auto",
 };
 
 const defaultOptions: MarkdownViewerOptions = {
-    linkTarget: "_blank",
     style: defaultStyle,
 };
 
-export class MarkdownViewer extends BaseWidget<MarkdownViewerModel> {
-    constructor(props?: MarkdownViewerProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+export class MarkdownViewer {
+    public readonly type = "markdownviewer";
+    public readonly id: string;
+    public name: string;
 
-        const providedOptions = props.options || {};
-        const mergedOptions: MarkdownViewerOptions = {
-            ...defaultOptions,
-            ...providedOptions,
-            style: {
-                ...(defaultOptions.style || {}),
-                ...((providedOptions.style as Partial<StyleProps>) || {}),
-                ...(props.style || {}),
-            },
-        };
-
-        this.model = {
-            type: "markdownviewer",
-            name: this.getName(props, "MarkdownViewer"),
-            description: this.getDescription(props, "Markdown Viewer Widget"),
-            id: this.createId(),
-            actions: this.getActions(props),
-            content: props.content || "# Markdown Viewer\n\nAdd your markdown content here.",
-            dataSource: this.getDataSource(props),
-            markdownOptions: props.markdownOptions || {
-                breaks: false,
-                linkify: true,
-                xhtmlOut: true,
-            },
-            mermaidOptions: props.mermaidOptions || {
-                theme: "default",
-            },
-            options: mergedOptions,
-            toolbars: this.getToolbars(props),
-        };
+    constructor(
+        public content: string = "",
+        public options: MarkdownViewerOptions = defaultOptions,
+        name?: string,
+        public description: string = "Markdown Viewer Widget",
+        public actions?: object,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("MarkdownViewer" + this.id);
     }
 
     setContent(content: string): ModifyAction {
-        return {
-            type: "modify",
-            id: this.model.id,
-            set: [{ name: "model.content", value: content }],
-        };
+        this.content = content;
+        return { type: "modify", id: this.id, target: this.id, changes: { content } };
     }
 
     getModel(): MarkdownViewerModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            content: this.content,
+            options: this.options,
+            actions: this.actions || {},
+            dataSource: {}, // Placeholder for dataSource
+            markdownOptions: {}, // Placeholder for markdownOptions
+            mermaidOptions: {}, // Placeholder for mermaidOptions
+            toolbars: {}, // Placeholder for toolbars
+        };
     }
 }

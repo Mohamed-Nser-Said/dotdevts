@@ -1,128 +1,64 @@
 import {
-    FormActionHook,
-    FormActions,
-    FormEntry,
     FormModel,
     FormOptions,
+    ModifyAction,
     StyleProps,
 } from "../../core/types";
-import { Window } from "../../core/Window";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
 
-export interface FormProps extends BaseWidgetProps<FormActions> {
-    entries?: FormEntry[];
+export interface FormProps {
+    fields?: Record<string, unknown>;
     options?: FormOptions;
+    name?: string;
+    description?: string;
+    actions?: object;
 }
 
-const defaultStyle: StyleProps = {
+const defaultStyle: Partial<StyleProps> = {
     backgroundColor: "#ffffff",
     color: "#0f172a",
     padding: "12px",
     borderRadius: "12px",
-    fontSize: "14px",
+    border: "1px solid #dbeafe",
+    boxShadow: "0 8px 20px rgba(37, 99, 235, 0.08)",
+    height: "360px",
 };
 
 const defaultOptions: FormOptions = {
-    showRefreshButton: false,
-    showToolbar: true,
+    showSubmitButton: true,
     style: defaultStyle,
-    submitButton: {
-        label: "Submit",
-    },
 };
 
-export class Form extends BaseWidget<FormModel, FormActions> {
-    constructor(props?: FormProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+export class Form {
+    public readonly type = "form";
+    public readonly id: string;
+    public name: string;
 
-        this.model = {
-            type: "form",
-            name: this.getName(props, "Form"),
-            description: this.getDescription(props, "Form Widget"),
-            id: this.createId(),
-            captionBar: this.getCaptionBar(props, "Form Widget", "hidden"),
-            actions: this.getActions(props),
-            dataSource: this.getDataSource(props),
-            entries: props.entries || [],
-            options: this.mergeOptions(props.options),
-            toolbars: this.getToolbars(props),
-        };
+    constructor(
+        public fields: Record<string, unknown> = {},
+        public options: FormOptions = defaultOptions,
+        name?: string,
+        public description: string = "Form Widget",
+        public actions?: object,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("Form" + this.id);
     }
 
-    private mergeOptions(options?: FormOptions): FormOptions {
-        const nextOptions = options || {};
-        const merged: FormOptions = {
-            ...defaultOptions,
-            ...nextOptions,
-        };
-
-        merged.style = {
-            ...(defaultOptions.style || {}),
-            ...(nextOptions.style || {}),
-        };
-
-        merged.styleByTheme = {
-            ...(defaultOptions.styleByTheme || {}),
-            ...(nextOptions.styleByTheme || {}),
-        };
-
-        merged.submitButton = {
-            ...(defaultOptions.submitButton || {}),
-            ...(nextOptions.submitButton || {}),
-        };
-
-        return merged;
-    }
-
-    private registerHook(hook: FormActionHook, handler: (ctx: Window) => void): this {
-        this.model.actions = this.addHook(this.model.actions, hook, handler);
-        return this;
-    }
-
-    setEntries(entries: FormEntry[]): this {
-        this.model.entries = entries;
-        return this;
-    }
-
-    setOptions(options: FormOptions): this {
-        this.model.options = this.mergeOptions(options);
-        return this;
-    }
-
-    setSubmitLabel(label: string): this {
-        const currentOptions = this.model.options || {};
-        const currentSubmitButton = currentOptions.submitButton || {};
-
-        this.model.options = this.mergeOptions({
-            ...currentOptions,
-            submitButton: {
-                ...currentSubmitButton,
-                label,
-            },
-        });
-        return this;
-    }
-
-    setStyle(style: Partial<StyleProps>): this {
-        const currentOptions = this.model.options || {};
-        const currentStyle = currentOptions.style || {};
-
-        this.model.options = this.mergeOptions({
-            ...currentOptions,
-            style: {
-                ...currentStyle,
-                ...style,
-            },
-        });
-        return this;
-    }
-
-    onSubmit(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSubmit", handler);
+    setFields(fields: Record<string, unknown>): ModifyAction {
+        this.fields = fields;
+        return { type: "modify", id: this.id, target: this.id, changes: { fields } };
     }
 
     getModel(): FormModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            captionBar: false,
+            entries: [],
+            options: this.options,
+            actions: this.actions || {},
+        };
     }
 }

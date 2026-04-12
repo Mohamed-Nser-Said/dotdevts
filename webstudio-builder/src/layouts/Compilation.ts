@@ -1,3 +1,9 @@
+
+export interface IWidget {
+  getModel(): WebStudioWidget | WebStudioCompilation;
+}
+
+
 export interface WebStudioCompilation {
   /** Must be "1" for current WebStudio model version */
   version: "1";
@@ -12,7 +18,7 @@ export interface WebStudioCompilation {
   rootOnly?: WebStudioRootOnly;
 
   /** List of all widgets in the dashboard */
-  widgets: WebStudioWidget[];
+  widgets: (WebStudioWidget | WebStudioCompilation)[];
 
   /** Global layout and behavior options */
   options?: WebStudioCompilationOptions;
@@ -396,28 +402,32 @@ export interface WebStudioAction {
 
 
 
-export class Compilation implements WebStudioCompilation {
+export class Compilation {
   public readonly version = "1";
-  public widgets: WebStudioWidget[] = [];
+  public widgets: (WebStudioWidget | WebStudioCompilation)[] = [];
   public actions: Record<string, WebStudioAction> = {};
   public info?: WebStudioInfo;
   public rootOnly?: WebStudioRootOnly;
-  public options?: WebStudioCompilationOptions;
+  public options: WebStudioCompilationOptions = {};
 
   constructor(
     public readonly name: string
   ) {
-    
-
 
   }
 
-  addWidget(widget: WebStudioWidget): this;
-  addWidget(widget: WebStudioWidget, x?: number, y?: number): this {
-    if (x !== undefined && y !== undefined) {
-      widget.layout = { ...widget.layout, x, y };
-    }
-    this.widgets.push(widget);
+  addWidget(widget: IWidget): this {
+    this.widgets.push(widget.getModel());
+    return this;
+  }
+
+  addWidgetMany(widgets: IWidget[]): this {
+    widgets.forEach(widget => this.addWidget(widget));
+    return this;
+  }
+
+  setLayout(options: WebStudioCompilationOptions): this {
+    this.options = { ...(this.options || {}), ...options };
     return this;
   }
 

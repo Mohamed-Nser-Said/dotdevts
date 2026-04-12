@@ -1,45 +1,71 @@
-import { ImageModel, StyleProps } from "../../core/types";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
+import {
+    ImageModel,
+    ImageOptions,
+    ModifyAction,
+    StyleProps,
+} from "../../core/types";
 
-export interface ImageProps extends BaseWidgetProps {
-    url?: string;
-    base64?: string;
-    mimeType?: string;
-    size?: "contain" | "cover" | "fill" | "none" | "scale-down" | string;
-    style?: Partial<StyleProps>;
+export interface ImageProps {
+    src?: string;
+    alt?: string;
+    options?: ImageOptions;
+    name?: string;
+    description?: string;
+    actions?: object;
 }
 
-const defaultStyle: StyleProps = {
-    backgroundColor: "#ffffff",
-    padding: "12px",
+const defaultStyle: Partial<StyleProps> = {
     borderRadius: "12px",
+    boxShadow: "0 8px 20px rgba(37, 99, 235, 0.08)",
+    height: "auto",
+    width: "100%",
 };
 
-export class Image extends BaseWidget<ImageModel> {
-    constructor(props?: ImageProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+const defaultOptions: ImageOptions = {
+    style: defaultStyle,
+};
 
-        this.model = {
-            type: "image",
-            name: this.getName(props, "Image"),
-            description: this.getDescription(props, "Image Widget"),
-            actions: this.getActions(props),
-            base64: props.base64 || "",
-            dataSource: this.getDataSource(props),
-            mimeType: props.mimeType || "",
-            options: {
-                size: props.size || "contain",
-                style: props.style || defaultStyle,
-            },
-            toolbars: this.getToolbars(props),
-            tooltip: {},
-            url: props.url || "",
-            id: this.createId(),
-        };
+export class Image {
+    public readonly type = "image";
+    public readonly id: string;
+    public name: string;
+
+    constructor(
+        public src: string = "",
+        public alt: string = "",
+        public options: ImageOptions = defaultOptions,
+        name?: string,
+        public description: string = "Image Widget",
+        public actions?: object,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("Image" + this.id);
+    }
+
+    setSrc(src: string): ModifyAction {
+        this.src = src;
+        return { type: "modify", id: this.id, target: this.id, changes: { src } };
+    }
+
+    setAlt(alt: string): ModifyAction {
+        this.alt = alt;
+        return { type: "modify", id: this.id, target: this.id, changes: { alt } };
     }
 
     getModel(): ImageModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            base64: "",
+            dataSource: {},
+            mimeType: "",
+            tooltip: {},
+            url: this.src,
+            options: this.options,
+            actions: this.actions as Record<string, unknown> || {},
+            toolbars: {},
+        };
     }
 }

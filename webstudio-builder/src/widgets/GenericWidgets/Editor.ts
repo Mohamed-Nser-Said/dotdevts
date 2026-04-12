@@ -1,21 +1,20 @@
 import {
-    EditorActionHook,
-    EditorActions,
     EditorModel,
     EditorOptions,
     ModifyAction,
     StyleProps,
 } from "../../core/types";
-import { Window } from "../../core/Window";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
 
-export interface EditorProps extends BaseWidgetProps<EditorActions> {
+export interface EditorProps {
     content?: unknown;
     contentToCompare?: unknown;
     editorOptions?: Record<string, unknown>;
     language?: "json" | "lua" | "markdown" | "txt" | "xml" | string;
     schema?: Record<string, unknown>;
     options?: EditorOptions;
+    name?: string;
+    description?: string;
+    actions?: object;
 }
 
 const defaultStyle: Partial<StyleProps> = {
@@ -44,67 +43,46 @@ const defaultEditorOptions: Record<string, unknown> = {
     },
 };
 
-export class Editor extends BaseWidget<EditorModel, EditorActions> {
-    constructor(props?: EditorProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+export class Editor {
+    public readonly type = "editor";
+    public readonly id: string;
+    public name: string;
 
-        const providedOptions = props.options || {};
-        const mergedOptions: EditorOptions = {
-            ...defaultOptions,
-            ...providedOptions,
-            style: {
-                ...(defaultOptions.style || {}),
-                ...((providedOptions.style as Partial<StyleProps>) || {}),
-            },
-        };
-
-        this.model = {
-            type: "editor",
-            name: this.getName(props, "Editor"),
-            description: this.getDescription(props, "Editor Widget"),
-            id: this.createId(),
-            actions: this.getActions(props),
-            content: props.content !== undefined ? props.content : {},
-            contentToCompare: props.contentToCompare,
-            dataSource: this.getDataSource(props),
-            editorOptions: {
-                ...defaultEditorOptions,
-                ...(props.editorOptions || {}),
-            },
-            language: props.language || "json",
-            schema: props.schema || {},
-            options: mergedOptions,
-            toolbars: this.getToolbars(props),
-        };
-    }
-
-    private registerHook(hook: EditorActionHook, handler: (ctx: Window) => void): this {
-        this.model.actions = this.addHook(this.model.actions, hook, handler);
-        return this;
+    constructor(
+        public content: unknown = {},
+        public contentToCompare?: unknown,
+        public editorOptions: Record<string, unknown> = defaultEditorOptions,
+        public language: string = "json",
+        public schema: Record<string, unknown> = {},
+        public options: EditorOptions = defaultOptions,
+        name?: string,
+        public description: string = "Editor Widget",
+        public actions?: object,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("Editor" + this.id);
     }
 
     setContent(content: unknown): ModifyAction {
-        return {
-            type: "modify",
-            id: this.model.id,
-            set: [{ name: "model.content", value: content }],
-        };
-    }
-
-    setComparisonContent(contentToCompare: unknown): ModifyAction {
-        return {
-            type: "modify",
-            id: this.model.id,
-            set: [{ name: "model.contentToCompare", value: contentToCompare }],
-        };
-    }
-
-    onContentChange(handler: (ctx: Window) => void): this {
-        return this.registerHook("onContentChange", handler);
+        this.content = content;
+        return { type: "modify", id: this.id, target: this.id, changes: { content } };
     }
 
     getModel(): EditorModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            content: this.content,
+            contentToCompare: this.contentToCompare,
+            editorOptions: this.editorOptions,
+            language: this.language,
+            schema: this.schema,
+            options: this.options,
+            actions: this.actions || {},
+            dataSource: {}, // Placeholder for dataSource
+            toolbars: {}, // Placeholder for toolbars
+        };
     }
 }

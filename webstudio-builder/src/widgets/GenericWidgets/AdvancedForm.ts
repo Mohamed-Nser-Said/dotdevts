@@ -1,94 +1,78 @@
 import {
-    ActionPipeline,
-    AdvancedFormActions,
     AdvancedFormModel,
     AdvancedFormOptions,
     AdvancedFormSchema,
     AdvancedFormUISchema,
     StyleProps,
 } from "../../core/types";
-import { Window } from "../../core/Window";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
 
-export interface AdvancedFormProps extends BaseWidgetProps<AdvancedFormActions> {
+export interface AdvancedFormProps {
     schema: AdvancedFormSchema;
     uiSchema?: AdvancedFormUISchema;
     data?: Record<string, unknown>;
     options?: AdvancedFormOptions;
     formOptions?: AdvancedFormModel["formOptions"];
     style?: Partial<StyleProps>;
+    name?: string;
+    description?: string;
+    actions?: object;
 }
 
-export class AdvancedForm extends BaseWidget<AdvancedFormModel, AdvancedFormActions> {
-    constructor(props: AdvancedFormProps) {
-        super(props.window);
+export class AdvancedForm {
+    public readonly type = "advancedform";
+    public readonly id: string;
+    public name: string;
 
-        this.model = {
-            type: "advancedform",
-            name: this.getName(props, "AdvancedForm"),
-            description: this.getDescription(props, "Advanced Form Widget"),
-            id: this.createId(),
-            actions: this.getActions(props),
-            captionBar: this.getCaptionBar(props, "Advanced Form", "hidden"),
-            dataSource: this.getDataSource(props),
-            toolbars: this.getToolbars(props),
-            options: props.options || (props.style ? { style: props.style } : undefined),
-            schema: props.schema,
-            uiSchema: props.uiSchema,
-            data: props.data,
-            formOptions: props.formOptions,
-        };
+    constructor(
+        public schema: AdvancedFormSchema,
+        public uiSchema?: AdvancedFormUISchema,
+        public data?: Record<string, unknown>,
+        public options?: AdvancedFormOptions,
+        public formOptions?: AdvancedFormModel["formOptions"],
+        public style: Partial<StyleProps> = {},
+        name?: string,
+        public description: string = "Advanced Form Widget",
+        public actions?: object,
+    ) {
+        this.id = syslib.uuid();
+        this.name = name ?? ("AdvancedForm" + this.id);
     }
 
     setSchema(schema: AdvancedFormSchema): this {
-        this.model.schema = schema;
+        this.schema = schema;
         return this;
     }
 
     setUISchema(uiSchema: AdvancedFormUISchema): this {
-        this.model.uiSchema = uiSchema;
+        this.uiSchema = uiSchema;
         return this;
     }
 
     setData(data: Record<string, unknown>): this {
-        this.model.data = data;
+        this.data = data;
         return this;
     }
 
     setFormOptions(formOptions: AdvancedFormModel["formOptions"]): this {
-        this.model.formOptions = {
-            ...(this.model.formOptions || {}),
+        this.formOptions = {
+            ...(this.formOptions || {}),
             ...formOptions,
         };
         return this;
     }
 
-    private registerHook(hook: string, handler: (ctx: Window) => void): this {
-        this.model.actions = this.addHook(this.model.actions, hook, handler);
-        return this;
-    }
-
-    on(hook: string, handler: (ctx: Window) => void): this {
-        return this.registerHook(hook, handler);
-    }
-
-    onSubmit(handler: (ctx: Window) => void): this {
-        return this.registerHook("onSubmit", handler);
-    }
-
-    onChange(handler: (ctx: Window) => void): this {
-        return this.registerHook("onChange", handler);
-    }
-
-    onValidate(handler: (ctx: Window) => void): this {
-        return this.registerHook("onValidate", handler);
-    }
-
-    onValidationError(handler: (ctx: Window) => void): this {
-        return this.registerHook("onValidationError", handler);
-    }
-
     getModel(): AdvancedFormModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            schema: this.schema,
+            uiSchema: this.uiSchema,
+            data: this.data,
+            options: this.options,
+            formOptions: this.formOptions,
+            actions: this.actions,
+        };
     }
 }

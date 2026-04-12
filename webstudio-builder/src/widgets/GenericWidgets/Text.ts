@@ -1,63 +1,65 @@
-import { ModifyAction, StyleProps, TextModel, WidgetActions } from "../../core/types";
-import { Window } from "../../core/Window";
-import { BaseWidget, BaseWidgetProps } from "../BaseWidget";
+import { WebStudioAction, WebStudioWidget } from "../../layouts/Compilation";
+import { ModifyAction, Layout, StyleProps, TextCaptionBar, WidgetActions } from "../../core/types";
+import { IWidget } from "../../interfaces/IWidget";
 
-export interface TextProps extends BaseWidgetProps<WidgetActions> {
+
+export interface TextProps {
     text?: string;
+    name?: string;
+    description?: string;
+    captionBar?: TextCaptionBar | false;
+    options?: { style: Partial<StyleProps> };
+    actions?: WidgetActions;
+    layout?: Layout;
     style?: Partial<StyleProps>;
+    showCaption?: boolean;
+    title?: string;
 }
 
-const defaultStyle: StyleProps = {
-    color: "grey",
-    textAlign: "center",
-    fontSize: "26px",
-    fontWeight: "bold",
-    fontFamily: '"Courier New", Courier, sans-serif',
-};
+export class Text implements IWidget {
 
-export class Text extends BaseWidget<TextModel> {
-    constructor(props?: TextProps) {
-        super(props && props.window ? props.window : undefined);
-        props = props || {};
+    public readonly type = "text";
+    public readonly name: string;
 
-        this.model = {
-            type: "text",
-            name: this.getName(props, "Text"),
-            description: this.getDescription(props, "Text Widget"),
-            text: props.text || "Your text here",
-            captionBar: this.getCaptionBar(props, "Text Widget", "visible"),
-            options: { style: props.style || defaultStyle },
-            id: this.createId(),
-            actions: this.getActions(props),
-        };
+    constructor(
+        public text: string = "",
+        name?: string,
+        public readonly id = syslib.uuid(),
+        public options: { style: Partial<StyleProps> } = { style: {} },
+        public description: string = "Text Widget",
+        public captionBar: TextCaptionBar | false = false,
+        public actions?: WidgetActions,
+        public layout?: Layout,
+    ) {
+        this.name = name ?? ("Text" + this.id);
     }
 
-    // Returns a modify action object — pass this to Button.onClicked or an
-    // action pipeline to update this widget's text at runtime.
-    setText(text: string): ModifyAction {
-        return {
-            type: "modify",
-            id: this.model.id,
-            set: [{ name: "model.text", value: text }],
+    setStyle(style: Partial<StyleProps>): this {
+        this.options.style = {
+            ...this.options.style,
+            ...style,
         };
-    }
-
-    private registerHook(hook: string, handler: (ctx: Window) => void): this {
-        this.model.actions = this.addHook(this.model.actions, hook, handler);
         return this;
     }
 
-    /** Register any widget action hook supported by WebStudio. */
-    on(hook: string, handler: (ctx: Window) => void): this {
-        return this.registerHook(hook, handler);
+    setText(text: string): this {
+        this.text = text;
+        return this;
     }
 
-    /** Convenience alias for the common text `onClick` hook. */
-    onClicked(handler: (ctx: Window) => void): this {
-        return this.registerHook("onClick", handler);
-    }
+    getModel(): WebStudioWidget {
 
-    getModel(): TextModel {
-        return this.model;
+        return {
+            type: this.type,
+            id: this.id,
+            text: this.text,
+            name: this.name,
+            description: this.description,
+            captionBar: this.captionBar,
+            options: this.options,
+            actions: this.actions as Record<string, WebStudioAction> | undefined,
+            layout: this.layout,
+        };
+
     }
 }

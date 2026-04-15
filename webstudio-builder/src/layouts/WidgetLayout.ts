@@ -19,7 +19,7 @@ export type LayoutOptions = {
 
 // Calculates pixel-grid cell positions from fractional column/row weights.
 // All positions are expressed as fractions of virtual columns/rows.
-export class BaseLayout {
+export class WidgetLayout {
     public readonly columns: number[];
     public readonly rows: number[];
     public readonly staticWidgets: boolean;
@@ -46,6 +46,7 @@ export class BaseLayout {
             showDevTools: options.showDevTools ?? false,
         };
     }
+
 
     private get colTotal(): number {
         return this.columns.reduce((s, w) => s + w, 0);
@@ -84,6 +85,10 @@ export class BaseLayout {
     setLayout(widget: IWidget, col: number, row: number): void {
         const layout = this.getLayout(col, row);
         widget.setLayout(layout);
+    }
+
+    getCompilationOptions(): CompilationOptions {
+        return this.modelOptions;
     }
 
     // col/row are 1-based

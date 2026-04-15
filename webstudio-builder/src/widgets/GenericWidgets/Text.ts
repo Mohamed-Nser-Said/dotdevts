@@ -29,7 +29,7 @@ export class Text implements IWidget {
         public description: string = "Text Widget",
         public captionBar: TextCaptionBar | false = false,
         public actions?: WidgetActions,
-        public layout?: Layout,
+        public layout: Layout = { x: 0, y: 0, w: 1, h: 1 },
     ) {
         this.name = name ?? ("Text" + this.id);
     }
@@ -45,6 +45,10 @@ export class Text implements IWidget {
     setText(text: string): this {
         this.text = text;
         return this;
+    }
+
+    setLayout(layout: Layout): void {
+        this.layout = layout;
     }
 
     getModel(): WebStudioWidget {

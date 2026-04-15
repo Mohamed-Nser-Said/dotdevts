@@ -140,6 +140,20 @@ The plugin at `tstl-plugins/toLuaString.js` rewrites certain call patterns **at 
 - `gap` and `padding` in `GridLayout` map to WebStudio `spacing` / `padding`; with `count` mode, very large row counts make widgets appear jammed together because the rows are compressed.
 - `cts-webstudio-builder/src/layouts/Grid.ts` was adjusted to preserve row units in fixed-height modes (`height` / `square`) so spacing and scrolling behave correctly after compilation.
 
+## WebStudio actions notes (reviewed against WebStudio 1.110 docs)
+
+- Every widget may define an `actions` object keyed by hook (`onClick`, `willRefresh`, etc.); each hook value is an **action pipeline**.
+- Pipelines receive and pass a **message object**. `message.payload` is the main data channel; use `key` when you need to preserve existing payload fields while adding action results.
+- Named `action` lookup prefers the widget’s own `actions` collection, then the current compilation’s `actions` collection. **Declaring a named action higher up does not by itself change execution context.**
+- For nested tabs / prompt content / container sub-compilations, widget IDs and routes are resolved relative to the **current compilation**. Use `delegate` when a named action must run in the context where it is defined (for example parent/root scope or a peer tab).
+- Use plain string IDs for widgets in the same compilation, prefer `route` IDs for nested widgets/tabs, and use `"self"` for the current widget when possible.
+- `modify` works on the widget’s work model and typically refreshes/updates the target. Prefer targeted fields like `model.text` or `model.options.style.fontSize` instead of replacing whole sub-objects unless intended.
+- `send` does **not** change the current pipeline output; it forwards a message to another widget. Topic `refresh` is the default; use topic `update` when you want the recipient to update without running a data-source refresh.
+- `prompt` expects a **single widget model** in `message.payload`; to show a larger UI, wrap it in a container/tabs widget. `dismiss` closes the most recently shown prompt/floating tab.
+- Nested action arrays behave like **parallel branches starting from the same input message**; only the output from the **last** nested array continues down the outer pipeline.
+- Use `catch` on risky actions (`function`, `load-compilation`, reads/writes) so failures surface to users via `notify` instead of only appearing in the browser console.
+- In this repo’s builder, `Window.action(name)` emits `{ type: "action", name }`, `Window.parallel([...])` models nested action arrays, and container-like helpers (`HLayoutContainer`, `GridLayoutContainer`, `Page`, `NavBar`) should expose local `addAction()` support when child widgets need named actions in the same compilation scope.
+
 ## Coding conventions
 
 - **Object creation**: use `syslib.mass([{ class, operation: MassOp.UPSERT, path, ... }])`.

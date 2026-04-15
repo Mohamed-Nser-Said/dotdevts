@@ -1,7 +1,7 @@
 import { TabModel } from "../../core/types";
 import { IWidget } from "../../interfaces/IWidget";
 import { GridContainer } from "../../layouts/Containers";
-import { GridOptions } from "../../layouts/Grid";
+import { GridOptions } from "../../layouts/WidgetLayout";
 
 export interface TabProps {
     name?: string;

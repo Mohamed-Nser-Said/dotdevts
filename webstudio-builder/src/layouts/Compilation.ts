@@ -434,7 +434,6 @@ export class Compilation {
     return {
       version: this.version,
       widgets: this.widgets,
-      // widgets: [],
       actions: this.actions,
       info: this.info,
       rootOnly: this.rootOnly,

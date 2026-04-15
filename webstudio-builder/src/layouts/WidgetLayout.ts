@@ -1,27 +1,34 @@
 import { CompilationNumberOfRows, CompilationOptions, Layout } from "../core/types";
+import { IWidget } from "../interfaces/IWidget";
 
-export interface GridOptions {
-    columns?: number[];
-    rows?: number[];
-    gap?: number;
+
+export type LayoutOptions = {
     padding?: { x?: number; y?: number };
     spacing?: { x?: number; y?: number };
     numberOfColumns?: number;
     numberOfRows?: number | Partial<CompilationNumberOfRows>;
     stacking?: "none" | "vertical" | "horizontal";
     showDevTools?: boolean;
+    staticWidgets?: boolean;
+    gap?: number;
+    columns?: number[];
+    rows?: number[];
+
 }
+
 
 // Calculates pixel-grid cell positions from fractional column/row weights.
 // All positions are expressed as fractions of virtual columns/rows.
-export class Grid {
-    columns: number[];
-    rows: number[];
-    modelOptions: CompilationOptions;
+export class BaseLayout {
+    public readonly columns: number[];
+    public readonly rows: number[];
+    public readonly staticWidgets: boolean;
+    public readonly modelOptions: CompilationOptions;
 
-    constructor(options: GridOptions = {}) {
+    constructor(options: LayoutOptions = {}) {
         this.columns = options.columns ?? [1];
         this.rows = options.rows ?? [1];
+        this.staticWidgets = options.staticWidgets ?? true;
 
         const spacingX = options.gap ?? options.spacing?.x ?? 0;
         const spacingY = options.gap ?? options.spacing?.y ?? 0;
@@ -64,13 +71,19 @@ export class Grid {
         return Math.max(0, numberOfRows.value - (this.rows.length - 1) * spacing.y - padding.y * 2);
     }
 
-    getCell(col: number, row: number): Layout {
+    getLayout(col: number, row: number): Layout {
         return {
             x: this.cellX(col),
             y: this.cellY(row),
             w: this.cellW(col),
             h: this.cellH(row),
+            static: this.staticWidgets ?? true,
         };
+    }
+
+    setLayout(widget: IWidget, col: number, row: number): void {
+        const layout = this.getLayout(col, row);
+        widget.setLayout(layout);
     }
 
     // col/row are 1-based
@@ -100,3 +113,4 @@ export class Grid {
         return y;
     }
 }
+

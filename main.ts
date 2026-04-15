@@ -22,7 +22,6 @@ import { main as CustomTimeSeriesDataStore } from "./examples/backend/CustomTime
 import { main as ScheduledActions } from "./examples/backend/ScheduledActionsExample";
 import * as mongo from "mongo";
 import { SetExample } from "./examples/backend/SetExample";
-import {index} from "./examples/webstudio/Demo";
 
 
 
@@ -52,5 +51,3 @@ import {index} from "./examples/webstudio/Demo";
 // systemDbExample();
 // bufferExample();
 // workspaceDocumentExample();
-
-console.log(index());

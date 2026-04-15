@@ -38,6 +38,7 @@ export type Layout = {
 
 }
 
+import { WebStudioCompilation } from "../layouts/Compilation";
 // ─── Action types (re-exported from action-types.ts) ──────────────────────────
 
 import type { ActionPipeline, ActionSequence } from "./action-types";
@@ -933,7 +934,7 @@ export interface ContainerModel {
     name: string;
     description: string;
     id: string;
-    compilation: Compilation | Record<string, unknown>;
+    compilation: WebStudioCompilation
     captionBar?: boolean | TextCaptionBar | Record<string, unknown>;
     actions?: WidgetActions;
     dragSource?: Record<string, unknown>;

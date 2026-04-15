@@ -1,7 +1,6 @@
+import { ContainerModel } from "../core/types";
+import { IWidget } from "../interfaces/IWidget";
 
-export interface IWidget {
-  getModel(): WebStudioWidget | WebStudioCompilation;
-}
 
 
 export interface WebStudioCompilation {
@@ -18,7 +17,7 @@ export interface WebStudioCompilation {
   rootOnly?: WebStudioRootOnly;
 
   /** List of all widgets in the dashboard */
-  widgets: (WebStudioWidget | WebStudioCompilation)[];
+  widgets: (WebStudioWidget | ContainerModel)[];
 
   /** Global layout and behavior options */
   options?: WebStudioCompilationOptions;
@@ -404,7 +403,7 @@ export interface WebStudioAction {
 
 export class Compilation {
   public readonly version = "1";
-  public widgets: (WebStudioWidget | WebStudioCompilation)[] = [];
+  public widgets: (WebStudioWidget | ContainerModel)[] = [];
   public actions: Record<string, WebStudioAction> = {};
   public info?: WebStudioInfo;
   public rootOnly?: WebStudioRootOnly;
@@ -435,6 +434,7 @@ export class Compilation {
     return {
       version: this.version,
       widgets: this.widgets,
+      // widgets: [],
       actions: this.actions,
       info: this.info,
       rootOnly: this.rootOnly,

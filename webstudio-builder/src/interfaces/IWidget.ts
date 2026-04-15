@@ -1,6 +1,7 @@
-import { WebStudioCompilation, WebStudioLayout, WebStudioWidget } from "../layouts/Compilation";
+import { ContainerModel } from "../core/types";
+import { WebStudioCompilation, WebStudioWidget } from "../layouts/Compilation";
 
 
 export interface IWidget {
-    getModel(): WebStudioWidget| WebStudioCompilation;
+    getModel(): WebStudioWidget | ContainerModel;
 }

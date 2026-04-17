@@ -1,6 +1,6 @@
-import { ScheduledActions } from "../../backend/src/components/ScheduledActions";
-import { Core } from "../../backend/src/core/Core";
-import { SchedulerItem } from "../../backend/src/objects/Scheduler";
+import { ScheduledActions } from "../../IntegrationProviders/Inmation/src/components/ScheduledActions";
+import { Core } from "../../IntegrationProviders/Inmation/src/core/Core";
+import { SchedulerItem } from "../../IntegrationProviders/Inmation/src/objects/Scheduler";
 
 
  export function main(){

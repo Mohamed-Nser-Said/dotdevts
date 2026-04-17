@@ -1,7 +1,7 @@
-import { ScheduledActions } from "../../backend/src/components/ScheduledActions";
-import { Core } from "../../backend/src/core/Core";
-import { dump } from "../../backend/src/std/Debug";
-import { mq } from "../../backend/src/std/MongoQuery";
+import { ScheduledActions } from "../../IntegrationProviders/Inmation/src/components/ScheduledActions";
+import { Core } from "../../IntegrationProviders/Inmation/src/core/Core";
+import { dump } from "../../IntegrationProviders/Inmation/src/std/Debug";
+import { mq } from "../../IntegrationProviders/Inmation/src/std/MongoQuery";
 
 
 

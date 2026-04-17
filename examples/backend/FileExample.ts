@@ -5,7 +5,7 @@
  * utility — plain text, JSON, CSV, directory listing, and existence checks.
  */
 
-import { File } from "../../backend/src/std/File";
+import { File } from "../../IntegrationProviders/Inmation/src/std/File";
 
 export function main(): void {
     const baseDir = "C:/Users/m.said/dev/projects/dotdevts";

@@ -24,9 +24,9 @@
  * replace/findLine/remove/toString), and the interplay between the two.
  */
 
-import { Workspace } from "../../backend/src/std/Workspace";
-import { Document } from "../../backend/src/std/Document";
-import { File } from "../../backend/src/std/File";
+import { Workspace } from "../../IntegrationProviders/Inmation/src/std/Workspace";
+import { Document } from "../../IntegrationProviders/Inmation/src/std/Document";
+import { File } from "../../IntegrationProviders/Inmation/src/std/File";
 
 
 export function main(): void {

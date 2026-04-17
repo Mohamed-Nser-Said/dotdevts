@@ -5,9 +5,9 @@
  * which persists rows attached to any inmation object's custom options.
  */
 
-import { CustomTable } from "../../backend/src/shared/CustomTable";
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { DataFrame } from "../../backend/src/std/DataFrame";
+import { CustomTable } from "../../IntegrationProviders/Inmation/src/shared/CustomTable";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { DataFrame } from "../../IntegrationProviders/Inmation/src/std/DataFrame";
 
 
 type Product = {

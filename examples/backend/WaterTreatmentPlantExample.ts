@@ -48,12 +48,12 @@
  *       HistoryTransferController must be direct children of Core.
  */
 
-import { Core } from "../../backend/src/core/Core";
-import { CustomEventDataStore } from "../../backend/src/datastores/CustomEventDataStore";
-import { CustomTimeSeriesDataStore } from "../../backend/src/datastores/CustomTimeSeriesDataStore";
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { HistoryTransferController } from "../../backend/src/history/HistoryTransferController";
-import { MessageProcessor } from "../../backend/src/objects/MessageProcessor";
+import { Core } from "../../IntegrationProviders/Inmation/src/core/Core";
+import { CustomEventDataStore } from "../../IntegrationProviders/Inmation/src/datastores/CustomEventDataStore";
+import { CustomTimeSeriesDataStore } from "../../IntegrationProviders/Inmation/src/datastores/CustomTimeSeriesDataStore";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { HistoryTransferController } from "../../IntegrationProviders/Inmation/src/history/HistoryTransferController";
+import { MessageProcessor } from "../../IntegrationProviders/Inmation/src/objects/MessageProcessor";
 
 
 // ─────────────────────────────────────────────────────────────

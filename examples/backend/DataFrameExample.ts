@@ -5,7 +5,7 @@
  * filtering, mapping, merging, joining, and CSV export.
  */
 
-import { DataFrame } from "../../backend/src/std/DataFrame";
+import { DataFrame } from "../../IntegrationProviders/Inmation/src/std/DataFrame";
 
 
 type Reading = {

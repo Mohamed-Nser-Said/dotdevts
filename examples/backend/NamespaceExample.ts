@@ -1,5 +1,5 @@
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { Namespace } from "../../backend/src/objects/Namespace";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { Namespace } from "../../IntegrationProviders/Inmation/src/objects/Namespace";
 
 export function main(): void {
         const corePath = "/System/Core";

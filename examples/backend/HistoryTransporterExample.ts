@@ -11,12 +11,12 @@
  * are wrapped in try/catch so the rest of the suite keeps running.
  */
 
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { GTSB } from "../../backend/src/datastores/GTSB";
-import { HistorianMapping, HistorianTag } from "../../backend/src/history/HistorianMapping";
-import { HistoryTransporter } from "../../backend/src/history/HistoryTransporter";
-import { Core } from "../../backend/src/core/Core";
-import { Connector } from "../../backend/src/core/Connector";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { GTSB } from "../../IntegrationProviders/Inmation/src/datastores/GTSB";
+import { HistorianMapping, HistorianTag } from "../../IntegrationProviders/Inmation/src/history/HistorianMapping";
+import { HistoryTransporter } from "../../IntegrationProviders/Inmation/src/history/HistoryTransporter";
+import { Core } from "../../IntegrationProviders/Inmation/src/core/Core";
+import { Connector } from "../../IntegrationProviders/Inmation/src/core/Connector";
 
 
 export function main(): void {

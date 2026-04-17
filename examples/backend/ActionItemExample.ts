@@ -5,8 +5,8 @@
  * the onTrigger builder for scheduled Lua execution.
  */
 
-import { ActionItem } from "../../backend/src/objects/ActionItem";
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
+import { ActionItem } from "../../IntegrationProviders/Inmation/src/objects/ActionItem";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
 
 
 export function main(): void {

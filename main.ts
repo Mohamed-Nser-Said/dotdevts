@@ -23,8 +23,6 @@ import { main as ScheduledActions } from "./examples/backend/ScheduledActionsExa
 import * as mongo from "mongo";
 import { SetExample } from "./examples/backend/SetExample";
 
-import { DataStudioLight } from "./usecases/TableMissingData";
-
 
 // import { GenericFolder } from "./src/objects/GenericFolder";
 // import { TableHolder } from "./src/objects/TableHolder";
@@ -51,7 +49,6 @@ import { DataStudioLight } from "./usecases/TableMissingData";
 // gtsbExample();
 // fileExample();
 
-DataStudioLight();
 // objectContainerExample();
 // waterTreatmentPlantExample();
 // systemDbExample();

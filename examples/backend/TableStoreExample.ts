@@ -1,5 +1,5 @@
-import { TableStore } from "../../backend/src/components/TableStore";
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
+import { TableStore } from "../../IntegrationProviders/Inmation/src/components/TableStore";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
 
 type Sensor = {
     id: string;

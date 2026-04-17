@@ -1,6 +1,6 @@
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { ObjectContainer } from "../../backend/src/objects/ObjectContainer";
-import { Variable } from "../../backend/src/objects/Variable";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { ObjectContainer } from "../../IntegrationProviders/Inmation/src/objects/ObjectContainer";
+import { Variable } from "../../IntegrationProviders/Inmation/src/objects/Variable";
 
 
 export function main(): void {

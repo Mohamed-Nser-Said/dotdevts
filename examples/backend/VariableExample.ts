@@ -5,9 +5,9 @@
  * and configuring archiving via the Archive property.
  */
 
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { Variable } from "../../backend/src/objects/Variable";
-import { VariableGroup } from "../../backend/src/objects/VariableGroup";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { Variable } from "../../IntegrationProviders/Inmation/src/objects/Variable";
+import { VariableGroup } from "../../IntegrationProviders/Inmation/src/objects/VariableGroup";
 
 
 export function main(): void {

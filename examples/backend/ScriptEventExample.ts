@@ -1,7 +1,7 @@
-import { ActionItem } from "../../backend/src/objects/ActionItem";
-import { GenericFolder } from "../../backend/src/objects/GenericFolder";
-import { SchedulerItem } from "../../backend/src/objects/Scheduler";
-import { ScriptEvent } from "../../backend/src/objects/ScriptEvent";
+import { ActionItem } from "../../IntegrationProviders/Inmation/src/objects/ActionItem";
+import { GenericFolder } from "../../IntegrationProviders/Inmation/src/objects/GenericFolder";
+import { SchedulerItem } from "../../IntegrationProviders/Inmation/src/objects/Scheduler";
+import { ScriptEvent } from "../../IntegrationProviders/Inmation/src/objects/ScriptEvent";
 
 
 export function main(): void {

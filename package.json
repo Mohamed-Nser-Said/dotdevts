@@ -4,11 +4,15 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "build": "tstl",
+    "setup": "tstl && cts run ./build/setup.lua -n win1000",
     "dev": "tstl --watch",
     "mainc": "tstl && cts run ./build/main.lua",
-    "mainm": "tstl && ctsv1 run ./build/main.lua",
-    "maind": "tstl && ctsv1 run ./build/main.lua -c dockerWEBAPI-BLESSED",
-    "main": "tstl && froge run ./build/main.lua -c win1000",
+    "maind": "tstl && cts run ./build/main.lua -n dockerWEBAPI-BLESSED",
+    "main": "tstl && cts run ./build/main.lua -n win1000 --bundle",
+    "webstudio:run": "node ./scripts/push-webstudio-examples.js --run --bundle",
+    "webstudio:run:all": "node ./scripts/push-webstudio-examples.js --run --bundle",
+    "webstudio:push": "node ./scripts/push-webstudio-examples.js",
+    "webstudio:push:all": "node ./scripts/push-webstudio-examples.js",
     "verify:setfunc": "tstl && node ./scripts/verify-setfunc.js"
   },
   "devDependencies": {

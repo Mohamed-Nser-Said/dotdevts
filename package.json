@@ -1,25 +1,32 @@
 {
   "private": true,
+  "workspaces": [
+    "IntegrationProviders/Inmation",
+    "usecases/windfarm/simulation/opc-server"
+  ],
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tstl",
-    "setup": "tstl && cts run ./build/setup.lua -n win1000",
+    "build:root": "tstl",
+    "build:workspaces": "npm run build --workspaces --if-present",
+    "inmation:build": "npm run build -w @dotdevts/inmation",
+    "opc:build": "npm run build -w @dotdevts/opc-server",
+    "opc:run": "npm run run -w @dotdevts/opc-server",
+    "build": "npm run build:root && npm run build:workspaces",
     "dev": "tstl --watch",
-    "mainc": "tstl && cts run ./build/main.lua",
-    "maind": "tstl && cts run ./build/main.lua -n dockerWEBAPI-BLESSED",
-    "main": "tstl && cts run ./build/main.lua -n win1000 --bundle",
+    "main:cts": "npm run build:root && cts run ./build/main.lua",
+    "main:docker": "npm run build:root && cts run ./build/main.lua -n dockerWEBAPI-BLESSED",
+    "main": "npm run build:root && cts run ./build/main.lua -n win1000 --bundle",
     "webstudio:run": "node ./scripts/push-webstudio-examples.js --run --bundle",
-    "webstudio:run:all": "node ./scripts/push-webstudio-examples.js --run --bundle",
     "webstudio:push": "node ./scripts/push-webstudio-examples.js",
-    "webstudio:push:all": "node ./scripts/push-webstudio-examples.js",
-    "verify:setfunc": "tstl && node ./scripts/verify-setfunc.js"
+    "verify:setfunc": "npm run build:root && node ./scripts/verify-setfunc.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
     "eslint": "^10.1.0",
     "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
     "typescript-to-lua": "^1.34.0"
   }
 }

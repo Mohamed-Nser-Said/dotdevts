@@ -6,15 +6,16 @@
 
 ## Build and run
 
-| Command                  | Description                                                                        |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| `npm run build`          | Compile TS → Lua (output in `build/`)                                              |
-| `npm run dev`            | Compile in watch mode                                                              |
-| `npm run main`           | Build + run via `froge` against the `win1000` connection                           |
-| `npm run mainc`          | Build + run via `cts`                                                              |
-| `npm run webstudio:run`  | Build + run the simple WebStudio page with `cts run ./build/examples/webstudio/page.lua` |
+| Command                  | Description                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `npm run build`          | Compile TS → Lua (output in `build/`)                                                            |
+| `npm run dev`            | Compile in watch mode                                                                            |
+| `npm run main`           | Build + run via `froge` against the `win1000` connection                                         |
+| `npm run main:cts`       | Build + run via `cts`                                                                            |
+| `npm run main:docker`    | Build + run via `cts` against the `dockerWEBAPI-BLESSED` connection                              |
+| `npm run webstudio:run`  | Build + run the simple WebStudio page with `cts run ./build/examples/webstudio/page.lua`         |
 | `npm run webstudio:push` | Build + push the simple WebStudio page with `cts ws --push ... --func createSimpleWebStudioPage` |
-| `npm run verify:setfunc` | Build + verify the TSTL plugin rewrote `setFunc`/`onTriggerFunc` calls             |
+| `npm run verify:setfunc` | Build + verify the TSTL plugin rewrote `setFunc`/`onTriggerFunc` calls                           |
 
 Entry point: `main.ts` → imports examples, calls one of them. Toggle which example runs by editing `main.ts`.
 WebStudio entry: `examples/webstudio/page.ts` → exports `createSimpleWebStudioPage()` for `cts ws --push`.

@@ -1,12 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
-  
   "compilerOptions": {
     "moduleResolution": "Node",
     "target": "ES2018",
     "types": ["@typescript-to-lua/language-extensions"],
     "strict": true,
-    "outDir": "build",
+    "outDir": "../../build/inmation",
+    "rootDir": "./src",
     "lib": ["ES2018", "DOM"]
   },
   "tstl": {
@@ -15,13 +15,16 @@
     "noResolvePaths": ["dkjson", "mongo", "GenericFolder"],
     "luaPlugins": [
       {
-        "name": "./tstl-plugins/toLuaString"
+        "name": "../../tstl-plugins/toLuaString"
       }
     ]
   },
+  "include": [
+    "src/**/*.ts",
+    "../../def/**/*.d.ts"
+  ],
   "exclude": [
-    "refresh.ts",
-    "IntegrationProviders/Inmation/**/*",
-    "usecases/windfarm/simulation/opc-server/**/*"
+    "../../build",
+    "../../node_modules"
   ]
 }

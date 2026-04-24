@@ -1,0 +1,7 @@
+{
+  "name": "@dotdevts/inmation",
+  "private": true,
+  "scripts": {
+    "build": "tstl -p ./tsconfig.json"
+  }
+}
